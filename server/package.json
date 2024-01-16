@@ -1,0 +1,32 @@
+{
+  "name": "uniqu-server",
+  "version": "1.0.0",
+  "description": "final-project-of-team-3-hck65",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/UniQu-HCK65/UniQu.git"
+  },
+  "keywords": [
+    "final-project",
+    "final",
+    "project",
+    "uniqu",
+    "fashion",
+    "accessories",
+    "luxury"
+  ],
+  "author": "team-3-hck65",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/UniQu-HCK65/UniQu/issues"
+  },
+  "homepage": "https://github.com/UniQu-HCK65/UniQu#readme",
+  "dependencies": {
+    "@apollo/server": "^4.10.0",
+    "graphql": "^16.8.1"
+  }
+}
