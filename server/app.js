@@ -11,10 +11,10 @@ const {
   resolvers: userResolvers,
 } = require("./schemas/users");
 
-// const {
-//   typeDefs: postTypeDefs,
-//   resolvers: postResolvers,
-// } = require("./schemas/posts");
+const {
+  typeDefs: talentTypeDefs,
+  resolvers: talentResolvers,
+} = require("./schemas/talents");
 
 // const {
 //   typeDefs: followsTypeDefs,
@@ -25,10 +25,8 @@ const client = require("./config/configMongo");
 const { ObjectId } = require("mongodb");
 
 const server = new ApolloServer({
-  typeDefs: [userTypeDefs],
-  //   typeDefs: [userTypeDefs, postTypeDefs, followsTypeDefs],
-  //   resolvers: [userResolvers, postResolvers, followsResolvers],
-  resolvers: [userResolvers],
+  typeDefs: [userTypeDefs, talentTypeDefs],
+  resolvers: [userResolvers, talentResolvers],
   introspection: true,
 });
 
@@ -81,8 +79,8 @@ const server = new ApolloServer({
 
               return {
                 _id: payload._id,
-                email: payload.email,
                 username: payload.username,
+                role: payload.role,
               };
             },
             db,
