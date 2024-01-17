@@ -1,9 +1,45 @@
+import * as SecureStore from 'expo-secure-store'
 import React, { useContext, useEffect, useState } from "react";
 import { Image, Keyboard, KeyboardAvoidingView, SafeAreaView, StyleSheet, Text, TextInput, ToastAndroid, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { useMutation, gql } from "@apollo/client";
+import { LoginContext } from "../context/LoginContext";
 
+
+async function save(key, value) {
+    await SecureStore.setItemAsync(key, value);
+}
+
+const LOGIN = gql`
+ mutation Login($email: String, $password: String) {
+  login(email: $email, password: $password) {
+    access_token
+  }
+}
+`
 
 export default function LoginScreen({ navigation }) {
-  
+    const [email, setEmail] = useState('nell@mail.com')
+    const [password, setPassword] = useState('12345')
+
+    const { setIsLoggedIn } = useContext(LoginContext)
+
+    const [handleLogin, { loading, error, data }] = useMutation(LOGIN)
+
+    const handleSubmit = () => {
+        handleLogin({
+            variables: {
+                email,
+                password
+            },
+            onCompleted: async (data) => {
+                setIsLoggedIn(data.login.access_token)
+                await save('accessToken', data.login.access_token)
+            },
+            onError: (error) => {
+                console.log(error)
+            }
+        })
+    }
 
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -21,20 +57,22 @@ export default function LoginScreen({ navigation }) {
                 <View style={styles.inputContainer}>
                     <TextInput
                         style={styles.input}
-                        placeholder="username"
-                        // value={username}
-                        // onChangeText={setUsername}
+                        placeholder="email"
+                        name="email"
+                        value={email}
+                        onChangeText={setEmail}
                     />
 
                     <TextInput
                         style={styles.input}
                         placeholder="password"
-                        // value={password}
-                        // onChangeText={setPassword}
+                        name="password"
+                        value={password}
+                        onChangeText={setPassword}
                         secureTextEntry={true}
                     />
                 </View>
-                <TouchableOpacity style={styles.buttonLogin}>
+                <TouchableOpacity onPress={handleSubmit} style={styles.buttonLogin}>
                     <Text style={{ color: 'white' }}>Login</Text>
                 </TouchableOpacity>
                 <View style={styles.buttonRegister}>
