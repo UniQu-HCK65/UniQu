@@ -13,9 +13,12 @@ const typeDefs = `#graphql
     username: String!
     email: String!
     password: String,
+    role:String!,
     gender: String,
     tags: [String],
     userLocations: [String]
+    createdAt: String
+    updatedAt: String
   }
 
   input NewUser {
@@ -38,8 +41,15 @@ const typeDefs = `#graphql
     followersName: [User]
   }
 
+  type TalentForMe {
+    _id: ID
+    username: String
+    talentsForMe:[Talent]
+  }
+
   type Query {
     users: [User]
+    talentsForMe: TalentForMe
     userById(userId:ID): [ProfileUser]
     whoAmI: User
   }
@@ -180,9 +190,56 @@ const resolvers = {
             code: "NOT_FOUND",
             status: 404,
           };
+
         return user;
       } catch (error) {
         console.log(error, "GET_USER_BY_ID"); // errorHandler next up
+        throw new GraphQLError(error.message || "Internal Server Error", {
+          extensions: {
+            code: error.code || "INTERNAL_SERVER_ERROR",
+            http: { status: error.status || 500 },
+          },
+        });
+      }
+    },
+
+    talentsForMe: async (parent, args, contextValue, info) => {
+      try {
+        const { db, authentication } = contextValue;
+        const auth = await authentication();
+
+        const users = await db.collection(COLLECTION_NAME);
+
+        const talents = await db.collection("Talents");
+
+        const userTags = (await users.findOne({ username: auth.username }))
+          .tags;
+
+        const userLocations = (await users.findOne({
+          username: auth.username,
+        })).userLocations;
+
+        // Find talents with common tags and talent locations
+        const talentsWithCommonTagsAndLocations = await talents
+          .find({
+            tags: { $in: userTags },
+            talentLocations: { $in: userLocations },
+          })
+          .toArray();
+
+        // console.log(talentsWithCommonTagsAndLocations.length, "AAAAAAAA");
+
+        const talentsForMe = {
+          _id: new ObjectId(auth._id),
+          username: auth.username,
+          talentsForMe: talentsWithCommonTagsAndLocations,
+        };
+
+        // console.dir(talentsForMe, { depth: null });
+
+        return talentsForMe;
+      } catch (error) {
+        console.log(error, "TALENT_FOR_ME"); // errorHandler next up
         throw new GraphQLError(error.message || "Internal Server Error", {
           extensions: {
             code: error.code || "INTERNAL_SERVER_ERROR",
@@ -291,15 +348,15 @@ const resolvers = {
         const insertedUser = await users.insertOne({
           ...newUser,
           password: hashPw(newUser.password),
+          // role: "user",
           createdAt: new Date(),
           updatedAt: new Date(),
         });
 
-        //   console.log(insertedUser, "<<<<<<<<<");
-
         return {
           ...newUser,
           _id: insertedUser.insertedId,
+          role: "user",
         };
       } catch (error) {
         console.log(error, "ADD_USER"); // errorHandler next up
@@ -344,6 +401,8 @@ const resolvers = {
 
         const comparedPw = comparePwDecrypted(password, findUser.password);
 
+        // console.log("MASUK SINI")
+
         if (!comparedPw)
           throw {
             message: "Wrong email or password",
@@ -354,6 +413,7 @@ const resolvers = {
         const payload = {
           _id: findUser._id,
           email,
+          role: findUser.role,
           username: findUser.username,
         };
 
