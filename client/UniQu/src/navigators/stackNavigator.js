@@ -13,13 +13,13 @@ export default function StackNavigator() {
     return (
         <Stack.Navigator>
 
-            <Stack.Screen
+            {/* <Stack.Screen
                 name="LandingPage"
                 component={LandingPage}
                 options={{
                     headerShown: false
                 }}
-            />
+            /> */}
 
             <Stack.Screen
                 name="Home"
