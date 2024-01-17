@@ -9,6 +9,7 @@ import {
   Image,
   TouchableOpacity,
 } from "react-native";
+import LogoutButton from "../components/logoutButton";
 
 export default function Home({ navigation }) {
   return (
@@ -129,10 +130,11 @@ export default function Home({ navigation }) {
         </View>
       </ScrollView>
 
-      <Button
+      {/* <Button
         title="Go to Login"
         onPress={() => navigation.navigate("Login")}
-      />
+      /> */}
+      <LogoutButton />
     </SafeAreaView>
   );
 }
