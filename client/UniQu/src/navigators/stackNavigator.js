@@ -4,12 +4,18 @@ import Home from '../screens/home';
 import Login from '../screens/login';
 import Register from '../screens/register';
 import LandingPage from '../screens/landingPage';
+import { LoginContext } from '../context/LoginContext';
+import { useContext } from 'react';
+import LogoutButton from '../components/logoutButton';
 
 
 const Stack = createNativeStackNavigator();
 
 
 export default function StackNavigator() {
+
+    const { isLoggedIn } = useContext(LoginContext)
+
     return (
         
         <Stack.Navigator 
@@ -17,17 +23,20 @@ export default function StackNavigator() {
                 gestureDirection: 'vertical',
             }}
         >
-            <Stack.Screen
+
+            {isLoggedIn ? (
+                 <Stack.Screen
+                 name="Home"
+                 component={Home}
+             />
+            ) : (
+                <>
+                <Stack.Screen
                 name="LandingPage"
                 component={LandingPage}
                 options={{ 
                     headerShown: false, 
                 }}
-            />
-
-            <Stack.Screen
-                name="Home"
-                component={Home}
             />
 
             <Stack.Screen
@@ -45,6 +54,10 @@ export default function StackNavigator() {
                     headerShown: false, 
                 }}
             />
+
+            </>
+            )}
+            
 
         </Stack.Navigator>
     )
