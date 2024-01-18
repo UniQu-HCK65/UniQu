@@ -10,9 +10,7 @@ import LogoutButton from "../components/logoutButton";
 import TalentDetails from "../screens/talentDetails";
 import ProfileUser from "../screens/profileUser";
 import AllTalent from "../screens/allTalent";
-import TalentDetails from "../screens/talentDetails";
-import MyTabs from "./tabNavigator";
-
+import MyTabs from "../navigators/tabNavigator"
 
 const Stack = createNativeStackNavigator();
 
