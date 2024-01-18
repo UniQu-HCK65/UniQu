@@ -25,7 +25,11 @@ export default function MyTabs({ navigation }) {
             <Tab.Screen
                 name="Home"
                 component={Home}
+                options={{
+                    headerShown: false
+                }}
             />
+
 
             <Tab.Screen
                 name="ProfileUser"

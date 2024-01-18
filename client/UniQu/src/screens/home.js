@@ -5,15 +5,18 @@ import {
   View,
   SafeAreaView,
   ScrollView,
+  ImageBackground,
   Button,
   Image,
   TouchableOpacity,
   FlatList,
   ActivityIndicator,
+  TextInput
 } from "react-native";
 import LogoutButton from "../components/logoutButton";
 import { useQuery } from "@apollo/client";
 import { FOR_YOU_TALENT_PAGE } from "../queries/query";
+import Ionicons from 'react-native-vector-icons/Feather';
 
 const tags = [
   "Sneakers",
@@ -38,8 +41,8 @@ const tags = [
 
 export default function Home({ navigation }) {
   const { loading, error, data } = useQuery(FOR_YOU_TALENT_PAGE);
-  // console.log(data.talentsForMe, ">> homescreen");
-  // console.log(loading, "loading home");
+  console.log(data)
+
 
   const renderTalentForYou = ({ item }) => {
     if (error) {
@@ -47,7 +50,7 @@ export default function Home({ navigation }) {
     }
 
     return (
-      <View>
+      <View style={styles.containerHeader}>
         <View key={item._id} style={styles.cardContainer}>
           <View style={styles.image}>
             <Image
@@ -83,42 +86,53 @@ export default function Home({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.scrollViewContent}
-      >
-        <TouchableOpacity>
-          <View style={styles.categoryCard}>
-            <Text style={styles.categoryText}> Clothes </Text>
-          </View>
-        </TouchableOpacity>
+      <View style={{}}>
+        {/* <Image
+          source={{
+            uri: 'https://images.unsplash.com/photo-1642439048934-27a82f89b866?q=80&w=3328&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+          }}
+          style={{ width: '100%', height: 130, resizeMode: 'cover', borderBottomLeftRadius: 70, borderBottomRightRadius: 70, zIndex: -1, position:'absolute', opacity: 40}}
+        /> */}
+          <View style={styles.contentHeader}>
+            <View style={styles.containerHeader}>
+              <Text style={styles.textNameHeader}>Hai, Maldini!</Text>
+              <Text style={styles.textWelcomingHeader}>Welcome back, What are you looking for today?</Text>
+            </View>
 
-        <TouchableOpacity>
-          <View style={styles.categoryCard}>
-            <Text style={styles.categoryText}> Shoes </Text>
+            <View style={{}}>
+              <Image
+                source={{
+                  uri: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fHByb2ZpbGV8ZW58MHx8MHx8fDA%3D"
+                }}
+                style={styles.avatarHeader}
+              />
+            </View>
           </View>
-        </TouchableOpacity>
 
-        <TouchableOpacity>
-          <View style={styles.categoryCard}>
-            <Text style={styles.categoryText}> Accessories </Text>
-          </View>
-        </TouchableOpacity>
+          <View style={styles.searchContainer}>
 
-        <TouchableOpacity>
-          <View style={styles.categoryCard}>
-            <Text style={styles.categoryText}> Luxury Brands </Text>
+            <View style={styles.searchContainerText}>
+              <TextInput
+                placeholder="Search"
+                style={styles.textInputSearch}
+              />
+              <TouchableOpacity
+                onPress={() => navigation.navigate("All Talent")}
+              >
+                <Ionicons name="search" size={20} style={{ marginRight: 10 }} />
+              </TouchableOpacity>
+            </View>
+
           </View>
-        </TouchableOpacity>
-      </ScrollView>
+
+      </View>
 
       <View style={styles.containerForyou}>
         <View style={styles.detailForYou}>
+          <View style={{ height: 40, borderColor: 'black', borderWidth: 2 }}></View>
           <Text style={styles.textForYou}>For You</Text>
 
           <TouchableOpacity
-            style={styles.seeAllButton}
             onPress={() => navigation.navigate("All Talent")}
           >
             <Text style={styles.textSeeAll}> See All </Text>
@@ -130,7 +144,7 @@ export default function Home({ navigation }) {
         <ActivityIndicator size="large" color="#5a84a5" />
       ) : (
         <FlatList
-          data={data.talentsForMe.talentsForMe}
+          // data={data.talentsForMe.talentsForMe}
           keyExtractor={(item) => item._id}
           renderItem={renderTalentForYou}
         />
@@ -145,7 +159,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    // backgroundColor: "red"
   },
   scrollViewContent: {
     alignItems: "center",
@@ -163,13 +176,10 @@ const styles = StyleSheet.create({
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
-    // elevation: 5,
     height: 54,
-    // backgroundColor: "red"
   },
   categoryText: {
     fontSize: 17,
-    // fontWeight: "bold",
     color: "#333",
   },
   cardContainer: {
@@ -177,33 +187,27 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 10,
     padding: 20,
-    margin: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 5,
   },
-  profileDetails: {
-    // flex: 1,
-    // marginLeft: 20,
-  },
   nameText: {
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: "bold",
     marginBottom: 5,
   },
   descriptionText: {
-    fontSize: 14,
+    marginRight: 10,
+    fontSize: 10,
     color: "#666",
     marginBottom: 10,
-    // backgroundColor: "orange",
-    // flexShrink: 1,
     textAlign: "justify",
     maxWidth: "100%",
   },
   ratingText: {
-    fontSize: 16,
+    fontSize: 12,
     color: "#f39c12",
   },
   reviewsText: {
@@ -218,27 +222,21 @@ const styles = StyleSheet.create({
   ratingContainer: {
     flexDirection: "row",
     alignItems: "center",
-    // backgroundColor: "yellow",
   },
   image: {
-    // backgroundColor: "pink",
     justifyContent: "center",
   },
   detailInformasi: {
-    // backgroundColor: "pink",
-    marginLeft: 15,
+    padding: 10,
     width: 270,
   },
   detailName: {
-    // backgroundColor: "green",
     marginBottom: 6,
     width: 270,
-    // height: 50
   },
   containerForyou: {
-    // backgroundColor: "yellow",
-    marginLeft: 15,
-    marginRight: 15,
+    marginHorizontal: 20,
+    marginTop: 15
   },
   seeAllButton: {
     alignSelf: "flex-end",
@@ -247,17 +245,69 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 10,
-    marginBottom: 10,
-    // backgroundColor: "red"
+    marginBottom: 5,
   },
   textForYou: {
-    fontSize: 27,
+    fontSize: 20,
     fontWeight: "bold",
-    fontFamily: "",
+    right: 100,
   },
   textSeeAll: {
     fontSize: 18,
     color: "#5a84a5",
   },
+  containerHeader: {
+    marginHorizontal: 20,
+    marginTop: 10,
+  },
+  contentHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginRight: 15,
+    marginBottom: 10,
+    zIndex: 5
+  },
+  textNameHeader: {
+    fontWeight: "bold",
+    fontSize: 26,
+    marginTop: 10,
+    
+  },
+  textWelcomingHeader: {
+    fontWeight: 450,
+    fontSize: 15,
+    marginTop: 10,
+    width: 300,
+  },
+  avatarHeader: {
+    width: 45,
+    height: 45,
+    borderRadius: 100,
+    marginTop: 10,
+  },
+  searchContainer: {
+    marginHorizontal: 20,
+    marginTop: 5,
+    marginBottom: 5,
+    flexDirection: "row",
+    alignItems: 'center',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4
+  },
+  searchContainerText: {
+    flex: 1,
+    flexDirection: 'row',
+    height: 40,
+    backgroundColor: 'white',
+    borderRadius: 15,
+    alignItems: 'center'
+  },
+  textInputSearch: {
+    flex: 1,
+    height: 35,
+    marginHorizontal: 20
+  }
 });
+
+
