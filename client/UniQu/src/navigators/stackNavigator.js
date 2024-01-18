@@ -30,12 +30,43 @@ export default function StackNavigator() {
         </>
       ) : (
         <>
-          <Stack.Screen
-            name="LandingPage"
-            component={LandingPage}
-            options={{
-              headerShown: false,
-            }}
+        
+                    <Stack.Screen
+                        name="LandingPage"
+                        component={LandingPage}
+                        options={{
+                            headerShown: false,
+                        }}
+                    />
+
+                    <Stack.Screen
+                        name="TalentDetails"
+                        component={TalentDetails}
+                        options={{
+                            headerShown: false,
+                        }}
+                    />
+
+
+                    <Stack.Screen
+                        name="Login"
+                        component={Login}
+                        options={{
+                            headerShown: false,
+                        }}
+                    />
+
+                    <Stack.Screen
+                        name="Register"
+                        component={Register}
+                        options={{
+                            headerShown: false,
+                        }}
+                    />
+
+                </>
+            )}
+
           />
 
           <Stack.Screen
