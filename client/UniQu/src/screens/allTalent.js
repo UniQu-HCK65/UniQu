@@ -1,5 +1,5 @@
 import { Text } from "react-native";
 
-export function AllTalent() {
+export default function AllTalent() {
   return <Text>all talent</Text>;
 }

@@ -47,7 +47,7 @@ export default function Home({ navigation }) {
     }
 
     const talents = data.talentsForMe.talentsForMe;
-    console.log(talents, ">> talents");
+
 
     return (
       <View>

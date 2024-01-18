@@ -1,17 +1,15 @@
 import { NavigationContainer } from "@react-navigation/native";
-import {
-    createNativeStackNavigator,
-    CardStyleInterpolators,
-} from "@react-navigation/native-stack";
+import { createNativeStackNavigator, CardStyleInterpolators } from "@react-navigation/native-stack";
 import Home from "../screens/home";
 import Login from "../screens/login";
 import Register from "../screens/register";
 import LandingPage from "../screens/landingPage";
 import { LoginContext } from "../context/LoginContext";
 import { useContext } from "react";
-import LogoutButton from "../components/logoutButton";
-import { AllTalent } from "../screens/allTalent";
+import AllTalent from "../screens/allTalent";
 import TalentDetails from "../screens/talentDetails";
+import MyTabs from "./tabNavigator";
+
 
 const Stack = createNativeStackNavigator();
 
@@ -26,8 +24,20 @@ export default function StackNavigator() {
         >
             {isLoggedIn ? (
                 <>
-                    <Stack.Screen name="Home" component={Home} />
-                    <Stack.Screen name="All Talent" component={AllTalent} />
+                    <Stack.Screen
+                        name="Home"
+                        component={MyTabs}
+                        options={{
+                            headerShown: false,
+                        }}
+                    />
+                    <Stack.Screen
+                        name="All Talent"
+                        component={AllTalent}
+                        options={{
+                            headerShown: false
+                        }}
+                    />
                 </>
             ) : (
                 <>
@@ -47,7 +57,6 @@ export default function StackNavigator() {
                         }}
                     />
 
-
                     <Stack.Screen
                         name="Login"
                         component={Login}
@@ -63,10 +72,9 @@ export default function StackNavigator() {
                             headerShown: false,
                         }}
                     />
-
                 </>
             )}
 
-    </Stack.Navigator >
-  );
+        </Stack.Navigator >
+    );
 }
