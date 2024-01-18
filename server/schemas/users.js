@@ -12,10 +12,10 @@ const typeDefs = `#graphql
     name: String
     username: String!
     email: String!
-    password: String,
-    role:String!,
-    gender: String,
-    tags: [String],
+    password: String
+    role: String!
+    gender: String
+    tags: [String]
     userLocations: [String]
     createdAt: String
     updatedAt: String
@@ -26,19 +26,32 @@ const typeDefs = `#graphql
     username: String!
     email: String!
     password: String!
-    gender: String,
-    tags: [String],
+    gender: String
+    tags: [String]
+    userLocations: [String]
+  }
+
+  input EditUser {
+    name: String
+    password: String
+    tags: [String]
     userLocations: [String]
   }
 
   type ProfileUser {
     _id: ID
     name: String
-    username: String!
-    email: String!
-    password: String
-    followingName: [User]
-    followersName: [User]
+    username: String
+    email: String
+    password: String,
+    role: String,
+    gender: String,
+    tags: [String],
+    userLocations: [String]
+    userBookings: [Booking]
+    userTransactions: [Transaction]
+    createdAt: String
+    updatedAt: String
   }
 
   type TalentForMe {
@@ -50,8 +63,7 @@ const typeDefs = `#graphql
   type Query {
     users: [User]
     talentsForMe: TalentForMe
-    userById(userId:ID): [ProfileUser]
-    whoAmI: User
+    whoAmI: ProfileUser
   }
 
   type Token {
@@ -61,6 +73,7 @@ const typeDefs = `#graphql
   type Mutation {
   register(newUser:NewUser): User
   login(email:String, password:String): Token
+  editProfile(editUser:EditUser): User
   }
 `;
 
@@ -88,9 +101,22 @@ const resolvers = {
 
       // return users;
     },
-    userById: async (parent, args, contextValue, info) => {
+    whoAmI: async (parent, args, contextValue, info) => {
       try {
-        const { userId } = args;
+        const { db, authentication } = contextValue;
+        const auth = await authentication();
+
+        const role = auth.role;
+
+        if (role !== "user") {
+          throw {
+            message: "Forbidden, you are not a user",
+            code: "FORBIDDEN",
+            status: 403,
+          };
+        }
+
+        const userId = auth._id;
 
         if (!userId)
           throw {
@@ -99,55 +125,29 @@ const resolvers = {
             status: 404,
           };
 
-        const { db, authentication } = contextValue;
-        const auth = await authentication();
-
         const users = await db.collection(COLLECTION_NAME);
 
         const user = await users
           .aggregate([
             {
               $match: {
-                _id: new ObjectId(userId),
+                _id: new ObjectId("65a660bd6b98acd1adb47fde"),
               },
             },
             {
               $lookup: {
-                from: "Follows",
+                from: "Bookings",
                 localField: "_id",
-                foreignField: "followerId",
-                as: "followingColl",
+                foreignField: "UserId",
+                as: "userBookings",
               },
             },
             {
               $lookup: {
-                from: "Users",
-                localField: "followingColl.followingId",
-                foreignField: "_id",
-                as: "followingName",
-              },
-            },
-            {
-              $lookup: {
-                from: "Follows",
+                from: "Transactions",
                 localField: "_id",
-                foreignField: "followingId",
-                as: "followersColl",
-              },
-            },
-            {
-              $lookup: {
-                from: "Users",
-                localField: "followersColl.followerId",
-                foreignField: "_id",
-                as: "followersName",
-              },
-            },
-            {
-              $project: {
-                "followersName.password": 0,
-                "followingName.password": 0,
-                password: 0,
+                foreignField: "UserId",
+                as: "userTransactions",
               },
             },
           ])
@@ -163,37 +163,9 @@ const resolvers = {
 
         // console.log(user,"AGGREGATE CUY");
 
-        return user;
+        return user[0];
       } catch (error) {
-        console.log(error, "GET_USER_BY_ID"); // errorHandler next up
-        throw new GraphQLError(error.message || "Internal Server Error", {
-          extensions: {
-            code: error.code || "INTERNAL_SERVER_ERROR",
-            http: { status: error.status || 500 },
-          },
-        });
-      }
-    },
-    whoAmI: async (parent, args, contextValue, info) => {
-      try {
-        const { db, authentication } = contextValue;
-        const auth = await authentication();
-        const users = await db.collection(COLLECTION_NAME);
-
-        const user = await users.findOne({
-          _id: new ObjectId(auth._id),
-        });
-
-        if (!user)
-          throw {
-            message: "User not found",
-            code: "NOT_FOUND",
-            status: 404,
-          };
-
-        return user;
-      } catch (error) {
-        console.log(error, "GET_USER_BY_ID"); // errorHandler next up
+        console.log(error, "GET_USER_PROFILE"); // errorHandler next up
         throw new GraphQLError(error.message || "Internal Server Error", {
           extensions: {
             code: error.code || "INTERNAL_SERVER_ERROR",
@@ -208,6 +180,16 @@ const resolvers = {
         const { db, authentication } = contextValue;
         const auth = await authentication();
 
+        const role = auth.role;
+
+        if (role !== "user") {
+          throw {
+            message: "Forbidden, you are not a user",
+            code: "FORBIDDEN",
+            status: 403,
+          };
+        }
+
         const users = await db.collection(COLLECTION_NAME);
 
         const talents = await db.collection("Talents");
@@ -215,9 +197,11 @@ const resolvers = {
         const userTags = (await users.findOne({ username: auth.username }))
           .tags;
 
-        const userLocations = (await users.findOne({
-          username: auth.username,
-        })).userLocations;
+        const userLocations = (
+          await users.findOne({
+            username: auth.username,
+          })
+        ).userLocations;
 
         // Find talents with common tags and talent locations
         const talentsWithCommonTagsAndLocations = await talents
@@ -348,7 +332,7 @@ const resolvers = {
         const insertedUser = await users.insertOne({
           ...newUser,
           password: hashPw(newUser.password),
-          // role: "user",
+          role: "user",
           createdAt: new Date(),
           updatedAt: new Date(),
         });
@@ -392,36 +376,118 @@ const resolvers = {
 
         const findUser = await users.findOne({ email });
 
-        if (!findUser)
+        const talents = await db.collection("Talents");
+
+        const findTalent = await talents.findOne({ email });
+
+        if (!findUser && !findTalent)
           throw {
             message: "Wrong email or password",
             code: "BAD_REQUEST",
             status: 400,
           };
 
-        const comparedPw = comparePwDecrypted(password, findUser.password);
+        let comparedPw = false;
 
-        // console.log("MASUK SINI")
+        if (findUser) {
+          comparedPw = comparePwDecrypted(password, findUser.password);
+          if (!comparedPw)
+            throw {
+              message: "Wrong email or password",
+              code: "BAD_REQUEST",
+              status: 400,
+            };
 
-        if (!comparedPw)
-          throw {
-            message: "Wrong email or password",
-            code: "BAD_REQUEST",
-            status: 400,
+          const payload = {
+            _id: findUser._id,
+            email,
+            role: findUser.role,
+            username: findUser.username,
           };
 
-        const payload = {
-          _id: findUser._id,
-          email,
-          role: findUser.role,
-          username: findUser.username,
-        };
+          const access_token = signToken(payload);
 
-        const access_token = signToken(payload);
+          return { access_token };
+        } else if (findTalent) {
+          comparedPw = comparePwDecrypted(password, findTalent.password);
 
-        return { access_token };
+          if (!comparedPw)
+            throw {
+              message: "Wrong email or password",
+              code: "BAD_REQUEST",
+              status: 400,
+            };
+
+          const payload = {
+            _id: findTalent._id,
+            email,
+            role: findTalent.role,
+            username: findTalent.username,
+          };
+
+          const access_token = signToken(payload);
+
+          return { access_token };
+        }
       } catch (error) {
         console.log(error, "LOGIN"); // errorHandler next up
+        throw new GraphQLError(error.message || "Internal Server Error", {
+          extensions: {
+            code: error.code || "INTERNAL_SERVER_ERROR",
+            http: { status: error.status || 500 },
+          },
+        });
+      }
+    },
+    editProfile: async (parent, args, contextValue, info) => {
+      try {
+        const { db, authentication } = contextValue;
+        const auth = await authentication();
+        const { editUser } = args;
+
+        const role = auth.role;
+
+        if (role !== "user") {
+          throw {
+            message: "Forbidden, you are not a user",
+            code: "FORBIDDEN",
+            status: 403,
+          };
+        }
+        const users = await db.collection(COLLECTION_NAME);
+
+        const findUserCheck = await users.findOne({
+          _id: new ObjectId(auth._id),
+        });
+
+        if(findUserCheck.username !== auth.username) {
+          throw {
+            message: "Forbidden, you are not the user",
+            code: "FORBIDDEN",
+            status: 403,
+          };
+        }
+
+        const updateUserData = await users.updateOne(
+          {
+            _id: new ObjectId(auth._id),
+          },
+          {
+            $set: {
+              ...editUser,
+              password: hashPw(editUser.password),
+              updatedAt: new Date(),
+            },
+          }
+        );
+
+        const findUpdatedUser = await users.findOne({
+          _id: new ObjectId(auth._id),
+        });
+
+        return findUpdatedUser;
+      } catch (error) {
+        console.log(error, "EDIT_USER_PROFILE"); // errorHandler next up
         throw new GraphQLError(error.message || "Internal Server Error", {
           extensions: {
             code: error.code || "INTERNAL_SERVER_ERROR",
