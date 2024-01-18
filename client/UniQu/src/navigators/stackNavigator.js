@@ -11,6 +11,8 @@ import { LoginContext } from "../context/LoginContext";
 import { useContext } from "react";
 import LogoutButton from "../components/logoutButton";
 import { AllTalent } from "../screens/allTalent";
+import TalentDetails from "../screens/talentDetails";
+import ProfileUser from "../screens/profileUser";
 
 const Stack = createNativeStackNavigator();
 
@@ -25,11 +27,20 @@ export default function StackNavigator() {
     >
       {isLoggedIn ? (
         <>
+          <Stack.Screen name="Profile" component={ProfileUser} />
           <Stack.Screen name="Home" component={Home} />
           <Stack.Screen name="All Talent" component={AllTalent} />
         </>
       ) : (
         <>
+          <Stack.Screen
+            name="TalentDetails"
+            component={TalentDetails}
+            options={{
+              headerShown: false,
+            }}
+          />
+
           <Stack.Screen
             name="LandingPage"
             component={LandingPage}
