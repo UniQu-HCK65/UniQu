@@ -1,7 +1,7 @@
 import { NavigationContainer } from "@react-navigation/native";
 import {
-  createNativeStackNavigator,
-  CardStyleInterpolators,
+    createNativeStackNavigator,
+    CardStyleInterpolators,
 } from "@react-navigation/native-stack";
 import Home from "../screens/home";
 import Login from "../screens/login";
@@ -11,26 +11,26 @@ import { LoginContext } from "../context/LoginContext";
 import { useContext } from "react";
 import LogoutButton from "../components/logoutButton";
 import { AllTalent } from "../screens/allTalent";
+import TalentDetails from "../screens/talentDetails";
 
 const Stack = createNativeStackNavigator();
 
 export default function StackNavigator() {
-  const { isLoggedIn } = useContext(LoginContext);
+    const { isLoggedIn } = useContext(LoginContext);
 
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        gestureDirection: "vertical",
-      }}
-    >
-      {isLoggedIn ? (
-        <>
-          <Stack.Screen name="Home" component={Home} />
-          <Stack.Screen name="All Talent" component={AllTalent} />
-        </>
-      ) : (
-        <>
-        
+    return (
+        <Stack.Navigator
+            screenOptions={{
+                gestureDirection: "vertical",
+            }}
+        >
+            {isLoggedIn ? (
+                <>
+                    <Stack.Screen name="Home" component={Home} />
+                    <Stack.Screen name="All Talent" component={AllTalent} />
+                </>
+            ) : (
+                <>
                     <Stack.Screen
                         name="LandingPage"
                         component={LandingPage}
@@ -67,25 +67,6 @@ export default function StackNavigator() {
                 </>
             )}
 
-          />
-
-          <Stack.Screen
-            name="Login"
-            component={Login}
-            options={{
-              headerShown: false,
-            }}
-          />
-
-          <Stack.Screen
-            name="Register"
-            component={Register}
-            options={{
-              headerShown: false,
-            }}
-          />
-        </>
-      )}
-    </Stack.Navigator>
+    </Stack.Navigator >
   );
 }
