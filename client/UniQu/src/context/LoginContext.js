@@ -2,7 +2,7 @@ import { createContext, useEffect, useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
 async function getValueFor(key) {
   let result = await SecureStore.getItemAsync(key);
-//   const data = await SecureStore.isAvailableAsync()
+  const data = await SecureStore.isAvailableAsync()
 
   return result
 }
