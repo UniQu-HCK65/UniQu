@@ -1,6 +1,6 @@
 import * as SecureStore from 'expo-secure-store'
 import React, { useContext, useEffect, useState } from "react";
-import { Image, Keyboard, KeyboardAvoidingView, SafeAreaView, StyleSheet, Text, TextInput, ToastAndroid, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { Image, Keyboard, KeyboardAvoidingView, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { useMutation, gql } from "@apollo/client";
 import { LoginContext } from "../context/LoginContext";
 
@@ -32,6 +32,7 @@ export default function LoginScreen({ navigation }) {
                 password
             },
             onCompleted: async (data) => {
+                console.log(data, ">>> data");
                 setIsLoggedIn(data.login.access_token)
                 await save('accessToken', data.login.access_token)
             },
