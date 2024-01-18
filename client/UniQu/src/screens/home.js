@@ -154,7 +154,7 @@ export default function Home({ navigation }) {
         <ActivityIndicator size="large" color="#5a84a5" />
       ) : (
         <FlatList
-          data={allTalents.length > 0 ? allTalents : data.talentsForMe.talentsForMe}
+          // data={allTalents.length > 0 ? allTalents : data.talentsForMe.talentsForMe}
           keyExtractor={(item) => item._id}
           renderItem={renderTalentForYou}
         />
