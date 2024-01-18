@@ -48,6 +48,7 @@ export default function StackNavigator() {
                         }}
                     />
 
+
                     <Stack.Screen
                         name="Login"
                         component={Login}
