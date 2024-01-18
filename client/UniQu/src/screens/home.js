@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -15,7 +15,7 @@ import {
 } from "react-native";
 import LogoutButton from "../components/logoutButton";
 import { useQuery } from "@apollo/client";
-import { FOR_YOU_TALENT_PAGE } from "../queries/query";
+import { FOR_YOU_TALENT_PAGE, GET_ALL_TALENT, GET_USER } from "../queries/query";
 import Ionicons from 'react-native-vector-icons/Feather';
 
 const tags = [
@@ -39,9 +39,19 @@ const tags = [
   "Rolex",
 ];
 
+
 export default function Home({ navigation }) {
+  const [allTalents, setAllTalents] = useState([]);
   const { loading, error, data } = useQuery(FOR_YOU_TALENT_PAGE);
-  console.log(data)
+  const getNameUser = useQuery(GET_USER)
+
+  const handleSeeAll = () => {
+    const seeAllTalent = useQuery(GET_ALL_TALENT)
+
+    if (seeAllTalent) {
+      setAllTalents(seeAllTalent.data)
+    }
+  };
 
 
   const renderTalentForYou = ({ item }) => {
@@ -93,37 +103,37 @@ export default function Home({ navigation }) {
           }}
           style={{ width: '100%', height: 130, resizeMode: 'cover', borderBottomLeftRadius: 70, borderBottomRightRadius: 70, zIndex: -1, position:'absolute', opacity: 40}}
         /> */}
-          <View style={styles.contentHeader}>
-            <View style={styles.containerHeader}>
-              <Text style={styles.textNameHeader}>Hai, Maldini!</Text>
-              <Text style={styles.textWelcomingHeader}>Welcome back, What are you looking for today?</Text>
-            </View>
-
-            <View style={{}}>
-              <Image
-                source={{
-                  uri: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fHByb2ZpbGV8ZW58MHx8MHx8fDA%3D"
-                }}
-                style={styles.avatarHeader}
-              />
-            </View>
+        <View style={styles.contentHeader}>
+          <View style={styles.containerHeader}>
+            {/* <Text style={styles.textNameHeader}>Hai, {getNameUser.whoAmI.name}</Text> */}
+            <Text style={styles.textWelcomingHeader}>Welcome back, What are you looking for today?</Text>
           </View>
 
-          <View style={styles.searchContainer}>
-
-            <View style={styles.searchContainerText}>
-              <TextInput
-                placeholder="Search"
-                style={styles.textInputSearch}
-              />
-              <TouchableOpacity
-                onPress={() => navigation.navigate("All Talent")}
-              >
-                <Ionicons name="search" size={20} style={{ marginRight: 10 }} />
-              </TouchableOpacity>
-            </View>
-
+          <View style={{}}>
+            <Image
+              source={{
+                uri: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fHByb2ZpbGV8ZW58MHx8MHx8fDA%3D"
+              }}
+              style={styles.avatarHeader}
+            />
           </View>
+        </View>
+
+        <View style={styles.searchContainer}>
+
+          <View style={styles.searchContainerText}>
+            <TextInput
+              placeholder="Search"
+              style={styles.textInputSearch}
+            />
+            <TouchableOpacity
+              onPress={() => navigation.navigate("All Talent")}
+            >
+              <Ionicons name="search" size={20} style={{ marginRight: 10 }} />
+            </TouchableOpacity>
+          </View>
+
+        </View>
 
       </View>
 
@@ -133,7 +143,7 @@ export default function Home({ navigation }) {
           <Text style={styles.textForYou}>For You</Text>
 
           <TouchableOpacity
-            onPress={() => navigation.navigate("All Talent")}
+            onPress={handleSeeAll}
           >
             <Text style={styles.textSeeAll}> See All </Text>
           </TouchableOpacity>
@@ -144,7 +154,7 @@ export default function Home({ navigation }) {
         <ActivityIndicator size="large" color="#5a84a5" />
       ) : (
         <FlatList
-          // data={data.talentsForMe.talentsForMe}
+          data={allTalents.length > 0 ? allTalents : data.talentsForMe.talentsForMe}
           keyExtractor={(item) => item._id}
           renderItem={renderTalentForYou}
         />
@@ -271,7 +281,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 26,
     marginTop: 10,
-    
+
   },
   textWelcomingHeader: {
     fontWeight: 450,
@@ -284,6 +294,8 @@ const styles = StyleSheet.create({
     height: 45,
     borderRadius: 100,
     marginTop: 10,
+    right: 10,
+
   },
   searchContainer: {
     marginHorizontal: 20,

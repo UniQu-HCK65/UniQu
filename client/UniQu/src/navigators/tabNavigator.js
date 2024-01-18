@@ -30,7 +30,6 @@ export default function MyTabs({ navigation }) {
                 }}
             />
 
-
             <Tab.Screen
                 name="ProfileUser"
                 component={ProfileUser}
