@@ -46,9 +46,6 @@ export default function Home({ navigation }) {
       return <Text>Error: {error.message}</Text>;
     }
 
-    // const talents = data.talentsForMe.talentsForMe;
-    // console.log(talents, ">> talents");
-
     return (
       <View>
         <View key={item._id} style={styles.cardContainer}>
