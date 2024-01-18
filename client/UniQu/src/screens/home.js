@@ -34,67 +34,49 @@ const tags = [
   "Gucci",
   "Armani",
   "Rolex",
-]
+];
 
 export default function Home({ navigation }) {
   const { loading, error, data } = useQuery(FOR_YOU_TALENT_PAGE);
   // console.log(data.talentsForMe, ">> homescreen");
   // console.log(loading, "loading home");
 
-  const renderTalentForYou = () => {
+  const renderTalentForYou = ({ item }) => {
     if (error) {
       return <Text>Error: {error.message}</Text>;
     }
 
-    const talents = data.talentsForMe.talentsForMe;
-
-
     return (
       <View>
-        {/* <View style={styles.containerForyou}>
-          <View style={styles.detailForYou}>
-            <Text style={styles.textForYou}>For You</Text>
-
-            <TouchableOpacity
-              style={styles.seeAllButton}
-              onPress={() => navigation.navigate("All Talent")}
-            >
-              <Text style={styles.textSeeAll}> See All </Text>
-            </TouchableOpacity>
+        <View key={item._id} style={styles.cardContainer}>
+          <View style={styles.image}>
+            <Image
+              source={{
+                uri: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fHByb2ZpbGV8ZW58MHx8MHx8fDA%3D",
+              }}
+              style={styles.profileImage}
+            />
           </View>
-        </View> */}
 
-        {talents.map((talent) => (
-          <View key={talent._id} style={styles.cardContainer}>
-            <View style={styles.image}>
-              <Image
-                source={{
-                  uri: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fHByb2ZpbGV8ZW58MHx8MHx8fDA%3D",
-                }}
-                style={styles.profileImage}
-              />
-            </View>
+          <View style={styles.detailInformasi}>
+            <View style={styles.profileDetails}>
+              <View style={styles.detailName}>
+                <Text style={styles.nameText}>{item.name}</Text>
+              </View>
 
-            <View style={styles.detailInformasi}>
-              <View style={styles.profileDetails}>
-                <View style={styles.detailName}>
-                  <Text style={styles.nameText}>{talent.name}</Text>
-                </View>
+              <View style={styles.descriptionText}>
+                <Text>{item.aboutme}</Text>
+              </View>
 
-                <View style={styles.descriptionText}>
-                  <Text>{talent.aboutme}</Text>
-                </View>
-
-                <View style={styles.ratingContainer}>
-                  <Text style={styles.ratingText}>{talent.rating}</Text>
-                  <Text style={styles.reviewsText}>
-                    ({talent.reviews}5 reviews)
-                  </Text>
-                </View>
+              <View style={styles.ratingContainer}>
+                <Text style={styles.ratingText}>{item.rating}</Text>
+                <Text style={styles.reviewsText}>
+                  ({item.reviews}5 reviews)
+                </Text>
               </View>
             </View>
           </View>
-        ))}
+        </View>
       </View>
     );
   };
@@ -154,13 +136,6 @@ export default function Home({ navigation }) {
         />
       )}
 
-      {/* {!loading && (
-        <FlatList
-          data={data.talentsForMe.talentsForMe}
-          keyExtractor={(item) => item._id}
-          renderItem={renderTalentForYou}
-        />
-      )} */}
       <LogoutButton />
     </SafeAreaView>
   );
@@ -177,7 +152,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginVertical: 5,
     paddingHorizontal: 10,
-    padding: 10
+    padding: 10,
   },
   categoryCard: {
     backgroundColor: "#fff",

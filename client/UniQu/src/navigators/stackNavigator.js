@@ -6,6 +6,9 @@ import Register from "../screens/register";
 import LandingPage from "../screens/landingPage";
 import { LoginContext } from "../context/LoginContext";
 import { useContext } from "react";
+import LogoutButton from "../components/logoutButton";
+import TalentDetails from "../screens/talentDetails";
+import ProfileUser from "../screens/profileUser";
 import AllTalent from "../screens/allTalent";
 import TalentDetails from "../screens/talentDetails";
 import MyTabs from "./tabNavigator";
@@ -14,6 +17,7 @@ import MyTabs from "./tabNavigator";
 const Stack = createNativeStackNavigator();
 
 export default function StackNavigator() {
+
     const { isLoggedIn } = useContext(LoginContext);
 
     return (
