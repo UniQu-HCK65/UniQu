@@ -105,7 +105,7 @@ export default function Home({ navigation }) {
         /> */}
         <View style={styles.contentHeader}>
           <View style={styles.containerHeader}>
-            {/* <Text style={styles.textNameHeader}>Hai, {getNameUser.whoAmI.name}</Text> */}
+            <Text style={styles.textNameHeader}>Hai, {getNameUser.whoAmI.name}</Text>
             <Text style={styles.textWelcomingHeader}>Welcome back, What are you looking for today?</Text>
           </View>
 
