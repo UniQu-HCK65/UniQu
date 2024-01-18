@@ -6,7 +6,7 @@ import Register from '../screens/register';
 import LandingPage from '../screens/landingPage';
 import { LoginContext } from '../context/LoginContext';
 import { useContext } from 'react';
-import LogoutButton from '../components/logoutButton';
+import TalentDetails from '../screens/talentDetails';
 
 
 const Stack = createNativeStackNavigator();
@@ -17,47 +17,56 @@ export default function StackNavigator() {
     const { isLoggedIn } = useContext(LoginContext)
 
     return (
-        
-        <Stack.Navigator 
+
+        <Stack.Navigator
             screenOptions={{
                 gestureDirection: 'vertical',
             }}
         >
 
             {isLoggedIn ? (
-                 <Stack.Screen
-                 name="Home"
-                 component={Home}
-             />
+                <Stack.Screen
+                    name="Home"
+                    component={Home}
+                />
             ) : (
                 <>
-                <Stack.Screen
-                name="LandingPage"
-                component={LandingPage}
-                options={{ 
-                    headerShown: false, 
-                }}
-            />
 
-            <Stack.Screen
-                name="Login"
-                component={Login}
-                options={{ 
-                    headerShown: false, 
-                }}
-            />
+                    <Stack.Screen
+                        name="LandingPage"
+                        component={LandingPage}
+                        options={{
+                            headerShown: false,
+                        }}
+                    />
 
-            <Stack.Screen
-                name="Register"
-                component={Register}
-                options={{ 
-                    headerShown: false, 
-                }}
-            />
+                    <Stack.Screen
+                        name="TalentDetails"
+                        component={TalentDetails}
+                        options={{
+                            headerShown: false,
+                        }}
+                    />
 
-            </>
+                    <Stack.Screen
+                        name="Login"
+                        component={Login}
+                        options={{
+                            headerShown: false,
+                        }}
+                    />
+
+                    <Stack.Screen
+                        name="Register"
+                        component={Register}
+                        options={{
+                            headerShown: false,
+                        }}
+                    />
+
+                </>
             )}
-            
+
 
         </Stack.Navigator>
     )
