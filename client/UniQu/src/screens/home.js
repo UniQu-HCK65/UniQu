@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     
   },
   textWelcomingHeader: {
-    fontWeight: 450,
+    fontWeight: "bold",
     fontSize: 15,
     marginTop: 10,
     width: 300,
