@@ -13,6 +13,7 @@ import LogoutButton from "../components/logoutButton";
 import { AllTalent } from "../screens/allTalent";
 import TalentDetails from "../screens/talentDetails";
 import ProfileUser from "../screens/profileUser";
+import EditProfileUser from "../screens/editProfileUser";
 
 const Stack = createNativeStackNavigator();
 
@@ -25,8 +26,9 @@ export default function StackNavigator() {
         gestureDirection: "vertical",
       }}
     >
-      {isLoggedIn ? (
+      {!isLoggedIn ? (
         <>
+          <Stack.Screen name="Edit Profile" component={EditProfileUser} />
           <Stack.Screen name="Profile" component={ProfileUser} />
           <Stack.Screen name="Home" component={Home} />
           <Stack.Screen name="All Talent" component={AllTalent} />
