@@ -15,6 +15,7 @@ import Chat from "../screens/chat";
 import Booking from "../screens/booking";
 import ListChat from "../screens/list-chat";
 
+import EditProfileUser from "../screens/editProfileUser";
 
 const Stack = createNativeStackNavigator();
 
@@ -37,6 +38,8 @@ export default function StackNavigator() {
                             headerShown: false,
                         }}
                     />
+                    <Stack.Screen name="Edit Profile" component={EditProfileUser} />
+                    <Stack.Screen name="Profile" component={ProfileUser} />
 
                     <Stack.Screen
                         name="Chat"
