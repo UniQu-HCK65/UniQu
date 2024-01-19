@@ -25,8 +25,6 @@ export default function StackNavigator() {
         >
             {isLoggedIn ? (
               <>
-              <Stack.Screen name="Edit Profile" component={EditProfileUser} />
-              <Stack.Screen name="Profile" component={ProfileUser} />
                     <Stack.Screen
                         name="Home"
                         component={MyTabs}
@@ -34,6 +32,8 @@ export default function StackNavigator() {
                             headerShown: false,
                         }}
                     />
+              <Stack.Screen name="Edit Profile" component={EditProfileUser} />
+              <Stack.Screen name="Profile" component={ProfileUser} />
                     <Stack.Screen
                         name="All Talent"
                         component={AllTalent}
