@@ -16,17 +16,32 @@ const {
   resolvers: talentResolvers,
 } = require("./schemas/talents");
 
-// const {
-//   typeDefs: followsTypeDefs,
-//   resolvers: followsResolvers,
-// } = require("./schemas/follows");
+const {
+  typeDefs: transactionsTypeDefs,
+  resolvers: transactionsResolvers,
+} = require("./schemas/transactions");
+
+const {
+  typeDefs: bookingsTypeDefs,
+  resolvers: bookingsResolvers,
+} = require("./schemas/bookings");
 
 const client = require("./config/configMongo");
 const { ObjectId } = require("mongodb");
 
 const server = new ApolloServer({
-  typeDefs: [userTypeDefs, talentTypeDefs],
-  resolvers: [userResolvers, talentResolvers],
+  typeDefs: [
+    userTypeDefs,
+    talentTypeDefs,
+    transactionsTypeDefs,
+    bookingsTypeDefs,
+  ],
+  resolvers: [
+    userResolvers,
+    talentResolvers,
+    transactionsResolvers,
+    bookingsResolvers,
+  ],
   introspection: true,
 });
 
@@ -63,14 +78,19 @@ const server = new ApolloServer({
               const payload = verifyToken(token);
 
               const users = await db.collection("Users");
-              // console.log(users, "AUTH");
+
+              const talents = await db.collection("Talents");
+
+              const findTalent = await talents.findOne({
+                _id: new ObjectId(payload._id),
+              });
 
               const findUser = await users.findOne({
                 _id: new ObjectId(payload._id),
               });
 
               // console.log(findUser);
-              if (!findUser)
+              if (!findUser && !findTalent)
                 throw {
                   message: "Invalid Token",
                   code: "UNAUTHORIZED",
