@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -14,7 +14,7 @@ import {
   TextInput
 } from "react-native";
 import LogoutButton from "../components/logoutButton";
-import { useQuery } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
 import { FOR_YOU_TALENT_PAGE, GET_ALL_TALENT, GET_USER } from "../queries/query";
 import Ionicons from 'react-native-vector-icons/Feather';
 
@@ -39,23 +39,79 @@ const tags = [
   "Rolex",
 ];
 
+const ALL_TALENT = gql`
+  query Talents {
+talents {
+  _id
+  name
+  username
+  email
+  password
+  aboutme
+  gender
+  tags
+  talentLocations
+  balance
+}
+}
+`
 
 export default function Home({ navigation }) {
   const [allTalents, setAllTalents] = useState([]);
-  const { loading, error, data } = useQuery(FOR_YOU_TALENT_PAGE);
-  const getNameUser = useQuery(GET_USER)
+  const [talentsForYou, setTalentsForYou] = useState([]);
+  const [selectedDataType, setSelectedDataType] = useState('all');
+  const [loading, setLoading] = useState(true);
+
+  const { loading: forYouLoading, error: forYouError, data: forYouData } = useQuery(FOR_YOU_TALENT_PAGE);
+  const { data: nameUserData } = useQuery(GET_USER);
+  const nameUser = nameUserData?.whoAmI?.name;
+  const { loading: allTalentLoading, error: allTalentError, data: allTalentData } = useQuery(ALL_TALENT)
 
   const handleSeeAll = () => {
-    const seeAllTalent = useQuery(GET_ALL_TALENT)
-
-    if (seeAllTalent) {
-      setAllTalents(seeAllTalent.data)
-    }
+    setSelectedDataType('all');
+    setAllTalents(allTalentData.talents);
   };
 
+  const handleForYou = () => {
+    setSelectedDataType('forYou');
+    setTalentsForYou(forYouData.talentsForMe.talentsForMe);
+  };
+
+  useEffect(() => {
+    if (!forYouLoading && !allTalentLoading) {
+      setLoading(false);
+    }
+
+    if (selectedDataType === 'forYou' && talentsForYou.length === 0) {
+      handleForYou();
+    }
+  }, [forYouLoading, allTalentLoading, forYouData, talentsForYou, selectedDataType]);
+
+  if (loading) {
+    return <Text>Loading...</Text>;
+  }
+
+  if (forYouError) {
+    return <Text>Error fetching FOR_YOU_TALENT_PAGE data</Text>;
+  }
+
+  if (allTalentError) {
+    return <Text>Error fetching ALL_TALENT data</Text>;
+  }
+
+  let dataRender; 
+
+  if (selectedDataType === 'all' && Array.isArray(allTalents) && allTalents.length > 0) {
+    dataRender = allTalents;
+  } else if (selectedDataType === 'forYou' && Array.isArray(talentsForYou) && talentsForYou.length > 0) {
+    dataRender = talentsForYou;
+  }
+
+  // console.log(dataRender, '<<<<')
+  // console.log(talentsForYou)
 
   const renderTalentForYou = ({ item }) => {
-    if (error) {
+    if (forYouError || allTalentError) {
       return <Text>Error: {error.message}</Text>;
     }
 
@@ -105,7 +161,7 @@ export default function Home({ navigation }) {
         /> */}
         <View style={styles.contentHeader}>
           <View style={styles.containerHeader}>
-            <Text style={styles.textNameHeader}>Hai, {getNameUser.whoAmI.name}</Text>
+            <Text style={styles.textNameHeader}>Hai, {nameUser}</Text>
             <Text style={styles.textWelcomingHeader}>Welcome back, What are you looking for today?</Text>
           </View>
 
@@ -140,7 +196,10 @@ export default function Home({ navigation }) {
       <View style={styles.containerForyou}>
         <View style={styles.detailForYou}>
           <View style={{ height: 40, borderColor: 'black', borderWidth: 2 }}></View>
-          <Text style={styles.textForYou}>For You</Text>
+
+          <TouchableOpacity onPress={handleForYou}>
+            <Text style={styles.textForYou}>For You</Text>
+          </TouchableOpacity>
 
           <TouchableOpacity
             onPress={handleSeeAll}
@@ -150,14 +209,14 @@ export default function Home({ navigation }) {
         </View>
       </View>
 
-      {loading ? (
-        <ActivityIndicator size="large" color="#5a84a5" />
-      ) : (
-        <FlatList
-          // data={allTalents.length > 0 ? allTalents : data.talentsForMe.talentsForMe}
-          keyExtractor={(item) => item._id}
-          renderItem={renderTalentForYou}
-        />
+      {forYouLoading || allTalentLoading? (
+      <ActivityIndicator size="large" color="#5a84a5" />
+      ) : ( 
+      <FlatList
+        data={!dataRender ? forYouData.talentsForMe.talentsForMe : dataRender}
+        keyExtractor={(item) => item._id}
+        renderItem={renderTalentForYou}
+      />
       )}
 
       <LogoutButton />
@@ -284,7 +343,7 @@ const styles = StyleSheet.create({
 
   },
   textWelcomingHeader: {
-    fontWeight: 450,
+    fontWeight: 'bold',
     fontSize: 15,
     marginTop: 10,
     width: 300,

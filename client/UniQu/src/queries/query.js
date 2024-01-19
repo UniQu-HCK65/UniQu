@@ -36,7 +36,7 @@ query WhoAmI {
 }`
 
 export const GET_ALL_TALENT = gql`
-  query Talents {
+query Talents {
   talents {
     _id
     name
