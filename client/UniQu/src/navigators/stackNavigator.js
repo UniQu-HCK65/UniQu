@@ -11,6 +11,7 @@ import TalentDetails from "../screens/talentDetails";
 import ProfileUser from "../screens/profileUser";
 import AllTalent from "../screens/allTalent";
 import MyTabs from "../navigators/tabNavigator"
+import Chat from "../screens/chat";
 
 const Stack = createNativeStackNavigator();
 
@@ -26,6 +27,15 @@ export default function StackNavigator() {
         >
             {isLoggedIn ? (
                 <>
+
+                    <Stack.Screen
+                        name="Chat"
+                        component={Chat}
+                        options={{
+                            headerShown: false
+                        }}
+                    />
+                    
                     <Stack.Screen
                         name="Home"
                         component={MyTabs}
@@ -40,6 +50,8 @@ export default function StackNavigator() {
                             headerShown: false
                         }}
                     />
+
+
                 </>
             ) : (
                 <>
