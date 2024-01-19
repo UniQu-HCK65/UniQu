@@ -72,5 +72,6 @@ const styles = StyleSheet.create({
     attachButton: {
         marginBottom: 20
     },
+    
 
 })
