@@ -12,6 +12,8 @@ import ProfileUser from "../screens/profileUser";
 import AllTalent from "../screens/allTalent";
 import MyTabs from "../navigators/tabNavigator"
 import Chat from "../screens/chat";
+import Booking from "../screens/booking";
+
 
 const Stack = createNativeStackNavigator();
 
@@ -27,15 +29,14 @@ export default function StackNavigator() {
         >
             {isLoggedIn ? (
                 <>
-
                     <Stack.Screen
-                        name="Chat"
-                        component={Chat}
+                        name="Booking"
+                        component={Booking}
                         options={{
-                            headerShown: false
+                            headerShown: false,
                         }}
                     />
-                    
+
                     <Stack.Screen
                         name="Home"
                         component={MyTabs}
@@ -51,6 +52,21 @@ export default function StackNavigator() {
                         }}
                     />
 
+                    <Stack.Screen
+                        name="TalentDetails"
+                        component={TalentDetails}
+                        options={{
+                            headerShown: false,
+                        }}
+                    />
+
+                    <Stack.Screen
+                        name="Chat"
+                        component={Chat}
+                        options={{
+                            headerShown: false
+                        }}
+                    />
 
                 </>
             ) : (
@@ -58,14 +74,6 @@ export default function StackNavigator() {
                     <Stack.Screen
                         name="LandingPage"
                         component={LandingPage}
-                        options={{
-                            headerShown: false,
-                        }}
-                    />
-
-                    <Stack.Screen
-                        name="TalentDetails"
-                        component={TalentDetails}
                         options={{
                             headerShown: false,
                         }}
