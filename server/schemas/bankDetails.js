@@ -23,6 +23,7 @@ const typeDefs = `#graphql
     bankDetails: [BankDetails]
   }
 `;
+//WHY
 
 const resolvers = {
   Query: {
