@@ -12,6 +12,10 @@ import ProfileUser from "../screens/profileUser";
 import EditProfileUser from "../screens/editProfileUser";
 import AllTalent from "../screens/allTalent";
 import MyTabs from "../navigators/tabNavigator"
+import Chat from "../screens/chat";
+import Booking from "../screens/booking";
+import ListChat from "../screens/list-chat";
+
 
 const Stack = createNativeStackNavigator();
 
@@ -33,22 +37,45 @@ export default function StackNavigator() {
                             headerShown: false,
                         }}
                     />
+
               <Stack.Screen name="Edit Profile" component={EditProfileUser} />
               <Stack.Screen name="Profile" component={ProfileUser} />
+
                     <Stack.Screen
+                        name="Chat"
+                        component={Chat}
+                        options={{
+                            headerShown: false
+                        }}
+                    />
+
+                    <Stack.Screen
+                        name="Booking"
+                        component={Booking}
+                        options={{
+                            headerShown: false,
+                        }}
+                    />
+
+                    <Stack.Screen
+
                         name="All Talent"
                         component={AllTalent}
                         options={{
                             headerShown: false
                         }}
                     />
-                              <Stack.Screen
-            name="TalentDetails"
-            component={TalentDetails}
-            options={{
-              headerShown: false,
-            }}
-          />
+
+                    <Stack.Screen
+                        name="TalentDetails"
+                        component={TalentDetails}
+                        options={{
+                            headerShown: false,
+                        }}
+                    />
+
+
+
                 </>
             ) : (
                 <>
@@ -61,6 +88,7 @@ export default function StackNavigator() {
                     />
 
                     <Stack.Screen
+
                         name="Login"
                         component={Login}
                         options={{
