@@ -29,6 +29,14 @@ export default function StackNavigator() {
         >
             {isLoggedIn ? (
                 <>
+
+                    <Stack.Screen
+                        name="Chat"
+                        component={Chat}
+                        options={{
+                            headerShown: false
+                        }}
+                    />
                     <Stack.Screen
                         name="Booking"
                         component={Booking}
@@ -60,13 +68,7 @@ export default function StackNavigator() {
                         }}
                     />
 
-                    <Stack.Screen
-                        name="Chat"
-                        component={Chat}
-                        options={{
-                            headerShown: false
-                        }}
-                    />
+
 
                 </>
             ) : (
