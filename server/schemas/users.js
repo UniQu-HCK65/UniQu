@@ -65,6 +65,7 @@ const typeDefs = `#graphql
     users: [User]
     talentsForMe: TalentForMe
     whoAmI: ProfileUser
+    getUserById(userId: ID): ProfileUser
   }
 
   type Token {
@@ -233,6 +234,63 @@ const resolvers = {
         });
       }
     },
+
+    getUserById: async (parent, args, contextValue, info) => {
+      try {
+        const { db, authentication } = contextValue;
+        const auth = await authentication();
+
+        const { userId } = args;
+
+        const role = auth.role;
+
+        const users = await db.collection(COLLECTION_NAME);
+
+        const getUser = await users
+          .aggregate([
+            {
+              $match: {
+                _id: new ObjectId(userId),
+              },
+            },
+            {
+              $lookup: {
+                from: "Bookings",
+                localField: "_id",
+                foreignField: "UserId",
+                as: "userBookings",
+              },
+            },
+            {
+              $lookup: {
+                from: "Transactions",
+                localField: "_id",
+                foreignField: "UserId",
+                as: "userTransactions",
+              },
+            },
+          ])
+          .toArray();
+        // console.log(user);
+
+        if (getUser.length < 1)
+          throw {
+            message: "User not found",
+            code: "NOT_FOUND",
+            status: 404,
+          };
+
+        return getUser;
+      } catch (error) {
+        console.log(error, "GET_USER_BY_ID"); // errorHandler next up
+        throw new GraphQLError(error.message || "Internal Server Error", {
+          extensions: {
+            code: error.code || "INTERNAL_SERVER_ERROR",
+            http: { status: error.status || 500 },
+          },
+        });
+      }
+    },
   },
 
   Mutation: {
@@ -344,7 +402,7 @@ const resolvers = {
           role: "user",
         };
       } catch (error) {
-        console.log(error, "ADD_USER"); // errorHandler next up
+        console.log(error, "REGISTER"); // errorHandler next up
         throw new GraphQLError(error.message || "Internal Server Error", {
           extensions: {
             code: error.code || "INTERNAL_SERVER_ERROR",
@@ -455,13 +513,14 @@ const resolvers = {
             status: 403,
           };
         }
+
         const users = await db.collection(COLLECTION_NAME);
 
         const findUserCheck = await users.findOne({
           _id: new ObjectId(auth._id),
         });
 
-        if(findUserCheck.username !== auth.username) {
+        if (findUserCheck.username !== auth.username) {
           throw {
             message: "Forbidden, you are not the user",
             code: "FORBIDDEN",

@@ -35,10 +35,6 @@ const typeDefs = `#graphql
 
 `;
 
-// type Mutation { //BELOM JALAN OK, FLOW
-// follow(newFollow:NewFollow) : Follow
-// }
-
 const resolvers = {
   Query: {
     transactions: async (parent, args, contextValue, info) => {
