@@ -46,6 +46,7 @@ const typeDefs = `#graphql
     email: String
     password: String,
     role: String,
+    imgUrl: String
     gender: String,
     tags: [String],
     userLocations: [String]

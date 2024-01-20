@@ -32,6 +32,7 @@ const typeDefs = `#graphql
     password: String
     aboutme: String
     gender: String
+    imgUrl: String
     tags: [String]
     reviews: [Review]
     rating: Float
