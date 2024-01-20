@@ -15,6 +15,7 @@ const typeDefs = `#graphql
     password: String
     role: String!
     gender: String
+    imgUrl: String
     tags: [String]
     userLocations: [String]
     createdAt: String
@@ -131,7 +132,7 @@ const resolvers = {
           .aggregate([
             {
               $match: {
-                _id: new ObjectId("65a660bd6b98acd1adb47fde"),
+                _id: new ObjectId(auth._id),
               },
             },
             {

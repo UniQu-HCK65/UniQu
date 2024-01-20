@@ -16,10 +16,12 @@ const typeDefs = `#graphql
     talentName: String
     userName: String
     paymentId: String
+    BookingId: ID
     transactionStatus: String
     paidByAdmin: Boolean
     updatedAt: String
     createdAt: String
+
   }
 
   input NewTransaction {
