@@ -64,7 +64,7 @@ query Talents {
 `
 
 export const WHO_AM_I_USER = gql`
-query WhoAmI {
+query Query {
   whoAmI {
     _id
     name
@@ -72,6 +72,7 @@ query WhoAmI {
     email
     password
     role
+    imgUrl
     gender
     tags
     userLocations
@@ -81,8 +82,8 @@ query WhoAmI {
       UserId
       talentName
       userName
-      TransactionId
       bookDate
+      bookSession
       bookLocation
       bookStatus
       updatedAt
@@ -95,6 +96,7 @@ query WhoAmI {
       talentName
       userName
       paymentId
+      BookingId
       transactionStatus
       paidByAdmin
       updatedAt
