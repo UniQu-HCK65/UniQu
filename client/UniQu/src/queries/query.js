@@ -62,3 +62,63 @@ query Talents {
   }
 }
 `
+
+export const WHO_AM_I_USER = gql`
+query WhoAmI {
+  whoAmI {
+    _id
+    name
+    username
+    email
+    password
+    role
+    gender
+    tags
+    userLocations
+    userBookings {
+      _id
+      TalentId
+      UserId
+      talentName
+      userName
+      TransactionId
+      bookDate
+      bookLocation
+      bookStatus
+      updatedAt
+      createdAt
+    }
+    userTransactions {
+      _id
+      TalentId
+      UserId
+      talentName
+      userName
+      paymentId
+      transactionStatus
+      paidByAdmin
+      updatedAt
+      createdAt
+    }
+    createdAt
+    updatedAt
+  }
+}`
+
+export const EditUser = gql`
+mutation EditProfile($editUser: EditUser) {
+  editProfile(editUser: $editUser) {
+    _id
+    name
+    username
+    email
+    password
+    role
+    gender
+    tags
+    userLocations
+    createdAt
+    updatedAt
+  }
+}
+`
