@@ -11,7 +11,7 @@ export default function LogoutButton() {
     const {setIsLoggedIn} = useContext(LoginContext)
     return (
         <TouchableOpacity style={{ alignItems: 'center' }}onPress={async () => {
-            await SecureStore.deleteItemAsync('access_token')
+            await SecureStore.deleteItemAsync('accessToken')
             setIsLoggedIn(false)
         }}>
             <Ionicons name="exit-outline" size={22} color="black" style={{ marginRight: 10 }} />

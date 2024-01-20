@@ -120,5 +120,4 @@ mutation EditProfile($editUser: EditUser) {
     createdAt
     updatedAt
   }
-}
-`
+}`

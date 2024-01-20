@@ -9,15 +9,12 @@ import Register from "../screens/register";
 import LandingPage from "../screens/landingPage";
 import { LoginContext } from "../context/LoginContext";
 import { useContext } from "react";
-import LogoutButton from "../components/logoutButton";
 import TalentDetails from "../screens/talentDetails";
 import ProfileUser from "../screens/profileUser";
 import EditProfileUser from "../screens/editProfileUser";
-import AllTalent from "../screens/allTalent";
 import MyTabs from "../navigators/tabNavigator";
 import Chat from "../screens/chat";
 import Booking from "../screens/booking";
-import ListChat from "../screens/list-chat";
 
 
 const Stack = createNativeStackNavigator();
@@ -33,7 +30,7 @@ export default function StackNavigator() {
         >
             {isLoggedIn ? (
                 <>
-                     <Stack.Screen
+                    <Stack.Screen
                         name="Booking"
                         component={Booking}
                     />
@@ -46,14 +43,14 @@ export default function StackNavigator() {
                         }}
                     />
 
-                    <Stack.Screen 
-                        name="Edit Profile" 
-                        component={EditProfileUser} 
+                    <Stack.Screen
+                        name="Edit Profile"
+                        component={EditProfileUser}
                     />
 
-                    <Stack.Screen 
-                        name="Profile" 
-                        component={ProfileUser} 
+                    <Stack.Screen
+                        name="Profile"
+                        component={ProfileUser}
                     />
 
                     <Stack.Screen
@@ -65,19 +62,10 @@ export default function StackNavigator() {
                     />
 
                     <Stack.Screen
-
-                        name="All Talent"
-                        component={AllTalent}
+                        name="TalentDetails"
+                        component={TalentDetails}
                         options={{
                             headerShown: false
-                        }}
-                    />
-
-                    <Stack.Screen
-                        name="Login"
-                        component={Login}
-                        options={{
-                            headerShown: false,
                         }}
                     />
                 </>
@@ -92,7 +80,6 @@ export default function StackNavigator() {
                     />
 
                     <Stack.Screen
-
                         name="Login"
                         component={Login}
                         options={{
