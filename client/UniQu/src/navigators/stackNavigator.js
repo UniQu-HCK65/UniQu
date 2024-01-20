@@ -16,6 +16,7 @@ import MyTabs from "../navigators/tabNavigator"
 const Stack = createNativeStackNavigator();
 
 export default function StackNavigator() {
+  const { isLoggedIn } = useContext(LoginContext);
 
     return (
         <Stack.Navigator
