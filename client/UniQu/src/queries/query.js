@@ -27,3 +27,38 @@ export const FOR_YOU_TALENT_PAGE = gql`
     }
   }
 `;
+
+export const GET_USER = gql`
+query WhoAmI {
+  whoAmI {
+    name
+  }
+}`
+
+export const GET_ALL_TALENT = gql`
+query Talents {
+  talents {
+    _id
+    name
+    username
+    email
+    password
+    aboutme
+    role
+    gender
+    tags
+    reviews {
+      message
+      reviewerName
+      rating
+      updatedAt
+      createdAt
+    }
+    rating
+    talentLocations
+    balance
+    updatedAt
+    createdAt
+  }
+}
+`

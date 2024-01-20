@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -14,8 +14,8 @@ import {
   TextInput
 } from "react-native";
 import LogoutButton from "../components/logoutButton";
-import { useQuery } from "@apollo/client";
-import { FOR_YOU_TALENT_PAGE } from "../queries/query";
+import { gql, useQuery } from "@apollo/client";
+import { FOR_YOU_TALENT_PAGE, GET_ALL_TALENT, GET_USER } from "../queries/query";
 import Ionicons from 'react-native-vector-icons/Feather';
 
 const tags = [
@@ -39,13 +39,79 @@ const tags = [
   "Rolex",
 ];
 
-export default function Home({ navigation }) {
-  const { loading, error, data } = useQuery(FOR_YOU_TALENT_PAGE);
-  console.log(data)
+const ALL_TALENT = gql`
+  query Talents {
+talents {
+  _id
+  name
+  username
+  email
+  password
+  aboutme
+  gender
+  tags
+  talentLocations
+  balance
+}
+}
+`
 
+export default function Home({ navigation }) {
+  const [allTalents, setAllTalents] = useState([]);
+  const [talentsForYou, setTalentsForYou] = useState([]);
+  const [selectedDataType, setSelectedDataType] = useState('all');
+  const [loading, setLoading] = useState(true);
+
+  const { loading: forYouLoading, error: forYouError, data: forYouData } = useQuery(FOR_YOU_TALENT_PAGE);
+  const { data: nameUserData } = useQuery(GET_USER);
+  const nameUser = nameUserData?.whoAmI?.name;
+  const { loading: allTalentLoading, error: allTalentError, data: allTalentData } = useQuery(ALL_TALENT)
+
+  const handleSeeAll = () => {
+    setSelectedDataType('all');
+    setAllTalents(allTalentData.talents);
+  };
+
+  const handleForYou = () => {
+    setSelectedDataType('forYou');
+    setTalentsForYou(forYouData.talentsForMe.talentsForMe);
+  };
+
+  useEffect(() => {
+    if (!forYouLoading && !allTalentLoading) {
+      setLoading(false);
+    }
+
+    if (selectedDataType === 'forYou' && talentsForYou.length === 0) {
+      handleForYou();
+    }
+  }, [forYouLoading, allTalentLoading, forYouData, talentsForYou, selectedDataType]);
+
+  if (loading) {
+    return <Text>Loading...</Text>;
+  }
+
+  if (forYouError) {
+    return <Text>Error fetching FOR_YOU_TALENT_PAGE data</Text>;
+  }
+
+  if (allTalentError) {
+    return <Text>Error fetching ALL_TALENT data</Text>;
+  }
+
+  let dataRender; 
+
+  if (selectedDataType === 'all' && Array.isArray(allTalents) && allTalents.length > 0) {
+    dataRender = allTalents;
+  } else if (selectedDataType === 'forYou' && Array.isArray(talentsForYou) && talentsForYou.length > 0) {
+    dataRender = talentsForYou;
+  }
+
+  // console.log(dataRender, '<<<<')
+  // console.log(talentsForYou)
 
   const renderTalentForYou = ({ item }) => {
-    if (error) {
+    if (forYouError || allTalentError) {
       return <Text>Error: {error.message}</Text>;
     }
 
@@ -93,61 +159,64 @@ export default function Home({ navigation }) {
           }}
           style={{ width: '100%', height: 130, resizeMode: 'cover', borderBottomLeftRadius: 70, borderBottomRightRadius: 70, zIndex: -1, position:'absolute', opacity: 40}}
         /> */}
-          <View style={styles.contentHeader}>
-            <View style={styles.containerHeader}>
-              <Text style={styles.textNameHeader}>Hai, Maldini!</Text>
-              <Text style={styles.textWelcomingHeader}>Welcome back, What are you looking for today?</Text>
-            </View>
-
-            <View style={{}}>
-              <Image
-                source={{
-                  uri: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fHByb2ZpbGV8ZW58MHx8MHx8fDA%3D"
-                }}
-                style={styles.avatarHeader}
-              />
-            </View>
+        <View style={styles.contentHeader}>
+          <View style={styles.containerHeader}>
+            <Text style={styles.textNameHeader}>Hai, {nameUser}</Text>
+            <Text style={styles.textWelcomingHeader}>Welcome back, What are you looking for today?</Text>
           </View>
 
-          <View style={styles.searchContainer}>
-
-            <View style={styles.searchContainerText}>
-              <TextInput
-                placeholder="Search"
-                style={styles.textInputSearch}
-              />
-              <TouchableOpacity
-                onPress={() => navigation.navigate("All Talent")}
-              >
-                <Ionicons name="search" size={20} style={{ marginRight: 10 }} />
-              </TouchableOpacity>
-            </View>
-
+          <View style={{}}>
+            <Image
+              source={{
+                uri: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fHByb2ZpbGV8ZW58MHx8MHx8fDA%3D"
+              }}
+              style={styles.avatarHeader}
+            />
           </View>
+        </View>
+
+        <View style={styles.searchContainer}>
+
+          <View style={styles.searchContainerText}>
+            <TextInput
+              placeholder="Search"
+              style={styles.textInputSearch}
+            />
+            <TouchableOpacity
+              onPress={() => navigation.navigate("All Talent")}
+            >
+              <Ionicons name="search" size={20} style={{ marginRight: 10 }} />
+            </TouchableOpacity>
+          </View>
+
+        </View>
 
       </View>
 
       <View style={styles.containerForyou}>
         <View style={styles.detailForYou}>
           <View style={{ height: 40, borderColor: 'black', borderWidth: 2 }}></View>
-          <Text style={styles.textForYou}>For You</Text>
+
+          <TouchableOpacity onPress={handleForYou}>
+            <Text style={styles.textForYou}>For You</Text>
+          </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => navigation.navigate("All Talent")}
+            onPress={handleSeeAll}
           >
             <Text style={styles.textSeeAll}> See All </Text>
           </TouchableOpacity>
         </View>
       </View>
 
-      {loading ? (
-        <ActivityIndicator size="large" color="#5a84a5" />
-      ) : (
-        <FlatList
-          // data={data.talentsForMe.talentsForMe}
-          keyExtractor={(item) => item._id}
-          renderItem={renderTalentForYou}
-        />
+      {forYouLoading || allTalentLoading? (
+      <ActivityIndicator size="large" color="#5a84a5" />
+      ) : ( 
+      <FlatList
+        data={!dataRender ? forYouData.talentsForMe.talentsForMe : dataRender}
+        keyExtractor={(item) => item._id}
+        renderItem={renderTalentForYou}
+      />
       )}
 
       <LogoutButton />
@@ -271,10 +340,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 26,
     marginTop: 10,
-    
+
   },
   textWelcomingHeader: {
-    fontWeight: "bold",
+    fontWeight: 'bold',
     fontSize: 15,
     marginTop: 10,
     width: 300,
@@ -284,6 +353,8 @@ const styles = StyleSheet.create({
     height: 45,
     borderRadius: 100,
     marginTop: 10,
+    right: 10,
+
   },
   searchContainer: {
     marginHorizontal: 20,
