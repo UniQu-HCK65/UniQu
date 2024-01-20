@@ -1,6 +1,29 @@
-import { Text, View, StyleSheet, Image, TouchableOpacity, TextInput } from "react-native";
+import { Text, View, StyleSheet, Image, TouchableOpacity, TextInput, Button } from "react-native";
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import RatingModal from "../components/modalRating";
+import { useState } from "react";
+
+
 export default function Chat() {
+    const [modalVisible, setModalVisible] = useState(false);
+
+    const openModal = () => {
+        setModalVisible(true);
+    };
+
+    const closeModal = () => {
+        setModalVisible(false);
+    };
+
+    const handleRatingSubmit = () => {
+        // Handle submission logic here
+        console.log('Rating submitted');
+        closeModal(); // Close the modal after submission
+    };
+
+    console.log(modalVisible)
+
+
     return (
         <View style={styles.container}>
 
@@ -21,7 +44,8 @@ export default function Chat() {
                     </TouchableOpacity>
                 </View>
             </View>
-
+            <Button title="Buka Modal Rating" onPress={openModal} />
+            <RatingModal isVisible={modalVisible} onClose={closeModal} onSubmit={handleRatingSubmit} />
 
             <View style={{ justifyContent: 'center', alignItems: 'center', borderTopColor: 'grey', borderTopWidth: 0.5, height: 130 }}>
                 <View style={styles.messageContainer}>
@@ -72,6 +96,6 @@ const styles = StyleSheet.create({
     attachButton: {
         marginBottom: 20
     },
-    
+
 
 })
