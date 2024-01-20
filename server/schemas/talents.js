@@ -14,6 +14,7 @@ const typeDefs = `#graphql
     aboutme: String!
     role: String!
     gender: String
+    imgUrl: String
     tags: [String]
     reviews: [Review]
     rating: Float
@@ -31,6 +32,7 @@ const typeDefs = `#graphql
     password: String
     aboutme: String
     gender: String
+    imgUrl: String
     tags: [String]
     reviews: [Review]
     rating: Float
@@ -38,6 +40,7 @@ const typeDefs = `#graphql
     balance: Int
     talentBookings: [Booking]
     talentTransactions: [Transaction]
+    talentBankAccount: [BankDetails]
     updatedAt: String
     createdAt: String
   }
@@ -127,6 +130,14 @@ const resolvers = {
                 localField: "_id",
                 foreignField: "TalentId",
                 as: "talentTransactions",
+              },
+            },
+            {
+              $lookup: {
+                from: "BankDetails",
+                localField: "_id",
+                foreignField: "TalentId",
+                as: "talentBankAccount",
               },
             },
           ])
