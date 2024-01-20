@@ -77,7 +77,7 @@ export default function EditProfileUser() {
           imgUrl: response.data?.editProfile?.imgUrl,
         });
 
-        navigation.navigate('Profile');
+        navigation.navigate("Profile");
       })
       .catch((error) => {
         console.error("Error during update data", error);
@@ -146,6 +146,9 @@ export default function EditProfileUser() {
         </View>
         <View style={styles.pickerInput}>
           <DropDownPicker
+            dropDownContainerStyle={{ backgroundColor: "#f0f0f0" }}
+            style={{ backgroundColor: "#f0f0f0" }}
+            dropDownDirection="TOP"
             multiple={true}
             min={0}
             max={18}
