@@ -4,51 +4,37 @@ const { ObjectId } = require("mongodb");
 
 const { formatDate } = require("../helpers/dateFormat");
 
-const COLLECTION_NAME = "Transactions";
+const COLLECTION_NAME = "BankDetails";
 
 // your data.
 const typeDefs = `#graphql
 
-  type Transaction {
+  type BankDetails {
     _id: ID
     TalentId: ID
-    UserId: ID
-    talentName: String
-    userName: String
-    paymentId: String
-    BookingId: ID
-    transactionStatus: String
-    paidByAdmin: Boolean
+    bankName: String
+    accountName: String
+    accountNumber: String
     updatedAt: String
     createdAt: String
-
-  }
-
-  input NewTransaction {
-    followingId: ID!
-    followerId: ID!
   }
 
   type Query {
-    transactions: [Transaction]
+    bankDetails: [BankDetails]
   }
-
 `;
+//WHY
 
 const resolvers = {
   Query: {
-    transactions: async (parent, args, contextValue, info) => {
+    bankDetails: async (parent, args, contextValue, info) => {
       try {
         const { db, authentication } = contextValue;
         const auth = await authentication();
-
-        const transactions = await db
-          .collection(COLLECTION_NAME)
-          .find()
-          .toArray();
-        return transactions;
+        const banks = await db.collection(COLLECTION_NAME).find().toArray();
+        return banks;
       } catch (error) {
-        console.log(error, "GET_TRANSACTIONS"); // errorHandler next up
+        console.log(error, "GET_BANKS"); // errorHandler next up
         throw new GraphQLError(error.message || "Internal Server Error", {
           extensions: {
             code: error.code || "INTERNAL_SERVER_ERROR",

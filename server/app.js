@@ -26,6 +26,11 @@ const {
   resolvers: bookingsResolvers,
 } = require("./schemas/bookings");
 
+const {
+  typeDefs: bankDetailsTypeDefs,
+  resolvers: bankDetailsResolvers,
+} = require("./schemas/bankDetails");
+
 const client = require("./config/configMongo");
 const { ObjectId } = require("mongodb");
 
@@ -35,12 +40,14 @@ const server = new ApolloServer({
     talentTypeDefs,
     transactionsTypeDefs,
     bookingsTypeDefs,
+    bankDetailsTypeDefs,
   ],
   resolvers: [
     userResolvers,
     talentResolvers,
     transactionsResolvers,
     bookingsResolvers,
+    bankDetailsResolvers,
   ],
   introspection: true,
 });
