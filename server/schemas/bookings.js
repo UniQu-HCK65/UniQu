@@ -15,18 +15,19 @@ const typeDefs = `#graphql
     UserId: ID
     talentName: String
     userName: String
-    TransactionId: ID
     bookDate: String
+    bookSession: String
     bookLocation: String
     bookStatus: String
     updatedAt: String
     createdAt: String
+
   }
 
   input NewBooking {
     TalentId: ID
-    TransactionId: ID
     bookDate: String
+    bookSession: String
     bookLocation: String
   }
 
@@ -68,16 +69,73 @@ const resolvers = {
 
         const auth = await authentication();
 
+        const role = auth.role;
+        const userId = auth._id;
+
+        const bookings = await db.collection(COLLECTION_NAME);
+
+        const findExistingBooking = await bookings
+          .find({
+            $and: [
+              { TalentId: new ObjectId(newBooking.TalentId) },
+              { UserId: new ObjectId(userId) },
+            ],
+          })
+          .toArray();
+
+        console.log(findExistingBooking, "findExistingBooking");
+
+        const requestedBooking = existingBookings.find(
+          (booking) => booking.bookStatus !== "ended"
+        );
+
+        if (requestedBooking) {
+          throw {
+            message:
+              "Cannot make another booking with the talent because you have an ongoing booking",
+            code: "FORBIDDEN",
+            status: 403,
+          };
+        }
+
+        
+
+
+
         return {
           _id: new ObjectId("1"),
           TalentId: new ObjectId("1"),
           UserId: new ObjectId(auth._id),
           TransactionId: new ObjectId("a"),
-          bookDate: new Date(),
+          talentName: "String",
+          userName: "String",
+          bookDate: new Date().toDateString(),
+          bookSession: "String",
           bookLocation: "String",
           bookStatus: "String",
           updatedAt: new Date(),
           createdAt: new Date(),
+          /*
+              _id: ID
+              TalentId: ID
+              UserId: ID
+              talentName: String
+              userName: String
+              bookDate: String
+              bookSession: String
+              bookLocation: String
+              bookStatus: String
+              updatedAt: String
+              createdAt: String
+
+              input NewBooking {
+                TalentId: ID
+                bookDate: String
+                bookSession: String
+                bookLocation: String
+              }
+
+          */
         };
       } catch (error) {
         console.log(error, "FOLLOW"); // errorHandler next up
