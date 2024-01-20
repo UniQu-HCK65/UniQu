@@ -46,6 +46,7 @@ export default function EditProfileUser() {
     userLocations: "",
     imgUrl: "",
   });
+  //ME WANT SLEEP MORE
 
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState();
@@ -146,6 +147,9 @@ export default function EditProfileUser() {
         </View>
         <View style={styles.pickerInput}>
           <DropDownPicker
+            dropDownContainerStyle={{ backgroundColor: "#f0f0f0" }}
+            style={{ backgroundColor: "#f0f0f0" }}
+            dropDownDirection="TOP"
             multiple={true}
             min={0}
             max={18}
