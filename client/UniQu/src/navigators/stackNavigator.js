@@ -1,7 +1,7 @@
 import { NavigationContainer } from "@react-navigation/native";
 import {
-  createNativeStackNavigator,
-  CardStyleInterpolators,
+    createNativeStackNavigator,
+    CardStyleInterpolators,
 } from "@react-navigation/native-stack";
 import Home from "../screens/home";
 import Login from "../screens/login";
@@ -19,21 +19,25 @@ import Chat from "../screens/chat";
 import Booking from "../screens/booking";
 import ListChat from "../screens/list-chat";
 
-import EditProfileUser from "../screens/editProfileUser";
 
 const Stack = createNativeStackNavigator();
 
 export default function StackNavigator() {
-  const { isLoggedIn } = useContext(LoginContext);
+    const { isLoggedIn } = useContext(LoginContext);
 
     return (
         <Stack.Navigator
             screenOptions={{
-              gestureDirection: "vertical",
+                gestureDirection: "vertical",
             }}
         >
             {isLoggedIn ? (
-              <>
+                <>
+                     <Stack.Screen
+                        name="Booking"
+                        component={Booking}
+                    />
+
                     <Stack.Screen
                         name="Home"
                         component={MyTabs}
@@ -42,22 +46,21 @@ export default function StackNavigator() {
                         }}
                     />
 
-              <Stack.Screen name="Edit Profile" component={EditProfileUser} />
-              <Stack.Screen name="Profile" component={ProfileUser} />
+                    <Stack.Screen 
+                        name="Edit Profile" 
+                        component={EditProfileUser} 
+                    />
+
+                    <Stack.Screen 
+                        name="Profile" 
+                        component={ProfileUser} 
+                    />
 
                     <Stack.Screen
                         name="Chat"
                         component={Chat}
                         options={{
                             headerShown: false
-                        }}
-                    />
-
-                    <Stack.Screen
-                        name="Booking"
-                        component={Booking}
-                        options={{
-                            headerShown: false,
                         }}
                     />
 
@@ -70,13 +73,13 @@ export default function StackNavigator() {
                         }}
                     />
 
-          <Stack.Screen
-            name="Login"
-            component={Login}
-            options={{
-              headerShown: false,
-            }}
-          />
+                    <Stack.Screen
+                        name="Login"
+                        component={Login}
+                        options={{
+                            headerShown: false,
+                        }}
+                    />
                 </>
             ) : (
                 <>
