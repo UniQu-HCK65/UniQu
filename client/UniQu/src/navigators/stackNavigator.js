@@ -9,6 +9,7 @@ import { useContext } from "react";
 import LogoutButton from "../components/logoutButton";
 import TalentDetails from "../screens/talentDetails";
 import ProfileUser from "../screens/profileUser";
+import EditProfileUser from "../screens/editProfileUser";
 import AllTalent from "../screens/allTalent";
 import MyTabs from "../navigators/tabNavigator"
 import Chat from "../screens/chat";
@@ -19,17 +20,16 @@ import ListChat from "../screens/list-chat";
 const Stack = createNativeStackNavigator();
 
 export default function StackNavigator() {
-
-    const { isLoggedIn } = useContext(LoginContext);
+  const { isLoggedIn } = useContext(LoginContext);
 
     return (
         <Stack.Navigator
             screenOptions={{
-                gestureDirection: "vertical",
+              gestureDirection: "vertical",
             }}
         >
             {isLoggedIn ? (
-                <>
+              <>
                     <Stack.Screen
                         name="Home"
                         component={MyTabs}
@@ -38,6 +38,9 @@ export default function StackNavigator() {
                         }}
                     />
 
+              <Stack.Screen name="Edit Profile" component={EditProfileUser} />
+              <Stack.Screen name="Profile" component={ProfileUser} />
+
                     <Stack.Screen
                         name="Chat"
                         component={Chat}
@@ -45,6 +48,7 @@ export default function StackNavigator() {
                             headerShown: false
                         }}
                     />
+
                     <Stack.Screen
                         name="Booking"
                         component={Booking}
@@ -54,6 +58,7 @@ export default function StackNavigator() {
                     />
 
                     <Stack.Screen
+
                         name="All Talent"
                         component={AllTalent}
                         options={{
@@ -83,6 +88,7 @@ export default function StackNavigator() {
                     />
 
                     <Stack.Screen
+
                         name="Login"
                         component={Login}
                         options={{
