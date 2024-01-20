@@ -30,10 +30,6 @@ export default function StackNavigator() {
         >
             {isLoggedIn ? (
                 <>
-                    <Stack.Screen
-                        name="Booking"
-                        component={Booking}
-                    />
 
                     <Stack.Screen
                         name="Home"
@@ -68,6 +64,10 @@ export default function StackNavigator() {
                             headerShown: false
                         }}
                     />
+                <Stack.Screen
+                    name="Booking"
+                    component={Booking}
+                />
                 </>
             ) : (
                 <>
