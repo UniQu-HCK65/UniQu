@@ -9,16 +9,16 @@ import Register from "../screens/register";
 import LandingPage from "../screens/landingPage";
 import { LoginContext } from "../context/LoginContext";
 import { useContext } from "react";
-import LogoutButton from "../components/logoutButton";
 import TalentDetails from "../screens/talentDetails";
 import ProfileUser from "../screens/profileUser";
 import EditProfileUser from "../screens/editProfileUser";
-import AllTalent from "../screens/allTalent";
 import MyTabs from "../navigators/tabNavigator";
 import Chat from "../screens/chat";
 import Booking from "../screens/booking";
 import ListChat from "../screens/list-chat";
 import HomeforTalent from "../screens/homeCMST";
+import StatusBooking from "../screens/statusBooking";
+import ListBookingTalent from "../screens/listBookingDetail";
 
 const Stack = createNativeStackNavigator();
 
@@ -40,21 +40,17 @@ export default function StackNavigator() {
               headerShown: false,
             }}
           />
-          
           <Stack.Screen
-            name="Home"
-            component={MyTabs}
+            name="List Booking Detail"
+            component={ListBookingTalent}
             options={{
               headerShown: false,
             }}
           />
 
-          <Stack.Screen name="Edit Profile" component={EditProfileUser} />
-          {/* <Stack.Screen name="Profile" component={ProfileUser} /> */}
-
           <Stack.Screen
-            name="Chat"
-            component={Chat}
+            name="Status Booking"
+            component={StatusBooking}
             options={{
               headerShown: false,
             }}
@@ -69,8 +65,20 @@ export default function StackNavigator() {
           />
 
           <Stack.Screen
-            name="All Talent"
-            component={AllTalent}
+            name="Home"
+            component={MyTabs}
+            options={{
+              headerShown: false,
+            }}
+          />
+
+          <Stack.Screen name="Edit Profile" component={EditProfileUser} />
+
+          <Stack.Screen name="Profile" component={ProfileUser} />
+
+          <Stack.Screen
+            name="Chat"
+            component={Chat}
             options={{
               headerShown: false,
             }}

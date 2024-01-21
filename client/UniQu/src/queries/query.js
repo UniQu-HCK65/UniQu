@@ -65,48 +65,44 @@ export const GET_ALL_TALENT = gql`
 `;
 
 export const WHO_AM_I_USER = gql`
-  query WhoAmI {
-    whoAmI {
+query Query {
+  whoAmI {
+    _id
+    name
+    username
+    email
+    password
+    role
+    imgUrl
+    gender
+    tags
+    userLocations
+    userBookings {
       _id
-      name
-      username
-      email
-      password
-      role
-      imgUrl
-      gender
-      tags
-      userLocations
-      userBookings {
-        _id
-        TalentId
-        UserId
-        talentName
-        userName
-        bookDate
-        bookSession
-        bookLocation
-        bookStatus
-        updatedAt
-        createdAt
-      }
-      userTransactions {
-        _id
-        TalentId
-        UserId
-        talentName
-        userName
-        paymentId
-        BookingId
-        transactionStatus
-        paidByAdmin
-        updatedAt
-        createdAt
-      }
+      TalentId
+      UserId
+      talentName
+      userName
+      bookDate
+      bookSession
+      bookLocation
+      bookStatus
+      updatedAt
       createdAt
+    }
+    userTransactions {
+      _id
+      TalentId
+      UserId
+      talentName
+      userName
+      paymentId
+      BookingId
+      transactionStatus
+      paidByAdmin
       updatedAt
     }
-  }
+  }}
 `;
 
 export const EditUser = gql`

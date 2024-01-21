@@ -12,7 +12,7 @@ import { io } from "socket.io-client";
 import * as ImagePicker from "expo-image-picker";
 import Icon from "react-native-vector-icons/FontAwesome";
 
-const serverURL = "http://192.168.72.141:4000";
+const serverURL = "http://192.168.68.168:4000";
 const socket = io(serverURL);
 
 export default function Chat() {
