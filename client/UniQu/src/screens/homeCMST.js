@@ -18,21 +18,21 @@ const convertToDate = (timestamp) => {
 const getStatusColor = (status) => {
   switch (status) {
     case "requested":
-      return "#819867"; // Color for requested status
+      return "#819867"; 
     case "denied":
-      return "#e61c19"; // Color for denied status
+      return "#e61c19"; 
     case "booked":
-      return "#cd6b32"; // Color for booked status
+      return "#cd6b32"; 
     case "in progress":
-      return "#b6b649"; // Color for in progress status
+      return "#b6b649"; 
     case "cancelled":
-      return "#4e4e4e"; // Color for cancelled status
+      return "#4e4e4e"; 
     case "started":
-      return "#74649b"; // Color for started status
+      return "#74649b"; 
     case "ended":
-      return "#5a84a5"; // Color for ended status
+      return "#5a84a5"; 
     default:
-      return "#FFFFFF"; // Default color
+      return "##000000";
   }
 };
 
