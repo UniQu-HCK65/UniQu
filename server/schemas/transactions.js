@@ -1,6 +1,7 @@
 const client = require("../config/configMongo");
 const { GraphQLError } = require("graphql");
 const { ObjectId } = require("mongodb");
+const midtransClient = require("midtrans-client");
 
 const { formatDate } = require("../helpers/dateFormat");
 
@@ -25,12 +26,19 @@ const typeDefs = `#graphql
   }
 
   input NewTransaction {
-    followingId: ID!
-    followerId: ID!
+    TalentId: ID
+    UserId: ID
+    talentName: String
+    userName: String
+    BookingId: ID
   }
 
   type Query {
     transactions: [Transaction]
+  }
+
+  type Mutation {
+  initPayment(newTransaction:NewTransaction): User
   }
 
 `;
@@ -59,7 +67,45 @@ const resolvers = {
     },
   },
 
-  Mutation: {},
+  Mutation: {
+    initPayment: async (parent, args, contextValue, info) => {
+      try {
+        //OLEH TALENT
+        const { newTransaction } = args;
+
+        let snap = new midtransClient.Snap({
+          isProduction: false,
+          serverKey: process.env.MIDTRANS_SERVER_KEY,
+        });
+
+        const orderId = `TRX-BKNG-${
+          newTransaction.BookingId
+        }-${Math.random().toString()}-${auth._id}`;
+
+        const trxAmount = 500_000;
+
+        const transaction = await snap.createTransaction({
+          transaction_details: {
+            order_id: orderId,
+            gross_amount: amount,
+          },
+          customer_details: {
+            email: user.email,
+          },
+        });
+
+        
+      } catch (error) {
+        console.log(error, "INIT_PAYMENT"); // errorHandler next up
+        throw new GraphQLError(error.message || "Internal Server Error", {
+          extensions: {
+            code: error.code || "INTERNAL_SERVER_ERROR",
+            http: { status: error.status || 500 },
+          },
+        });
+      }
+    },
+  },
 };
 
 module.exports = {
