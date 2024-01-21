@@ -21,6 +21,7 @@ import {
   GET_USER,
 } from "../queries/query";
 import Ionicons from "react-native-vector-icons/Feather";
+import HomeforTalent from "./homeCMST";
 
 const tags = [
   "Sneakers",
@@ -228,6 +229,7 @@ export default function Home({ navigation }) {
           </TouchableOpacity>
         </View>
       </View>
+     
 
       {forYouLoading || allTalentLoading ? (
         <ActivityIndicator size="large" color="#5a84a5" />
