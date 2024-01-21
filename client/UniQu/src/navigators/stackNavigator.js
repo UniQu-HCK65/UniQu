@@ -36,18 +36,26 @@ export default function StackNavigator() {
       {isLoggedIn ? (
         <>
           <Stack.Screen
+            name="Register"
+            component={Register}
+            options={{
+              headerShown: false,
+            }}
+          />
+          
+          <Stack.Screen
             name="List Booking"
             component={HomeforTalent}
             options={{
               headerShown: false,
             }}
           />
-           <Stack.Screen
-             name="Konfirmasi Booking"
-             component={EditStatusBooking}
-             options={{
-               headerShown: false
-             }}
+          <Stack.Screen
+            name="Konfirmasi Booking"
+            component={EditStatusBooking}
+            options={{
+              headerShown: false
+            }}
           />
 
           <Stack.Screen
@@ -120,13 +128,7 @@ export default function StackNavigator() {
             }}
           />
 
-          <Stack.Screen
-            name="Register"
-            component={Register}
-            options={{
-              headerShown: false,
-            }}
-          />
+
         </>
       )}
     </Stack.Navigator>
