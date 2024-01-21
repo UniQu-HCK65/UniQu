@@ -38,6 +38,7 @@ const typeDefs = `#graphql
   type Mutation {
   book(newBooking:NewBooking) : Booking
   updateBookingStatus(bookingId:ID) : Booking
+  denyBooking(bookingId:ID) : Booking
   }
 `;
 
@@ -152,6 +153,10 @@ const resolvers = {
 
         const auth = await authentication();
 
+        const role = auth.role;
+
+        const talentId = new ObjectId(auth._id);
+
         const bookings = await db.collection(COLLECTION_NAME);
 
         const findBooking = await bookings.findOne({
@@ -167,7 +172,28 @@ const resolvers = {
           };
         }
 
+        const findBookingTalentId = findBooking.TalentId;
+
+        const checkTalent = findBookingTalentId.equals(talentId);
+
+        console.log(checkTalent, "checkTalent");
+        if (!checkTalent) {
+          throw {
+            message: "Forbidden, you are not the talent",
+            code: "FORBIDDEN",
+            status: 403,
+          };
+        }
+
         if (findBooking.bookStatus === "requested") {
+          if (role !== "talent") {
+            throw {
+              message: "Forbidden, you are not a talent",
+              code: "FORBIDDEN",
+              status: 403,
+            };
+          }
+
           await bookings.updateOne(
             {
               _id: new ObjectId(bookingId),
@@ -179,7 +205,17 @@ const resolvers = {
               },
             }
           );
+
+          //JALANIN BUAT MIDTRANS, MAKE USERID(POSISI SEBAGAI TALENT,HARUS GET USERID)
         } else if (findBooking.bookStatus === "booked") {
+          if (role !== "talent") {
+            throw {
+              message: "Forbidden, you are not a talent",
+              code: "FORBIDDEN",
+              status: 403,
+            };
+          }
+
           await bookings.updateOne(
             {
               _id: new ObjectId(bookingId),
@@ -192,6 +228,14 @@ const resolvers = {
             }
           );
         } else if (findBooking.bookStatus === "in progress") {
+          if (role !== "talent") {
+            throw {
+              message: "Forbidden, you are not a talent",
+              code: "FORBIDDEN",
+              status: 403,
+            };
+          }
+
           await bookings.updateOne(
             {
               _id: new ObjectId(bookingId),
@@ -204,6 +248,14 @@ const resolvers = {
             }
           );
         } else if (findBooking.bookStatus === "started") {
+          if (role !== "talent") {
+            throw {
+              message: "Forbidden, you are not a talent",
+              code: "FORBIDDEN",
+              status: 403,
+            };
+          }
+
           await bookings.updateOne(
             {
               _id: new ObjectId(bookingId),
@@ -225,18 +277,99 @@ const resolvers = {
         } else if (findBooking.bookStatus === "denied") {
           throw {
             message:
-              "Booking has been denied, please reconfirm with the talent",
+              "Booking has been denied, please reconfirm with the talent and try booking again",
             code: "BAD_REQUEST",
             status: 400,
           };
         } else if (findBooking.bookStatus === "cancelled") {
           throw {
             message:
-              "Booking has been cancelled, please reconfirm with the talent",
+              "Booking has been cancelled, please reconfirm with the talent and try booking again",
             code: "BAD_REQUEST",
             status: 400,
           };
         }
+
+        const findUpdatedBooking = await bookings.findOne({
+          _id: new ObjectId(bookingId),
+        });
+        return findUpdatedBooking;
+      } catch (error) {
+        console.log(error, "UPDATE_STATUS_BOOKING"); // errorHandler next up
+        throw new GraphQLError(error.message || "Internal Server Error", {
+          extensions: {
+            code: error.code || "INTERNAL_SERVER_ERROR",
+            http: { status: error.status || 500 },
+          },
+        });
+      }
+    },
+
+    denyBooking: async (parent, args, contextValue, info) => {
+      try {
+        const { bookingId } = args;
+        const { db, authentication } = contextValue;
+
+        const auth = await authentication();
+
+        const role = auth.role;
+        const talentId = new ObjectId(auth._id);
+
+        if (role !== "talent") {
+          throw {
+            message: "Forbidden, you are not a talent",
+            code: "FORBIDDEN",
+            status: 403,
+          };
+        }
+        const bookings = await db.collection(COLLECTION_NAME);
+
+        const findBooking = await bookings.findOne({
+          _id: new ObjectId(bookingId),
+        });
+
+        if (!findBooking) {
+          throw {
+            message:
+              "Booking Not Found, please check your booking id and try again",
+            code: "BAD_REQUEST",
+            status: 400,
+          };
+        }
+
+        const findBookingTalentId = findBooking.TalentId;
+
+        const checkTalent = findBookingTalentId.equals(talentId);
+
+        console.log(checkTalent, "checkTalent");
+        if (!checkTalent) {
+          throw {
+            message: "Forbidden, you are not the talent",
+            code: "FORBIDDEN",
+            status: 403,
+          };
+        }
+
+        if (findBooking.bookStatus !== "requested") {
+          throw {
+            message:
+              "Can't cancel / deny request, the booking has either started or finished",
+            code: "FORBIDDEN",
+            status: 403,
+          };
+        }
+
+        await bookings.updateOne(
+          {
+            _id: new ObjectId(bookingId),
+          },
+          {
+            $set: {
+              bookStatus: "denied",
+              updatedAt: new Date(),
+            },
+          }
+        );
 
         const findUpdatedBooking = await bookings.findOne({
           _id: new ObjectId(bookingId),
