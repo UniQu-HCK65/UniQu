@@ -23,7 +23,14 @@ export default function ProfileUser({ navigation }) {
   }
 
   const { whoAmI } = data;
-  
+  const paymentId = whoAmI.userTransactions[0].paymentId;
+  // console.log(paymentId, ">> hai");
+
+  const convertToDate = (timestamp) => {
+    const date = new Date(parseInt(timestamp));
+    return date.toLocaleDateString();
+  };
+
   return (
     <ScrollView style={styles.container}>
       <View>
@@ -110,7 +117,7 @@ export default function ProfileUser({ navigation }) {
                       <Text style={styles.historyLabel}>No. Payment</Text>
                     </View>
                     <View style={{ marginLeft: 10 }}>
-                      <Text> : {booking.TransactionId}</Text>
+                      <Text> : {paymentId}</Text>
                     </View>
                   </View>
 
@@ -119,7 +126,7 @@ export default function ProfileUser({ navigation }) {
                       <Text style={styles.historyLabel}>Date</Text>
                     </View>
                     <View style={{ marginLeft: 60 }}>
-                      <Text>: {booking.bookDate}</Text>
+                      <Text>: {convertToDate(booking.bookDate)}</Text>
                     </View>
                   </View>
 
@@ -128,7 +135,16 @@ export default function ProfileUser({ navigation }) {
                       <Text style={styles.historyLabel}>Shopper</Text>
                     </View>
                     <View style={{ marginLeft: 39 }}>
-                      <Text>: {booking.userName}</Text>
+                      <Text>: {booking.talentName}</Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.historyContainer}>
+                    <View>
+                      <Text style={styles.historyLabel}>Book Seesion</Text>
+                    </View>
+                    <View style={{ marginLeft: 10 }}>
+                      <Text>: Session {booking.bookSession}</Text>
                     </View>
                   </View>
 

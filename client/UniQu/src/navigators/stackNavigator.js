@@ -18,57 +18,81 @@ import MyTabs from "../navigators/tabNavigator";
 import Chat from "../screens/chat";
 import Booking from "../screens/booking";
 import ListChat from "../screens/list-chat";
-
-import EditProfileUser from "../screens/editProfileUser";
+import HomeforTalent from "../screens/homeCMST";
 
 const Stack = createNativeStackNavigator();
 
 export default function StackNavigator() {
   const { isLoggedIn } = useContext(LoginContext);
 
-    return (
-        <Stack.Navigator
-            screenOptions={{
-              gestureDirection: "vertical",
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        gestureDirection: "vertical",
+      }}
+    >
+      {isLoggedIn ? (
+        <>
+          <Stack.Screen
+            name="List Booking"
+            component={HomeforTalent}
+            options={{
+              headerShown: false,
             }}
-        >
-            {isLoggedIn ? (
-              <>
-                    <Stack.Screen
-                        name="Home"
-                        component={MyTabs}
-                        options={{
-                            headerShown: false,
-                        }}
-                    />
+          />
+          
+          <Stack.Screen
+            name="Home"
+            component={MyTabs}
+            options={{
+              headerShown: false,
+            }}
+          />
 
-              <Stack.Screen name="Edit Profile" component={EditProfileUser} />
-              <Stack.Screen name="Profile" component={ProfileUser} />
+          <Stack.Screen name="Edit Profile" component={EditProfileUser} />
+          {/* <Stack.Screen name="Profile" component={ProfileUser} /> */}
 
-                    <Stack.Screen
-                        name="Chat"
-                        component={Chat}
-                        options={{
-                            headerShown: false
-                        }}
-                    />
+          <Stack.Screen
+            name="Chat"
+            component={Chat}
+            options={{
+              headerShown: false,
+            }}
+          />
 
-                    <Stack.Screen
-                        name="Booking"
-                        component={Booking}
-                        options={{
-                            headerShown: false,
-                        }}
-                    />
+          <Stack.Screen
+            name="Booking"
+            component={Booking}
+            options={{
+              headerShown: false,
+            }}
+          />
 
-                    <Stack.Screen
+          <Stack.Screen
+            name="All Talent"
+            component={AllTalent}
+            options={{
+              headerShown: false,
+            }}
+          />
 
-                        name="All Talent"
-                        component={AllTalent}
-                        options={{
-                            headerShown: false
-                        }}
-                    />
+          <Stack.Screen
+            name="TalentDetails"
+            component={TalentDetails}
+            options={{
+              headerShown: false,
+            }}
+          />
+        </>
+      ) : (
+        <>
+          <Stack.Screen
+            name="LandingPage"
+            component={LandingPage}
+            options={{
+              headerShown: false,
+            }}
+          />
 
           <Stack.Screen
             name="Login"
@@ -77,36 +101,16 @@ export default function StackNavigator() {
               headerShown: false,
             }}
           />
-                </>
-            ) : (
-                <>
-                    <Stack.Screen
-                        name="LandingPage"
-                        component={LandingPage}
-                        options={{
-                            headerShown: false,
-                        }}
-                    />
 
-                    <Stack.Screen
-
-                        name="Login"
-                        component={Login}
-                        options={{
-                            headerShown: false,
-                        }}
-                    />
-
-                    <Stack.Screen
-                        name="Register"
-                        component={Register}
-                        options={{
-                            headerShown: false,
-                        }}
-                    />
-                </>
-            )}
-
-        </Stack.Navigator >
-    );
+          <Stack.Screen
+            name="Register"
+            component={Register}
+            options={{
+              headerShown: false,
+            }}
+          />
+        </>
+      )}
+    </Stack.Navigator>
+  );
 }
