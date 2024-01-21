@@ -10,7 +10,7 @@ const multer = require("multer");
 const path = require("path");
 
 const PORT = 4000;
-const clientOrigins = "exp://192.168.72.141:8081";
+const clientOrigins = "exp://192.168.68.168:8081";
 const mongoUri = process.env.CHAT_DB_URI;
 
 const app = express();
@@ -102,6 +102,19 @@ io.on("connect", (socket) => {
     console.log(username, socket.id);
     io.emit("new-user", username);
   });
+
+  io.use(function (socket, next) {
+    socket.room = socket.handshake.query.room;
+    return next();
+  })
+  .on("connection", function(socket) {
+    socket.on('private', (msg) => {
+        socket.broadcast
+        .to(socket.room)
+        .emit("chat", msg)
+    });
+  });
+
 });
 
 startServer();
