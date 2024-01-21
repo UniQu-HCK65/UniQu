@@ -3,10 +3,10 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function ListBookingTalent() {
     const [status, setStatus] = useState('Requested');
-    const [payment, setPayment] = useState(true)
-    const [time, setTime] = useState(true)
+    const [payment, setPayment] = useState(false)
+    const [time, setTime] = useState(false)
     const [showButton, setShowButton] = useState(true)
-    
+
 
     const handleOnAccept = () => {
         setStatus('Booked')
@@ -132,13 +132,13 @@ export default function ListBookingTalent() {
                             </TouchableOpacity>
                         )}
 
-                        {showButton && status === 'On Progress' && time === false && (
+                        {showButton && status === 'On Progress' && !time&& (
                             <TouchableOpacity style={styles.onProgress}>
                                 <Text style={styles.buttonText}>Progress</Text>
                             </TouchableOpacity>
                         )}
 
-                        {showButton && time === true && payment === true &&(
+                        {showButton && time && payment &&(
                             <TouchableOpacity onPress={handleOnEndSession} style={styles.endSession}>
                                 <Text style={styles.buttonText}>End Session</Text>
                             </TouchableOpacity>
