@@ -19,6 +19,8 @@ import ListChat from "../screens/list-chat";
 import HomeforTalent from "../screens/homeCMST";
 import StatusBooking from "../screens/statusBooking";
 import ListBookingTalent from "../screens/listBookingDetail";
+import EditStatusBooking from "../screens/editStatusBooking";
+
 
 const Stack = createNativeStackNavigator();
 
@@ -40,6 +42,14 @@ export default function StackNavigator() {
               headerShown: false,
             }}
           />
+           <Stack.Screen
+             name="Konfirmasi Booking"
+             component={EditStatusBooking}
+             options={{
+               headerShown: false
+             }}
+          />
+
           <Stack.Screen
             name="List Booking Detail"
             component={ListBookingTalent}
