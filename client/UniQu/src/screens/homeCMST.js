@@ -10,6 +10,8 @@ import {
 import { WHO_AM_I_TALENT } from "../queries/query";
 import LogoutButton from "../components/logoutButton";
 
+// updated
+
 const convertToDate = (timestamp) => {
   const date = new Date(parseInt(timestamp));
   return date.toLocaleDateString();
