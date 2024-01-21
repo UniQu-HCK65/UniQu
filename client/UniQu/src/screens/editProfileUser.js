@@ -40,7 +40,7 @@ export default function EditProfileUser() {
   const [editProfileMutation] = useMutation(EditUser);
 
   const [input, setInput] = useState({
-    name: "Nell",
+    name: "",
     tags: [],
     password: "",
     userLocations: "",
@@ -75,10 +75,10 @@ export default function EditProfileUser() {
           name: response.data.editProfile.name,
           tags: response.data.editProfile.tags,
           userLocations: response.data.editProfile.userLocations,
-          imgUrl: response.data?.editProfile?.imgUrl,
+          imgUrl: response.data.editProfile.imgUrl,
         });
 
-        navigation.navigate('Profile');
+        navigation.navigate("Profile");
       })
       .catch((error) => {
         console.error("Error during update data", error);
@@ -87,9 +87,11 @@ export default function EditProfileUser() {
 
   useEffect(() => {
     setInput({
-      name: "Nell",
+      name: "",
       tags: [],
-      userLocations: "Jakarta Selatan",
+      password: "",
+      userLocations: "",
+      imgUrl: "",
     });
 
     setItems(tags.map((tag) => ({ label: tag, value: tag })));
@@ -118,9 +120,7 @@ export default function EditProfileUser() {
           <TextInput
             style={{ fontSize: 20, marginTop: 5 }}
             value={input.name}
-            onChangeText={(text) =>
-              setInput((prevInput) => ({ ...prevInput, name: text }))
-            }
+            onChangeText={(text) => setInput({ ...input, name: text })}
           />
         </View>
       </View>
@@ -176,7 +176,7 @@ export default function EditProfileUser() {
 
       <View style={styles.cardEdit}>
         <View>
-          <Text style={styles.textStyle}> Location </Text>
+          <Text style={{ ...styles.textStyle, marginTop: 15 }}> Location </Text>
         </View>
         <View style={styles.pickerInput}>
           <SelectList
