@@ -1,16 +1,51 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function ListBookingTalent() {
-    const [status, setStatus] = useState('');
+    const [status, setStatus] = useState('Requested');
+    const [payment, setPayment] = useState(true)
+    const [time, setTime] = useState(true)
+    const [showButton, setShowButton] = useState(true)
+    
 
     const handleOnAccept = () => {
-        setStatus('booked')
+        setStatus('Booked')
     }
 
     const handleOnCancel = () => {
-        setStatus('cancel')
+        setStatus('Cancel')
     }
+
+    const handleOnPayment = () => {
+        if(payment && !time){
+            setStatus('In Process')
+        } 
+    }
+   
+    useEffect(() => {
+        handleOnPayment()
+    }, [])
+
+    const handleOnStartSession = () => {
+        if((!time && payment) || (time && !payment)) {
+            setStatus('On Progress')
+        }
+    }
+
+    const handleOnEndSession = () => {
+        setStatus('End Session')
+        setShowButton(false);
+    }
+
+    const handleTimeUp = () => {
+       if(time && payment ){
+           setStatus('On Progress')
+       }
+    }
+
+    useEffect(() => {
+        handleTimeUp()
+    }, [])
 
 
     return (
@@ -57,7 +92,7 @@ export default function ListBookingTalent() {
                             <View>
                                 <View style={styles.userDetail}>
                                     <Text style={styles.name}>Maldini Junior</Text>
-                                    <Text style={styles.status}>Requested</Text>
+                                    <Text style={styles.status}>{status}</Text>
                                 </View>
 
                                 <Text style={styles.status}>@maldinigay</Text>
@@ -66,19 +101,52 @@ export default function ListBookingTalent() {
                     </View>
 
                     <View style={styles.buttonContainer}>
-                        <TouchableOpacity onPress={handleOnCancel} style={styles.buttonCancel}>
 
-                            <Text style={styles.buttonText}>Cancel</Text>
+                        {showButton && status === 'Requested' && !time && !payment && (
+                            <TouchableOpacity onPress={handleOnCancel} style={styles.buttonCancel}>
+                                <Text style={styles.buttonText}>Cancel</Text>
+                            </TouchableOpacity>
+                        )}
 
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={handleOnAccept} style={[
-                            styles.buttonConfirm,
-                            { backgroundColor: status === 'booked' ? '#4CAF50' : '#2b471f' }, // Ganti warna tombol jika status booked
-                        ]}>
 
-                            <Text style={styles.buttonText}>{status === 'booked' ? 'Booked' : 'Accept'}</Text>
+                        {showButton && status === 'Requested' && (
+                            <TouchableOpacity onPress={handleOnAccept} style={[
+                                styles.buttonConfirm,
+                                { backgroundColor: status === 'Booked' ? '#4CAF50' : '#2b471f' },
+                            ]}
+                                disabled={status === 'Booked'}
+                            >
+                                <Text style={styles.buttonText}>{status === 'Booked' ? 'Start Session' : 'Accept'}</Text>
+                            </TouchableOpacity>
+                        )}
 
-                        </TouchableOpacity>
+                        {showButton && status === 'Booked' && (
+                            <TouchableOpacity style={styles.waitingPayment}>
+                                <Text style={styles.buttonText}>Waiting for payament..</Text>
+                            </TouchableOpacity>
+                        )}
+
+                        {showButton && payment && status === 'In Process' && !time && (
+                            <TouchableOpacity onPress={handleOnStartSession} style={styles.buttonConfirm}>
+                                <Text style={styles.buttonText}>Start Session</Text>
+                            </TouchableOpacity>
+                        )}
+
+                        {showButton && status === 'On Progress' && time === false && (
+                            <TouchableOpacity style={styles.onProgress}>
+                                <Text style={styles.buttonText}>Progress</Text>
+                            </TouchableOpacity>
+                        )}
+
+                        {showButton && time === true && payment === true &&(
+                            <TouchableOpacity onPress={handleOnEndSession} style={styles.endSession}>
+                                <Text style={styles.buttonText}>End Session</Text>
+                            </TouchableOpacity>
+                        )}
+
+                     
+
+
                     </View>
 
 
@@ -224,6 +292,29 @@ const styles = StyleSheet.create({
         position: 'absolute',
         marginTop: 240,
         opacity: 0.2
+    },
+    waitingPayment: {
+        width: 170,
+        height: 40,
+        backgroundColor: 'grey',
+        borderRadius: 10,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    onProgress : {
+        width: 140,
+        height: 40,
+        backgroundColor: 'grey',
+        borderRadius: 10,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    endSession : {
+        width: 140,
+        height: 40,
+        backgroundColor: '#632b27',
+        borderRadius: 10,
+        alignItems: 'center',
+        justifyContent: 'center'
     }
-
 });
