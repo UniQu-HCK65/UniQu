@@ -123,18 +123,17 @@ const resolvers = {
           updatedAt: new Date(),
         });
 
-        // console.log(newBookRequest.insertedId, "newBookRequest");
-
         const findCreatedBooking = await bookings.findOne({
           _id: new ObjectId(newBookRequest.insertedId),
         });
 
-        return {
-          ...findCreatedBooking,
-          bookDate: formatDate(findCreatedBooking.bookDate),
-          createdAt: formatDate(findCreatedBooking.createdAt),
-          updatedAt: formatDate(findCreatedBooking.updatedAt),
-        };
+        // return {
+        //   ...findCreatedBooking,
+        //   bookDate: formatDate(findCreatedBooking.bookDate),
+        //   createdAt: formatDate(findCreatedBooking.createdAt),
+        //   updatedAt: formatDate(findCreatedBooking.updatedAt),
+        // };
+        return findCreatedBooking;
       } catch (error) {
         console.log(error, "POST_BOOK_USER"); // errorHandler next up
         throw new GraphQLError(error.message || "Internal Server Error", {
