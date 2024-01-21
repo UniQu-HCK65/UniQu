@@ -29,39 +29,40 @@ export const FOR_YOU_TALENT_PAGE = gql`
 `;
 
 export const GET_USER = gql`
-query WhoAmI {
-  whoAmI {
-    name
+  query WhoAmI {
+    whoAmI {
+      name
+    }
   }
-}`
+`;
 
 export const GET_ALL_TALENT = gql`
-query Talents {
-  talents {
-    _id
-    name
-    username
-    email
-    password
-    aboutme
-    role
-    gender
-    tags
-    reviews {
-      message
-      reviewerName
+  query Talents {
+    talents {
+      _id
+      name
+      username
+      email
+      password
+      aboutme
+      role
+      gender
+      tags
+      reviews {
+        message
+        reviewerName
+        rating
+        updatedAt
+        createdAt
+      }
       rating
+      talentLocations
+      balance
       updatedAt
       createdAt
     }
-    rating
-    talentLocations
-    balance
-    updatedAt
-    createdAt
   }
-}
-`
+`;
 
 export const WHO_AM_I_USER = gql`
 query Query {
@@ -100,26 +101,89 @@ query Query {
       transactionStatus
       paidByAdmin
       updatedAt
-      createdAt
     }
-    createdAt
-    updatedAt
-  }
-}`
+  }}
+`;
 
 export const EditUser = gql`
-mutation EditProfile($editUser: EditUser) {
-  editProfile(editUser: $editUser) {
-    _id
-    name
-    username
-    email
-    password
-    role
-    gender
-    tags
-    userLocations
-    createdAt
-    updatedAt
+  mutation EditProfile($editUser: EditUser) {
+    editProfile(editUser: $editUser) {
+      _id
+      name
+      username
+      email
+      password
+      role
+      gender
+      imgUrl
+      tags
+      userLocations
+      createdAt
+      updatedAt
+    }
   }
-}`
+`;
+
+export const WHO_AM_I_TALENT = gql`
+  query WhoAmITalent {
+    whoAmITalent {
+      _id
+      name
+      username
+      email
+      password
+      aboutme
+      gender
+      imgUrl
+      tags
+      reviews {
+        message
+        reviewerName
+        rating
+        updatedAt
+        createdAt
+      }
+      rating
+      talentLocations
+      balance
+      talentBookings {
+        _id
+        TalentId
+        UserId
+        talentName
+        userName
+        bookDate
+        bookSession
+        bookLocation
+        bookStatus
+        updatedAt
+        createdAt
+      }
+      talentTransactions {
+        _id
+        TalentId
+        UserId
+        talentName
+        userName
+        paymentId
+        BookingId
+        transactionStatus
+        paidByAdmin
+        updatedAt
+        createdAt
+      }
+      talentBankAccount {
+        _id
+        TalentId
+        bankName
+        accountName
+        accountNumber
+        updatedAt
+        createdAt
+      }
+      updatedAt
+      createdAt
+    }
+  }
+`;
+

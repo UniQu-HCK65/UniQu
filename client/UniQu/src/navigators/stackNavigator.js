@@ -1,7 +1,7 @@
 import { NavigationContainer } from "@react-navigation/native";
 import {
-    createNativeStackNavigator,
-    CardStyleInterpolators,
+  createNativeStackNavigator,
+  CardStyleInterpolators,
 } from "@react-navigation/native-stack";
 import Home from "../screens/home";
 import Login from "../screens/login";
@@ -15,106 +15,110 @@ import EditProfileUser from "../screens/editProfileUser";
 import MyTabs from "../navigators/tabNavigator";
 import Chat from "../screens/chat";
 import Booking from "../screens/booking";
+import ListChat from "../screens/list-chat";
+import HomeforTalent from "../screens/homeCMST";
 import StatusBooking from "../screens/statusBooking";
 import ListBookingTalent from "../screens/listBookingDetail";
-
 
 const Stack = createNativeStackNavigator();
 
 export default function StackNavigator() {
-    const { isLoggedIn } = useContext(LoginContext);
+  const { isLoggedIn } = useContext(LoginContext);
 
-    return (
-        <Stack.Navigator
-            screenOptions={{
-                gestureDirection: "vertical",
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        gestureDirection: "vertical",
+      }}
+    >
+      {isLoggedIn ? (
+        <>
+          <Stack.Screen
+            name="List Booking"
+            component={HomeforTalent}
+            options={{
+              headerShown: false,
             }}
-        >
-            {isLoggedIn ? (
-                <>
-                    <Stack.Screen
-                        name="List Booking Detail"
-                        component={ListBookingTalent}
-                        options={{
-                            headerShown: false
-                        }}
-                    />
+          />
+          <Stack.Screen
+            name="List Booking Detail"
+            component={ListBookingTalent}
+            options={{
+              headerShown: false,
+            }}
+          />
 
-                    <Stack.Screen
-                        name="Status Booking"
-                        component={StatusBooking}
-                        options={{
-                            headerShown: false
-                        }}
-                    />
+          <Stack.Screen
+            name="Status Booking"
+            component={StatusBooking}
+            options={{
+              headerShown: false,
+            }}
+          />
 
-                    <Stack.Screen
-                        name="Booking"
-                        component={Booking}
-                    />
+          <Stack.Screen
+            name="Booking"
+            component={Booking}
+            options={{
+              headerShown: false,
+            }}
+          />
 
-                    <Stack.Screen
-                        name="Home"
-                        component={MyTabs}
-                        options={{
-                            headerShown: false,
-                        }}
-                    />
+          <Stack.Screen
+            name="Home"
+            component={MyTabs}
+            options={{
+              headerShown: false,
+            }}
+          />
 
-                    <Stack.Screen
-                        name="Edit Profile"
-                        component={EditProfileUser}
-                    />
+          <Stack.Screen name="Edit Profile" component={EditProfileUser} />
 
-                    <Stack.Screen
-                        name="Profile"
-                        component={ProfileUser}
-                    />
+          <Stack.Screen name="Profile" component={ProfileUser} />
 
-                    <Stack.Screen
-                        name="Chat"
-                        component={Chat}
-                        options={{
-                            headerShown: false
-                        }}
-                    />
+          <Stack.Screen
+            name="Chat"
+            component={Chat}
+            options={{
+              headerShown: false,
+            }}
+          />
 
-                    <Stack.Screen
-                        name="TalentDetails"
-                        component={TalentDetails}
-                        options={{
-                            headerShown: false
-                        }}
-                    />
-                </>
-            ) : (
-                <>
-                    <Stack.Screen
-                        name="LandingPage"
-                        component={LandingPage}
-                        options={{
-                            headerShown: false,
-                        }}
-                    />
+          <Stack.Screen
+            name="TalentDetails"
+            component={TalentDetails}
+            options={{
+              headerShown: false,
+            }}
+          />
+        </>
+      ) : (
+        <>
+          <Stack.Screen
+            name="LandingPage"
+            component={LandingPage}
+            options={{
+              headerShown: false,
+            }}
+          />
 
-                    <Stack.Screen
-                        name="Login"
-                        component={Login}
-                        options={{
-                            headerShown: false,
-                        }}
-                    />
+          <Stack.Screen
+            name="Login"
+            component={Login}
+            options={{
+              headerShown: false,
+            }}
+          />
 
-                    <Stack.Screen
-                        name="Register"
-                        component={Register}
-                        options={{
-                            headerShown: false,
-                        }}
-                    />
-                </>
-            )}
-
-        </Stack.Navigator >
-    );
+          <Stack.Screen
+            name="Register"
+            component={Register}
+            options={{
+              headerShown: false,
+            }}
+          />
+        </>
+      )}
+    </Stack.Navigator>
+  );
 }
