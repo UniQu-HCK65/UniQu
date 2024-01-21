@@ -1,5 +1,5 @@
 import React from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function ListBookingTalent() {
     return (
@@ -27,7 +27,7 @@ export default function ListBookingTalent() {
                         Your Request:
                     </Text>
 
-                    <View style={styles.cardUser}>
+                    <TouchableOpacity style={styles.cardUser}>
                         <View style={styles.infoUser}>
                             <Image
                                 source={{
@@ -44,7 +44,7 @@ export default function ListBookingTalent() {
                                 <Text style={styles.status}>@maldinigay</Text>
                             </View>
                         </View>
-                    </View>
+                    </TouchableOpacity>
 
                     <View style={styles.cardUser}>
                         <View style={styles.infoUser}>
