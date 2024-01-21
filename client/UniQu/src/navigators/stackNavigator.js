@@ -16,6 +16,7 @@ import MyTabs from "../navigators/tabNavigator";
 import Chat from "../screens/chat";
 import Booking from "../screens/booking";
 import StatusBooking from "../screens/statusBooking";
+import ListBookingTalent from "../screens/listBookingDetail";
 
 
 const Stack = createNativeStackNavigator();
@@ -31,6 +32,14 @@ export default function StackNavigator() {
         >
             {isLoggedIn ? (
                 <>
+                    <Stack.Screen
+                        name="List Booking Detail"
+                        component={ListBookingTalent}
+                        options={{
+                            headerShown: false
+                        }}
+                    />
+
                     <Stack.Screen
                         name="Status Booking"
                         component={StatusBooking}
