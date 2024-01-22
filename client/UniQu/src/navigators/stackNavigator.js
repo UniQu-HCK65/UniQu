@@ -33,10 +33,9 @@ export default function StackNavigator() {
       screenOptions={{
         gestureDirection: "vertical",
       }}
-    >
+      >
       {isLoggedIn ? (
         <>
-
           <Stack.Screen
             name="Home"
             component={MyTabs}
@@ -84,7 +83,6 @@ export default function StackNavigator() {
               headerShown: false,
             }}
           />
-
 
 
           <Stack.Screen name="Edit Profile" component={EditProfileUser} />
