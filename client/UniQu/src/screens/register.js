@@ -4,7 +4,7 @@ import DropDownPicker from "react-native-dropdown-picker";
 import { SelectList } from "react-native-dropdown-select-list";
 import { USER_REGISTER } from "../queries/query";
 import { useMutation } from "@apollo/client";
-
+import ToastManager, { Toast } from 'toastify-react-native'
 
 const tagsExample = [
     "Sneakers",
@@ -51,19 +51,15 @@ export default function Register({ navigation }) {
     const [userLocations, setUserLocation] = useState('')
     const [errorMessage, setErrorMessage] = useState('');
 
+    // const [register, { loading, errors, data }] = useMutation(USER_REGISTER)
 
-    const [register, { loading, error, data }] = useMutation(USER_REGISTER)
+    const [register, response] = useMutation(USER_REGISTER)
 
     const [open, setOpen] = useState(false);
     const [items, setItems] = useState([]);
 
-    const handleOnSubmit = () => {
-        if (!name || !username || !email || !password || !gender || !imgUrl || !tags || !userLocations) {
-            setErrorMessage('All fields are required')
-            return
-        }
-
-        register({
+    const handleOnSubmit = async () => {
+        const response = await register({
             variables: {
                 newUser: {
                     name,
@@ -71,7 +67,7 @@ export default function Register({ navigation }) {
                     email,
                     password,
                     gender,
-                    imgUrl,
+                    // imgUrl,
                     tags,
                     userLocations
                 }
@@ -81,19 +77,29 @@ export default function Register({ navigation }) {
             ],
             onCompleted: () => {
                 onChangeName(''),
-                    onChangeUsername(''),
-                    onChangeEmail(''),
-                    onChangePassword(''),
-                    onChangeGender(''),
-                    setTags([]),
-                    setUserLocation(''),
-                    navigation.navigate('Login')
+                onChangeUsername(''),
+                onChangeEmail(''),
+                onChangePassword(''),
+                onChangeGender(''),
+                setTags([]),
+                setUserLocation(''),
+                navigation.navigate('Login')
             },
             onError: (error) => {
-                // console.log(error)
+                console.log(error)
             }
         })
+
+        const error = JSON.stringify(response.errors.networkError.result.errors[0].message, null, 2)
+
+        if (error) {
+            // Toast.error(error.slice(1, -1));
+            setErrorMessage(error.slice(1, -1))
+        }
+
     }
+
+
 
     useEffect(() => {
         setItems(tagsExample.map((tag) => ({ label: tag, value: tag })));
@@ -115,6 +121,7 @@ export default function Register({ navigation }) {
                 </View>
 
                 <View style={styles.inputContainer}>
+                    <ToastManager />
                     {errorMessage ? (
                         <Text style={{ color: 'red', marginLeft: 4, fontSize: 10 }}>*{errorMessage}</Text>
                     ) : null}
@@ -264,7 +271,6 @@ const styles = StyleSheet.create({
         marginBottom: 5,
         marginTop: 5,
         paddingLeft: 20,
-        placeholderStyle: { color: "#a0a0a0" },
         fontSize: 12,
     },
     dropDown: {
