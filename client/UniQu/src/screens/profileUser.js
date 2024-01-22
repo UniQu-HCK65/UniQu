@@ -10,6 +10,7 @@ import {
 import { Feather } from "@expo/vector-icons";
 import { WHO_AM_I_USER } from "../queries/query";
 import { useQuery } from "@apollo/client";
+import LogoutButton from "../components/logoutButton";
 
 export default function ProfileUser({ navigation }) {
   const { loading, error, data, refetch } = useQuery(WHO_AM_I_USER);
@@ -124,12 +125,13 @@ export default function ProfileUser({ navigation }) {
 
             <View style={styles.cardTagsStyle}>
               {whoAmI.userBookings.map((booking, index) => (
+                
                 <View style={styles.historyStyle} key={index}>
                   <View style={styles.historyContainer}>
                     <View>
                       <Text style={styles.historyLabel}>No. Payment</Text>
                     </View>
-                    <View style={{ marginLeft: 10 }}>
+                    <View >
                       <Text style={{ width: 273 }}>
                         {" "}
                         : {paymentId ? paymentId : "-"}
@@ -187,6 +189,7 @@ export default function ProfileUser({ navigation }) {
           </View>
         </View>
       </View>
+      <LogoutButton/>
     </ScrollView>
   );
 }
@@ -284,7 +287,7 @@ const styles = StyleSheet.create({
   cardTagsStyle: {
     flexWrap: "wrap",
     flexDirection: "row",
-    // backgroundColor:"red"
+    
   },
   locationStyle: {
     marginLeft: 25,
@@ -297,21 +300,22 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   historyStyle: {
-    marginLeft: 25,
     marginTop: 10,
     backgroundColor: "#f4f4f4",
-    width: 360,
+    width: 330,
     height: 120,
-    paddingLeft: 20,
     justifyContent: "center",
     borderRadius: 8,
     shadowColor: "#000",
+    marginBottom: 5,
     shadowOffset: {
       width: 0,
       height: 2,
     },
     shadowOpacity: 0.2,
     shadowRadius: 4,
+    marginHorizontal: 30
+    
   },
   historyContainer: {
     flexDirection: "row",

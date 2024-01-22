@@ -8,13 +8,13 @@ export default function LandingPage({ navigation }) {
     return (
         <View style={styles.container}>
             <View style={styles.backgroundContainer}>
-                {/* <Video
+                <Video
                     source={{ uri: 'https://v1.pinimg.com/videos/mc/720p/e1/81/7d/e1817d58749dedb8152a02e701e102c0.mp4' }}
                     resizeMode="cover"
                     isLooping
                     shouldPlay
                     style={styles.backgroundVideo}
-                /> */}
+                /> 
             </View>
 
             <View style={styles.overlay}></View>
