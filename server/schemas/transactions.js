@@ -21,11 +21,19 @@ const typeDefs = `#graphql
     orderId: String
     paymentLink: String
     BookingId: ID
+    expiryDate: String
     transactionStatus: String
     paidByAdmin: Boolean
     updatedAt: String
     createdAt: String
 
+  }
+
+  type TransactionLink {
+    paymentId: String
+    orderId: String
+    paymentLink: String
+    BookingId: ID
   }
 
   input NewTransaction {
@@ -34,10 +42,15 @@ const typeDefs = `#graphql
 
   type Query {
     transactions: [Transaction]
+    getTransactionLink(bookingId:ID): TransactionLink
+    getTransactionByBookingId(bookingId:ID): Transaction
+
   }
 
   type Mutation {
   initPayment(newTransaction:NewTransaction): Transaction
+  updateTransactionStatus(bookingId:ID): Transaction
+
   }
 
 `;
@@ -56,6 +69,130 @@ const resolvers = {
         return transactions;
       } catch (error) {
         console.log(error, "GET_TRANSACTIONS"); // errorHandler next up
+        throw new GraphQLError(error.message || "Internal Server Error", {
+          extensions: {
+            code: error.code || "INTERNAL_SERVER_ERROR",
+            http: { status: error.status || 500 },
+          },
+        });
+      }
+    },
+
+    getTransactionLink: async (parent, args, contextValue, info) => {
+      try {
+        const { bookingId } = args;
+        const { db, authentication } = contextValue;
+        const auth = await authentication();
+
+        const findBooking = await db.collection("Bookings").findOne({
+          _id: new ObjectId(bookingId),
+        });
+
+        if (!findBooking) {
+          throw {
+            message:
+              "Booking Not Found, please check your booking id and try again",
+            code: "BAD_REQUEST",
+            status: 400,
+          };
+        }
+
+        const transaction = await db.collection(COLLECTION_NAME);
+
+        const findTransaction = await transaction.findOne({
+          BookingId: new ObjectId(bookingId),
+        });
+
+        if (!findTransaction) {
+          throw {
+            message:
+              "Transaction Not Found, please check your booking id and try again",
+            code: "BAD_REQUEST",
+            status: 400,
+          };
+        }
+
+        return {
+          paymentId: findTransaction.paymentId,
+          orderId: findTransaction.orderId,
+          paymentLink: findTransaction.paymentLink,
+          BookingId: findTransaction.BookingId,
+        };
+      } catch (error) {
+        console.log(error, "INIT_PAYMENT"); // errorHandler next up
+        throw new GraphQLError(error.message || "Internal Server Error", {
+          extensions: {
+            code: error.code || "INTERNAL_SERVER_ERROR",
+            http: { status: error.status || 500 },
+          },
+        });
+      }
+    },
+
+    getTransactionByBookingId: async (parent, args, contextValue, info) => {
+      try {
+        const { bookingId } = args;
+        const { db, authentication } = contextValue;
+        const auth = await authentication();
+
+        const findBooking = await db.collection("Bookings").findOne({
+          _id: new ObjectId(bookingId),
+        });
+
+        if (!findBooking) {
+          throw {
+            message:
+              "Booking Not Found, please check your booking id and try again",
+            code: "BAD_REQUEST",
+            status: 400,
+          };
+        }
+
+        const transaction = await db.collection(COLLECTION_NAME);
+
+        const findTransaction = await transaction.findOne({
+          BookingId: new ObjectId(bookingId),
+        });
+
+        if (!findTransaction) {
+          throw {
+            message:
+              "Transaction Not Found, please check your booking id and try again",
+            code: "BAD_REQUEST",
+            status: 400,
+          };
+        }
+
+        const orderId = findTransaction.orderId;
+
+        const midtransStatusUrl = `https://api.sandbox.midtrans.com/v2/${orderId}/status`;
+        console.log(midtransStatusUrl, "midtransStatusUrl");
+
+        const midtransOptions = {
+          method: "GET",
+          headers: {
+            accept: "application/json",
+            Authorization: `Basic ${Buffer.from(
+              `${process.env.MIDTRANS_SERVER_KEY}:`
+            ).toString("base64")}`,
+          },
+        };
+
+        const midtransResponse = await axios.get(
+          midtransStatusUrl,
+          midtransOptions
+        );
+        const midtransData = midtransResponse.data;
+
+        console.log(midtransData, "BBBBBB");
+
+        const findUpdatedTransaction = await transaction.findOne({
+          _id: new ObjectId(findTransaction._id),
+        });
+
+        return findUpdatedTransaction;
+      } catch (error) {
+        console.log(error, "INIT_PAYMENT"); // errorHandler next up
         throw new GraphQLError(error.message || "Internal Server Error", {
           extensions: {
             code: error.code || "INTERNAL_SERVER_ERROR",
@@ -110,9 +247,9 @@ const resolvers = {
 
         const twoDigitRandom = Math.floor(Math.random() * 90) + 10;
 
-        // const orderId = `TRX-BKNG-${Math.random().toString()}`;
+        const orderId = `TRX-BKNG-${Math.random().toString()}`;
         // const orderId = `TRX-BKNG-1`;
-        const orderId = `TRX-BKNG-${newTransaction.BookingId}-${auth.username}-${twoDigitRandom}`;
+        // const orderId = `TRX-BKNG-${newTransaction.BookingId}-${auth.username}-${twoDigitRandom}`;
 
         const trxAmount = 500_000;
 
@@ -135,32 +272,10 @@ const resolvers = {
           },
         });
 
-        console.log(midtransTransaction, "AAAAAAA");
+        // console.log(midtransTransaction, "AAAAAAA");
 
-        console.log(orderId, "orderId");
-
-
-        // const midtransStatusUrl = `https://api.sandbox.midtrans.com/v2/TRX-BKNG-65acbf9036a6e5332ef534ab-JinYoung-92/status`;
-        // // const midtransStatusUrl = `https://api.sandbox.midtrans.com/v2/${orderId}/status`;
-        // console.log(midtransStatusUrl, "midtransStatusUrl");
-
-        // const midtransOptions = {
-        //   method: "GET",
-        //   headers: {
-        //     accept: "application/json",
-        //     Authorization: `Basic ${Buffer.from(
-        //       `${process.env.MIDTRANS_SERVER_KEY}:`
-        //     ).toString("base64")}`,
-        //   },
-        // };
-
-        // const midtransResponse = await axios.get(
-        //   midtransStatusUrl,
-        //   midtransOptions
-        // );
-        // const midtransData = midtransResponse.data;
-
-        // console.log(midtransData, "BBBBBB");
+        const expiryDate = new Date(new Date() + 2 * 60 * 1000); //NANTI GANTI OI
+        // const expiryDate = new Date(new Date() + 60 * 60 * 1000);
 
         const createTransaction = await transaction.insertOne({
           ...newTransaction,
@@ -173,6 +288,7 @@ const resolvers = {
           orderId: orderId,
           paymentLink: midtransTransaction.redirect_url,
           transactionStatus: "unpaid",
+          expiryDate: expiryDate,
           paidByAdmin: false,
           updatedAt: new Date(),
           createdAt: new Date(),
@@ -193,6 +309,147 @@ const resolvers = {
         });
       }
     },
+
+    updateTransactionStatus: async (parent, args, contextValue, info) => {
+      try {
+        const { bookingId } = args;
+        const { db, authentication } = contextValue;
+        const auth = await authentication();
+
+        const findBooking = await db.collection("Bookings").findOne({
+          _id: new ObjectId(bookingId),
+        });
+
+        if (!findBooking) {
+          throw {
+            message:
+              "Booking Not Found, please check your booking id and try again",
+            code: "BAD_REQUEST",
+            status: 400,
+          };
+        }
+
+        const transaction = await db.collection(COLLECTION_NAME);
+
+        const findTransaction = await transaction.findOne({
+          BookingId: new ObjectId(bookingId),
+          transactionStatus: "unpaid",
+        });
+
+        if (!findTransaction) {
+          throw {
+            message:
+              "Transaction Not Found, please check your booking id and try again",
+            code: "BAD_REQUEST",
+            status: 400,
+          };
+        }
+
+        const orderId = findTransaction.orderId;
+
+        const midtransStatusUrl = `https://api.sandbox.midtrans.com/v2/${orderId}/status`;
+        console.log(midtransStatusUrl, "midtransStatusUrl");
+
+        const midtransOptions = {
+          method: "GET",
+          headers: {
+            accept: "application/json",
+            Authorization: `Basic ${Buffer.from(
+              `${process.env.MIDTRANS_SERVER_KEY}:`
+            ).toString("base64")}`,
+          },
+        };
+
+        const midtransResponse = await axios.get(
+          midtransStatusUrl,
+          midtransOptions
+        );
+        const midtransData = midtransResponse.data;
+
+        // console.log(midtransData, "BBBBBB");
+
+        if (midtransData.status_code === "404") {
+          throw {
+            message:
+              "You have an unstarted transaction, please visit this link: " +
+              findTransaction.paymentLink,
+            code: "NOT_FOUND",
+            status: 404,
+          };
+        } else if (
+          midtransData.status_code === "201" &&
+          midtransData.transaction_status === "pending"
+        ) {
+          throw {
+            message:
+              "You have an unfinished transaction, please visit this link: " +
+              findTransaction.paymentLink,
+            code: "UNAUTHORIZED",
+            status: 401,
+          };
+        } else if (midtransData.transaction_status === "expire") {
+          if (findTransaction.transactionStatus === "expired") {
+            throw {
+              message:
+                "Your transaction has expired, please place an order again",
+              code: "UNAUTHORIZED",
+              status: 401,
+            };
+          } else {
+            const espireTransaction = await transaction.updateOne(
+              {
+                _id: new ObjectId(findTransaction._id),
+              },
+              {
+                $set: {
+                  transactionStatus: "expired",
+                  updatedAt: new Date(),
+                },
+              }
+            );
+
+            throw {
+              message:
+                "Your transaction has expired, please place an order again",
+              code: "UNAUTHORIZED",
+              status: 401,
+            };
+          }
+        } else if (
+          midtransData.status_code === "200" &&
+          (midtransData.transaction_status === "settlement" ||
+            midtransData.transaction_status === "capture")
+        ) {
+          await transaction.updateOne(
+            {
+              _id: new ObjectId(findTransaction._id),
+            },
+            {
+              $set: {
+                transactionStatus: "paid",
+                updatedAt: new Date(),
+              },
+            }
+          );
+        }
+
+        const findUpdatedTransaction = await transaction.findOne({
+          _id: new ObjectId(findTransaction._id),
+        });
+
+        return findUpdatedTransaction;
+      } catch (error) {
+        console.log(error, "UPDATE_PAYMENT"); // errorHandler next up
+        throw new GraphQLError(error.message || "Internal Server Error", {
+          extensions: {
+            code: error.code || "INTERNAL_SERVER_ERROR",
+            http: { status: error.status || 500 },
+          },
+        });
+      }
+    },
+
+    ///////////////END OF MUTATIONS/////////////////
   },
 };
 
