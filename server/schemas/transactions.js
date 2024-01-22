@@ -339,7 +339,7 @@ const resolvers = {
         if (!findTransaction) {
           throw {
             message:
-              "Transaction Not Found, please check your booking id and try again",
+              "No active transaction found, please check your booking id or place a new booking",
             code: "BAD_REQUEST",
             status: 400,
           };
@@ -388,33 +388,24 @@ const resolvers = {
             status: 401,
           };
         } else if (midtransData.transaction_status === "expire") {
-          if (findTransaction.transactionStatus === "expired") {
-            throw {
-              message:
-                "Your transaction has expired, please place an order again",
-              code: "UNAUTHORIZED",
-              status: 401,
-            };
-          } else {
-            const espireTransaction = await transaction.updateOne(
-              {
-                _id: new ObjectId(findTransaction._id),
+          const espireTransaction = await transaction.updateOne(
+            {
+              _id: new ObjectId(findTransaction._id),
+            },
+            {
+              $set: {
+                transactionStatus: "expired",
+                updatedAt: new Date(),
               },
-              {
-                $set: {
-                  transactionStatus: "expired",
-                  updatedAt: new Date(),
-                },
-              }
-            );
+            }
+          );
 
-            throw {
-              message:
-                "Your transaction has expired, please place an order again",
-              code: "UNAUTHORIZED",
-              status: 401,
-            };
-          }
+          throw {
+            message:
+              "Your transaction has expired, please place an order again",
+            code: "UNAUTHORIZED",
+            status: 401,
+          };
         } else if (
           midtransData.status_code === "200" &&
           (midtransData.transaction_status === "settlement" ||
