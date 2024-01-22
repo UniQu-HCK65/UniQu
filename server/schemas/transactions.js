@@ -55,6 +55,8 @@ const typeDefs = `#graphql
 
 `;
 
+//MORE?
+
 const resolvers = {
   Query: {
     transactions: async (parent, args, contextValue, info) => {
@@ -111,7 +113,6 @@ const resolvers = {
             status: 400,
           };
         }
-
         return {
           paymentId: findTransaction.paymentId,
           orderId: findTransaction.orderId,
