@@ -48,7 +48,7 @@ const typeDefs = `#graphql
   }
 
   type Mutation {
-  initPayment(newTransaction:NewTransaction): Transaction
+  initPayment(bookingId:ID): Transaction
   updateTransactionStatus(bookingId:ID): Transaction
 
   }
@@ -207,7 +207,7 @@ const resolvers = {
     initPayment: async (parent, args, contextValue, info) => {
       try {
         //OLEH TALENT
-        const { newTransaction } = args;
+        const { bookingId } = args;
         const { db, authentication } = contextValue;
         const auth = await authentication();
 
@@ -218,13 +218,30 @@ const resolvers = {
         const transaction = await db.collection(COLLECTION_NAME);
 
         const findBooking = await db.collection("Bookings").findOne({
-          _id: new ObjectId(newTransaction.BookingId),
+          _id: new ObjectId(bookingId),
         });
 
-        // console.log(findBooking);
+        const findActiveTransaction = await transaction.findOne({
+          BookingId: new ObjectId(bookingId),
+          transactionStatus: "unpaid",
+        });
+
+        if (findActiveTransaction) {
+          throw {
+            message:
+              "You still have an ongoing transaction, please go to this link: " +
+              findActiveTransaction.paymentLink,
+            code: "BAD_REQUEST",
+            status: 400,
+          };
+        }
 
         const findTalent = await db.collection("Talents").findOne({
           _id: new ObjectId(talentId),
+        });
+
+        const findUser = await db.collection("Users").findOne({
+          _id: new ObjectId(findBooking.UserId),
         });
 
         let snap = new midtransClient.Snap({
@@ -249,7 +266,7 @@ const resolvers = {
 
         const orderId = `TRX-BKNG-${Math.random().toString()}`;
         // const orderId = `TRX-BKNG-1`;
-        // const orderId = `TRX-BKNG-${newTransaction.BookingId}-${auth.username}-${twoDigitRandom}`;
+        // const orderId = `TRX-BKNG-${bookingId}-${auth.username}-${twoDigitRandom}`;
 
         const trxAmount = 500_000;
 
@@ -260,28 +277,31 @@ const resolvers = {
           },
           item_details: [
             {
-              id: newTransaction.BookingId,
+              id: bookingId,
               price: 500000,
               quantity: 1,
-              name: "Booking Session with " + findTalent.name,
+              name:
+                findUser.name +
+                "'s" +
+                "Booking Session with " +
+                findTalent.name,
             },
           ],
           customer_details: {
-            first_name: findTalent.name,
-            email: findTalent.email,
+            first_name: findUser.name,
+            email: findUser.email,
           },
         });
 
         // console.log(midtransTransaction, "AAAAAAA");
 
-        const expiryDate = new Date(new Date() + 2 * 60 * 1000); //NANTI GANTI OI
-        // const expiryDate = new Date(new Date() + 60 * 60 * 1000);
+        const expiryDate = new Date(new Date().getTime() + 2 * 60 * 1000) //NANTI GANTI
+        // const expiryDate = new Date(new Date().getTime() + 60 * 60 * 1000)
 
         const createTransaction = await transaction.insertOne({
-          ...newTransaction,
           TalentId: new ObjectId(talentId),
           UserId: new ObjectId(findBooking.UserId),
-          BookingId: new ObjectId(newTransaction.BookingId),
+          BookingId: new ObjectId(bookingId),
           talentName: findBooking.talentName,
           userName: findBooking.userName,
           paymentId: midtransTransaction.token,
