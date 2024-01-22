@@ -20,6 +20,7 @@ import HomeforTalent from "../screens/homeCMST";
 import StatusBooking from "../screens/statusBooking";
 import ListBookingTalent from "../screens/listBookingDetail";
 import EditStatusBooking from "../screens/editStatusBooking";
+import ProfileTalent from "../screens/profileTalent";
 
 const Stack = createNativeStackNavigator();
 
@@ -84,10 +85,12 @@ export default function StackNavigator() {
             }}
           />
 
+          <Stack.Screen name="Profile" component={ProfileTalent}  />
+
 
           <Stack.Screen name="Edit Profile" component={EditProfileUser} />
 
-          <Stack.Screen name="Profile" component={ProfileUser} />
+          {/* <Stack.Screen name="Profile" component={ProfileUser} /> */}
 
           <Stack.Screen
             name="Chat"

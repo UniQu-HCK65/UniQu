@@ -64,7 +64,7 @@ export default function EditProfileUser() {
       imgUrl: input.imgUrl,
     };
     console.log("successfully changed", updatedProfile);
-    console.log(onInputHandler, ">>> ikiii");
+    // console.log(onInputHandler, ">>> ikiii");
 
     editProfileMutation({
       variables: {
