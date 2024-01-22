@@ -21,8 +21,9 @@ import StatusBooking from "../screens/statusBooking";
 import ListBookingTalent from "../screens/listBookingDetail";
 import EditStatusBooking from "../screens/editStatusBooking";
 
-
 const Stack = createNativeStackNavigator();
+
+//update
 
 export default function StackNavigator() {
   const { isLoggedIn } = useContext(LoginContext);
@@ -35,21 +36,14 @@ export default function StackNavigator() {
       >
       {isLoggedIn ? (
         <>
-        <Stack.Screen
-          name="Home"
-          component={MyTabs}
-          options={{
-            headerShown: false,
-          }}
-        />
           <Stack.Screen
-            name="Register"
-            component={Register}
+            name="Home"
+            component={MyTabs}
             options={{
               headerShown: false,
             }}
           />
-          
+
           <Stack.Screen
             name="List Booking"
             component={HomeforTalent}
@@ -57,11 +51,12 @@ export default function StackNavigator() {
               headerShown: false,
             }}
           />
+
           <Stack.Screen
             name="Konfirmasi Booking"
             component={EditStatusBooking}
             options={{
-              headerShown: false
+              headerShown: false,
             }}
           />
 
@@ -128,7 +123,13 @@ export default function StackNavigator() {
             }}
           />
 
-
+          <Stack.Screen
+            name="Register"
+            component={Register}
+            options={{
+              headerShown: false,
+            }}
+          />
         </>
       )}
     </Stack.Navigator>

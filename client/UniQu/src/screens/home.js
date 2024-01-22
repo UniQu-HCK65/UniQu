@@ -21,7 +21,7 @@ import {
   GET_USER,
 } from "../queries/query";
 import Ionicons from "react-native-vector-icons/Feather";
-import HomeforTalent from "./homeCMST";
+
 
 const tags = [
   "Sneakers",
@@ -71,26 +71,54 @@ export default function Home({ navigation }) {
     loading: forYouLoading,
     error: forYouError,
     data: forYouData,
+    refetch: refetchForYou,
   } = useQuery(FOR_YOU_TALENT_PAGE);
-  const { data: nameUserData } = useQuery(GET_USER);
+  const {
+    data: nameUserData,
+    loading: getUserLoading,
+    error: getUserError,
+    refetch: refetchGetUser,
+  } = useQuery(GET_USER);
   const nameUser = nameUserData?.whoAmI?.name;
   const {
     loading: allTalentLoading,
     error: allTalentError,
     data: allTalentData,
+    refetch: refetchAllTalent,
   } = useQuery(ALL_TALENT);
 
-  const handleSeeAll = () => {
+  const handleSeeAll = async () => {
     setSelectedDataType("all");
+    await refetchAllTalent();
     setAllTalents(allTalentData.talents);
   };
 
-  const handleForYou = () => {
+  const handleForYou = async () => {
     setSelectedDataType("forYou");
+    await refetchForYou();
     setTalentsForYou(forYouData.talentsForMe.talentsForMe);
   };
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const forYouResult = await refetchForYou();
+        const allTalentResult = await refetchAllTalent();
+        const getUserResult = await refetchGetUser();
+
+        if (
+          !forYouResult.loading &&
+          !allTalentResult.loading &&
+          !getUserResult.loading
+        ) {
+          setTalentsForYou(forYouResult.data.talentsForMe?.talentsForMe);
+          setAllTalents(allTalentResult.data.talents);
+          setLoading(false);
+        }
+      } catch (error) {
+        console.log(error, "error refatch home");
+      }
+    };
     if (!forYouLoading && !allTalentLoading) {
       setLoading(false);
     }
@@ -104,6 +132,9 @@ export default function Home({ navigation }) {
     forYouData,
     talentsForYou,
     selectedDataType,
+    refetchForYou,
+    refetchAllTalent,
+    refetchGetUser,
   ]);
 
   if (loading) {
@@ -138,17 +169,31 @@ export default function Home({ navigation }) {
   // console.log(talentsForYou)
 
   const renderTalentForYou = ({ item }) => {
+    // console.log(item, "item");
     if (forYouError || allTalentError) {
       return <Text>Error: {error.message}</Text>;
     }
 
+    const totalReviewers = new Set();
+    if (item.reviews && Array.isArray(item.reviews)) {
+      item.reviews.forEach((review) => totalReviewers.add(review.reviewerName));
+    }
+
+    // console.log(totalReviewers, "total");
+
     return (
-      <View style={styles.containerHeader}>
+      <TouchableOpacity
+        style={styles.containerHeader}
+        onPress={() => {
+          navigation.navigate("TalentDetails", { talentId: item._id });
+          console.log(item._id, "kelikkk ditel");
+        }}
+      >
         <View key={item._id} style={styles.cardContainer}>
           <View style={styles.image}>
             <Image
               source={{
-                uri: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fHByb2ZpbGV8ZW58MHx8MHx8fDA%3D",
+                uri: item.imgUrl,
               }}
               style={styles.profileImage}
             />
@@ -167,13 +212,13 @@ export default function Home({ navigation }) {
               <View style={styles.ratingContainer}>
                 <Text style={styles.ratingText}>{item.rating}</Text>
                 <Text style={styles.reviewsText}>
-                  ({item.reviews}5 reviews)
+                  ({totalReviewers.size} reviews)
                 </Text>
               </View>
             </View>
           </View>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -229,7 +274,6 @@ export default function Home({ navigation }) {
           </TouchableOpacity>
         </View>
       </View>
-     
 
       {forYouLoading || allTalentLoading ? (
         <ActivityIndicator size="large" color="#5a84a5" />
@@ -304,10 +348,11 @@ const styles = StyleSheet.create({
   reviewsText: {
     fontSize: 14,
     color: "#555",
+    marginLeft: 3,
   },
   profileImage: {
-    width: 80,
-    height: 80,
+    width: 75,
+    height: 75,
     borderRadius: 40,
   },
   ratingContainer: {

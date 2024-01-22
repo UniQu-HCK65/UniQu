@@ -28,6 +28,7 @@ const typeDefs = `#graphql
     email: String!
     password: String!
     gender: String
+    imgUrl: String
     tags: [String]
     userLocations: [String]
   }
@@ -35,6 +36,7 @@ const typeDefs = `#graphql
   input EditUser {
     name: String
     password: String
+    imgUrl: String
     tags: [String]
     userLocations: [String]
   }
