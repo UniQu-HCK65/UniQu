@@ -12,8 +12,9 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import RatingModal from "../components/modalRating";
 import { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
+import { launchImageLibraryAsync } from 'expo-image-picker';
 
-const serverURL = "http://192.168.68.168:4000";
+const serverURL = "http://192.168.27.141:4000";
 const socket = io(serverURL);
 
 export default function Chat({ route, navigation }) {
@@ -25,7 +26,7 @@ export default function Chat({ route, navigation }) {
   const [chats, setChats] = useState([]);
   const roomName = route.params.roomName;
   const userLoggedInName = route.params.userLoggedInName;
-  console.log(route.params, "<<<<<<<<<<username>>>>>>>>>>");
+  // console.log(route.params, "<<<<<<<<<<username>>>>>>>>>>");
 
   function handleRoom(roomName) {
     setRoom(roomName);
@@ -47,6 +48,43 @@ export default function Chat({ route, navigation }) {
     }
   };
 
+  const handleImageUpload = async () => {
+    try {
+      let result = await launchImageLibraryAsync({
+        mediaTypes: "Images",
+        allowsEditing: true,
+        aspect: [9, 16],
+        quality: 1,
+      });
+  
+      if (!result.canceled) {
+        // Now, upload the image to Cloudinary
+        const formData = new FormData();
+        formData.append("image", {
+          uri: result.assets[0].uri,
+          type: "image/jpeg",
+          name: "myImage.jpg",
+        });
+  
+        const response = await fetch(`${serverURL}/upload`, {
+          method: "POST",
+          body: formData,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+  
+        const data = await response.json();
+  
+        // Use the Cloudinary URL from the response
+        setImageUri(data.imageUrl);
+      }
+    } catch (error) {
+      console.error("Error uploading image:", error);
+    }
+  };
+    
+
   const openModal = () => {
     setModalVisible(true);
   };
@@ -57,7 +95,7 @@ export default function Chat({ route, navigation }) {
 
   const handleRatingSubmit = () => {
     // Handle submission logic here
-    console.log("Rating submitted");
+    // console.log("Rating submitted");
     closeModal(); // Close the modal after submission
   };
 
@@ -94,37 +132,35 @@ export default function Chat({ route, navigation }) {
 
 
 useEffect(() => {
-    handleRoom(roomName);
-  
-    socket.on("new-message", (newChat) => {
-      setChats((prevChats) => [...prevChats, newChat]);
-    });
-  
-    const fetchMessages = async () => {
-      try {
-        const response = await fetch(`${serverURL}/get-messages?room=${room}`);
-        const data = await response.json();
-        setChats(data.messages);
-      } catch (error) {
-        console.error("Error fetching messages:", error);
-      }
-    };
-  
-    fetchMessages();
+  handleRoom(route.params.roomName);
 
-    return () => {
-        // Clean up socket subscriptions
-        socket.off("new-message");
-      };
+  socket.on("new-message", (newChat) => {
+    setChats((prevChats) => [...prevChats, newChat]);
+  });
 
-      
-  }, [room]); // Only depend on 'room' in the dependency array
+  const fetchMessages = async () => {
+    try {
+      const response = await fetch(`${serverURL}/get-messages?room=${room}`);
+      const data = await response.json();
+      setChats(data.messages);
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+    }
+  };
+
+  fetchMessages();
+
+  return () => {
+    // Clean up socket subscriptions
+    socket.off("new-message");
+  };
+}, [room]);
   
 
 
 
 
-  console.log(modalVisible);
+  // console.log(modalVisible);
 
   return (
     <View style={styles.container}>
@@ -178,7 +214,7 @@ useEffect(() => {
             <View
               style={{
                 alignSelf: el.username === userLoggedInName ? "flex-end" : "flex-start",
-                backgroundColor: el.username === userLoggedInName ? "#ADD8E6" : "white",
+                backgroundColor: el.username === userLoggedInName ? "#ADD8E6" : "#eeeeee",
                 padding: 10,
                 borderRadius: 8,
                 marginTop: 5,
@@ -214,7 +250,9 @@ useEffect(() => {
         }}
       >
         <View style={styles.messageContainer}>
-          <Ionicons name="attach" size={29} style={styles.attachButton} />
+          <TouchableOpacity onPress={handleImageUpload}>
+          <Ionicons name="attach" size={29} style={styles.attachButton}  />
+          </TouchableOpacity>
           <TextInput
             placeholder="Message..."
             value={messageInput}
