@@ -9,18 +9,24 @@ async function getValueFor(key) {
 
 export const LoginContext = createContext(null)
 
-export function AuthComponent({children}) {
-    const [isLoggedIn, setIsLoggedIn] = useState('')
+export function AuthComponent({ children }) {
+  const [isLoggedIn, setIsLoggedIn] = useState({
+    accessToken: "",
+    role: ""
+  })
 
-    useEffect(() => {
-     getValueFor('accessToken').then((data) => {
-      setIsLoggedIn(data)
-     });
-    }, []);
+  useEffect(() => {
+    getValueFor('accessToken').then((token) => {
+      setIsLoggedIn((prev) => ({ ...prev, accessToken: token }))
+    });
+    getValueFor('role').then((role) => {
+      setIsLoggedIn((prev) => ({ ...prev, role: role }))
+    });
+  }, []);
 
-    return (
-        <LoginContext.Provider value={{isLoggedIn, setIsLoggedIn}}>
-         {children}
-        </LoginContext.Provider>
-      );
+  return (
+    <LoginContext.Provider value={{ isLoggedIn, setIsLoggedIn }}>
+      {children}
+    </LoginContext.Provider>
+  );
 }

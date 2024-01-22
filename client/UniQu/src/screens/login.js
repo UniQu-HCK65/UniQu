@@ -24,6 +24,7 @@ const LOGIN = gql`
   mutation Login($email: String, $password: String) {
     login(email: $email, password: $password) {
       access_token
+      role
     }
   }
 `;
@@ -38,27 +39,53 @@ export default function LoginScreen({ navigation }) {
     refetchQueries: [GET_USER],
   });
 
-  const handleSubmit = async () => {
-    const { data } = await handleLogin({
-      variables: {
-        email,
-        password,
-      },
-      // onCompleted: async (data) => {
-      //     console.log(data, ">>> data");
-      //     setIsLoggedIn(data.login.access_token)
-      //     await save('accessToken', data.login.access_token)
-      // },
-      onError: (error) => {
-        console.log(error);
-      },
-    });
-    console.log(data, ">> datalogin");
-    if (data) {
-      setIsLoggedIn(data.login.access_token);
-      await save("accessToken", data.login.access_token);
-    }
-  };
+  // const handleSubmit = async () => {
+  //   const { data } = await handleLogin({
+  //     variables: {
+  //       email,
+  //       password,
+  //     },
+  //     onCompleted: async (data) => {
+  //       // setIsLoggedIn(data.login.access_token)
+  //       setIsLoggedIn({
+  //           accessToken: data.login.access_token,
+  //           role: data.login.role
+  //       })
+  //       // setIsLoggedIn(data.login.role)
+  //       await save('accessToken', data.login.access_token)
+  //       await save('role', data.login.role)
+  //   },
+  //     onError: (error) => {
+  //       console.log(error);
+  //     },
+  //   });
+  //   // console.log(data, ">> datalogin");
+  //   if (data) {
+  //     setIsLoggedIn(data.login.access_token);
+  //     await save("accessToken", data.login.access_token);
+  //   }
+  // };
+  const handleSubmit = () => {
+    handleLogin({
+        variables: {
+            email,
+            password
+        },
+        onCompleted: async (data) => {
+            // setIsLoggedIn(data.login.access_token)
+            setIsLoggedIn({
+                accessToken: data.login.access_token,
+                role: data.login.role
+            })
+            // setIsLoggedIn(data.login.role)
+            await save('accessToken', data.login.access_token)
+            await save('role', data.login.role)
+        },
+        onError: (error) => {
+            console.log(error)
+        }
+    })
+}
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
