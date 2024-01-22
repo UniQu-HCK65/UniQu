@@ -46,6 +46,8 @@ export default function EditProfileUser() {
     userLocations: "",
     imgUrl: "",
   });
+
+  console.log(input, "input edit");
   //ME WANT SLEEP MORE
 
   const [open, setOpen] = useState(false);
@@ -62,6 +64,7 @@ export default function EditProfileUser() {
       imgUrl: input.imgUrl,
     };
     console.log("successfully changed", updatedProfile);
+    console.log(onInputHandler, ">>> ikiii");
 
     editProfileMutation({
       variables: {
@@ -100,7 +103,7 @@ export default function EditProfileUser() {
   return (
     <View style={styles.container}>
       <View style={styles.cardEdit}>
-        <View>
+        <View style={{ marginTop: 20 }}>
           <Text style={styles.textStyle}> Photo Profile </Text>
         </View>
         <View style={styles.textInput}>
@@ -176,7 +179,10 @@ export default function EditProfileUser() {
 
       <View style={styles.cardEdit}>
         <View>
-          <Text style={{ ...styles.textStyle, marginTop: 15 }}> Location </Text>
+          <Text style={{ ...styles.textStyle, marginTop: 15, marginLeft: 10 }}>
+            {" "}
+            Location{" "}
+          </Text>
         </View>
         <View style={styles.pickerInput}>
           <SelectList
@@ -212,6 +218,7 @@ const styles = StyleSheet.create({
   },
   textStyle: {
     fontSize: 20,
+    marginLeft: 10,
   },
   cardEdit: {
     margin: 15,

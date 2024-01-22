@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -12,7 +12,18 @@ import { WHO_AM_I_USER } from "../queries/query";
 import { useQuery } from "@apollo/client";
 
 export default function ProfileUser({ navigation }) {
-  const { loading, error, data } = useQuery(WHO_AM_I_USER);
+  const { loading, error, data, refetch } = useQuery(WHO_AM_I_USER);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await refetch();
+      } catch (error) {
+        console.log(error, "error refetch");
+      }
+    };
+    fetchData();
+  }, []);
 
   if (loading) {
     return <Text>Loading...</Text>;
@@ -23,7 +34,8 @@ export default function ProfileUser({ navigation }) {
   }
 
   const { whoAmI } = data;
-  const paymentId = whoAmI.userTransactions[0].paymentId;
+  const paymentId = whoAmI.userTransactions[0]?.paymentId;
+
   // console.log(paymentId, ">> hai");
 
   const convertToDate = (timestamp) => {
@@ -31,6 +43,7 @@ export default function ProfileUser({ navigation }) {
     return date.toLocaleDateString();
   };
 
+  console.log(data, "dataa user");
   return (
     <ScrollView style={styles.container}>
       <View>
@@ -38,7 +51,7 @@ export default function ProfileUser({ navigation }) {
           <View style={styles.photoProfileContainer}>
             <Image
               source={{
-                uri: "https://images.unsplash.com/photo-1543610892-0b1f7e6d8ac1?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8cHJvZmlsZSUyMHBpY3R1cmVzJTIwbW9kZWxzfGVufDB8fDB8fHww",
+                uri: whoAmI.imgUrl,
               }}
               style={styles.photoImage}
             />
@@ -117,7 +130,7 @@ export default function ProfileUser({ navigation }) {
                       <Text style={styles.historyLabel}>No. Payment</Text>
                     </View>
                     <View style={{ marginLeft: 10 }}>
-                      <Text> : {paymentId}</Text>
+                      <Text style={{ width: 273 }}> : {paymentId}</Text>
                     </View>
                   </View>
 
