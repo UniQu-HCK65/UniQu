@@ -223,7 +223,7 @@ export default function Register({ navigation }) {
                 </TouchableOpacity>
 
                 <View style={styles.buttonRegister}>
-                    <Text style={{ color: 'black' }}>Have an account ?</Text>
+                    <Text style={{ color: 'black' }}>Already have an account ?</Text>
                     <TouchableOpacity onPress={() => navigation.navigate('Login')}>
                         <Text style={{ color: 'blue' }}>Login</Text>
                     </TouchableOpacity>
