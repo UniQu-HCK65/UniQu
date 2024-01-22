@@ -8,21 +8,31 @@ export const LOGIN = gql`
   }
 `;
 export const FOR_YOU_TALENT_PAGE = gql`
-  query Talents {
+  query TalentsForMe {
     talentsForMe {
-      _id
-      username
       talentsForMe {
         _id
         name
         username
         email
+        password
         aboutme
+        role
         gender
+        imgUrl
         tags
+        reviews {
+          message
+          reviewerName
+          updatedAt
+          createdAt
+          rating
+        }
         rating
         talentLocations
         balance
+        updatedAt
+        createdAt
       }
     }
   }
@@ -65,44 +75,48 @@ export const GET_ALL_TALENT = gql`
 `;
 
 export const WHO_AM_I_USER = gql`
-query Query {
-  whoAmI {
-    _id
-    name
-    username
-    email
-    password
-    role
-    imgUrl
-    gender
-    tags
-    userLocations
-    userBookings {
+  query WhoAmI {
+    whoAmI {
       _id
-      TalentId
-      UserId
-      talentName
-      userName
-      bookDate
-      bookSession
-      bookLocation
-      bookStatus
-      updatedAt
+      name
+      username
+      email
+      password
+      role
+      imgUrl
+      gender
+      tags
+      userLocations
       createdAt
-    }
-    userTransactions {
-      _id
-      TalentId
-      UserId
-      talentName
-      userName
-      paymentId
-      BookingId
-      transactionStatus
-      paidByAdmin
       updatedAt
+      userBookings {
+        _id
+        TalentId
+        UserId
+        talentName
+        userName
+        bookDate
+        bookSession
+        bookLocation
+        bookStatus
+        updatedAt
+        createdAt
+      }
+      userTransactions {
+        _id
+        TalentId
+        UserId
+        talentName
+        userName
+        paymentId
+        BookingId
+        transactionStatus
+        paidByAdmin
+        updatedAt
+        createdAt
+      }
     }
-  }}
+  }
 `;
 
 export const EditUser = gql`
@@ -187,3 +201,28 @@ export const WHO_AM_I_TALENT = gql`
   }
 `;
 
+export const GET_TALENTS_BY_ID = gql`
+  query GetTalentsById($talentId: String) {
+    getTalentsById(talentId: $talentId) {
+      _id
+      name
+      username
+      email
+      password
+      aboutme
+      gender
+      imgUrl
+      tags
+      reviews {
+        message
+        reviewerName
+        rating
+        updatedAt
+        createdAt
+      }
+      rating
+      talentLocations
+      balance
+    }
+  }
+`;

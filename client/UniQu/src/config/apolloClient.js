@@ -4,7 +4,7 @@ import { setContext } from "@apollo/client/link/context";
 
 const httpLink = createHttpLink({
   // uri:  'http://localhost:5555'
-  uri: "https://40ba-180-252-115-172.ngrok-free.app",
+  uri: "https://784e-139-228-111-126.ngrok-free.app",
 });
 
 async function getValueFor(key) {
