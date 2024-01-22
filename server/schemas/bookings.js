@@ -15,6 +15,8 @@ const typeDefs = `#graphql
     UserId: ID
     talentName: String
     userName: String
+    talentImgUrl: String
+    userImgUrl:String
     bookDate: String
     bookSession: String
     bookLocation: String
@@ -88,7 +90,6 @@ const resolvers = {
 
   Mutation: {
     book: async (parent, args, contextValue, info) => {
-      //BELOM JALAN OK, FLOW
       try {
         const { newBooking } = args;
         const { db, authentication } = contextValue;
@@ -118,7 +119,7 @@ const resolvers = {
             booking.bookStatus !== "cancelled"
         );
 
-        if (ongoingBooking) {
+        if (!ongoingBooking) {
           throw {
             message:
               "Cannot make another booking with the talent because you have an ongoing booking",
@@ -129,11 +130,11 @@ const resolvers = {
 
         // console.log(newBooking, "newBooking");
 
-        const findTalentName = await db.collection("Talents").findOne({
+        const findTalent = await db.collection("Talents").findOne({
           _id: new ObjectId(newBooking.TalentId),
         });
 
-        const findUserName = await db.collection("Users").findOne({
+        const findUser = await db.collection("Users").findOne({
           _id: new ObjectId(userId),
         });
 
@@ -141,8 +142,10 @@ const resolvers = {
           ...newBooking,
           TalentId: new ObjectId(newBooking.TalentId),
           UserId: new ObjectId(userId),
-          talentName: findTalentName.name,
-          userName: findUserName.name,
+          talentName: findTalent.name,
+          userName: findUser.name,
+          talentImgUrl: findTalent.imgUrl,
+          userImgUrl: findUser.imgUrl,
           bookDate: new Date(newBooking.bookDate),
           bookStatus: "requested",
           createdAt: new Date(),
@@ -195,19 +198,10 @@ const resolvers = {
 
         const checkTalent = findBookingTalentId.equals(talentId);
 
-        // console.log(checkTalent, "checkTalent");
-        if (!checkTalent) {
-          throw {
-            message: "Forbidden, you are not the talent",
-            code: "FORBIDDEN",
-            status: 403,
-          };
-        }
-
         if (findBooking.bookStatus === "requested") {
-          if (role !== "talent") {
+          if (!checkTalent) {
             throw {
-              message: "Forbidden, you are not a talent",
+              message: "Forbidden, you are not the talent",
               code: "FORBIDDEN",
               status: 403,
             };

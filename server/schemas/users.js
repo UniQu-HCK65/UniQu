@@ -71,13 +71,14 @@ const typeDefs = `#graphql
     getUserById(userId: ID): ProfileUser
   }
 
-  type Token {
+  type Auth {
     access_token: String
+    role: String
   }
 
   type Mutation {
   register(newUser:NewUser): User
-  login(email:String, password:String): Token
+  login(email:String, password:String): Auth
   editProfile(editUser:EditUser): User
   }
 `;
@@ -468,8 +469,9 @@ const resolvers = {
           };
 
           const access_token = signToken(payload);
+          //NGENG
 
-          return { access_token };
+          return { access_token, role: payload.role };
         } else if (findTalent) {
           comparedPw = comparePwDecrypted(password, findTalent.password);
 
@@ -489,7 +491,7 @@ const resolvers = {
 
           const access_token = signToken(payload);
 
-          return { access_token };
+          return { access_token, role: payload.role };
         }
       } catch (error) {
         console.log(error, "LOGIN"); // errorHandler next up

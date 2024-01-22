@@ -36,10 +36,6 @@ const typeDefs = `#graphql
     BookingId: ID
   }
 
-  input NewTransaction {
-    BookingId: ID
-  }
-
   type Query {
     transactions: [Transaction]
     getTransactionLink(bookingId:ID): TransactionLink
