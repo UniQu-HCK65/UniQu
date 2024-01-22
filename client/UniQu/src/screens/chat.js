@@ -15,6 +15,7 @@ import { io } from "socket.io-client";
 import { launchImageLibraryAsync } from 'expo-image-picker';
 
 const serverURL = "http://192.168.27.141:4000";
+
 const socket = io(serverURL);
 
 export default function Chat({ route, navigation }) {
