@@ -19,6 +19,7 @@ import ListChat from "../screens/list-chat";
 import HomeforTalent from "../screens/homeCMST";
 import StatusBooking from "../screens/statusBooking";
 import ListBookingTalent from "../screens/listBookingDetail";
+import EditStatusBooking from "../screens/editStatusBooking";
 
 const Stack = createNativeStackNavigator();
 
@@ -33,13 +34,29 @@ export default function StackNavigator() {
     >
       {isLoggedIn ? (
         <>
-          {/* <Stack.Screen
+          <Stack.Screen
+            name="Register"
+            component={Register}
+            options={{
+              headerShown: false,
+            }}
+          />
+
+          <Stack.Screen
             name="List Booking"
             component={HomeforTalent}
             options={{
               headerShown: false,
             }}
           />
+          <Stack.Screen
+            name="Konfirmasi Booking"
+            component={EditStatusBooking}
+            options={{
+              headerShown: false,
+            }}
+          />
+
           <Stack.Screen
             name="List Booking Detail"
             component={ListBookingTalent}
@@ -62,7 +79,7 @@ export default function StackNavigator() {
             options={{
               headerShown: false,
             }}
-          /> */}
+          />
 
           <Stack.Screen
             name="Home"
@@ -105,14 +122,6 @@ export default function StackNavigator() {
           <Stack.Screen
             name="Login"
             component={Login}
-            options={{
-              headerShown: false,
-            }}
-          />
-
-          <Stack.Screen
-            name="Register"
-            component={Register}
             options={{
               headerShown: false,
             }}
