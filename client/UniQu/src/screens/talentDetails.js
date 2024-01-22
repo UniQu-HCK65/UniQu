@@ -12,7 +12,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import { GET_TALENTS_BY_ID } from "../queries/query";
 import { useQuery } from "@apollo/client";
 
-export default function TalentDetails({ route }) {
+export default function TalentDetails({navigation, route }) {
   const { talentId } = route.params;
   const { loading, error, data } = useQuery(GET_TALENTS_BY_ID, {
     variables: { talentId },
@@ -161,14 +161,14 @@ export default function TalentDetails({ route }) {
               marginRight: 50,
             }}
           >
-            <TouchableOpacity style={styles.chatButton}>
+            <TouchableOpacity onPress={() => navigation.navigate("Chat")} style={styles.chatButton}>
               <Ionicons
                 name="chatbubbles-outline"
                 color="white"
                 size={23}
               ></Ionicons>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.bookingButton}>
+            <TouchableOpacity onPress={() => navigation.navigate("Booking")} style={styles.bookingButton}>
               <Text style={styles.textButton}>Booking Now</Text>
             </TouchableOpacity>
           </View>

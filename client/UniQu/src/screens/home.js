@@ -228,12 +228,14 @@ export default function Home({ navigation }) {
           </View>
 
           <View style={{}}>
-            <Image
-              source={{
-                uri: photoUser,
-              }}
-              style={styles.avatarHeader}
-            />
+            <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
+              <Image
+                source={{
+                  uri: photoUser,
+                }}
+                style={styles.avatarHeader}
+              />
+              </TouchableOpacity>
           </View>
         </View>
 

@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { Picker } from '@react-native-picker/picker';
 
-export default function Booking() {
+export default function Booking({navigation}) {
     const [selectedDate, setSelectedDate] = useState('');
     const [selectedSlot, setSelectedSlot] = useState('');
     const [selectedLocation, setSelectedLocation] = useState('');
@@ -88,7 +88,7 @@ export default function Booking() {
             </View>
 
             <View style={{ flexDirection: 'row', gap: 10, marginHorizontal: 20, justifyContent: 'center' }}>
-                <TouchableOpacity style={styles.submitButton}>
+                <TouchableOpacity onPress={() => navigation.navigate('Status Booking')} style={styles.submitButton}>
                     <Text style={{ color: 'white' }}>Submit</Text>
                 </TouchableOpacity>
             </View>
