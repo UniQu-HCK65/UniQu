@@ -33,6 +33,7 @@
     "react-native-review-modal": "^0.0.1",
     "react-native-star-rating": "^1.1.0",
     "react-native-vector-icons": "^10.0.3",
+    "react-native-webview": "^13.6.4",
     "socket.io-client": "^4.7.4"
   },
   "devDependencies": {

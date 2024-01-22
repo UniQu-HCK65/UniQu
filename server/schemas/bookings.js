@@ -33,6 +33,7 @@ const typeDefs = `#graphql
 
   type Query {
     bookings: [Booking]
+    bookingById(bookingId:ID): Booking
   }
 
   type Mutation {
@@ -52,6 +53,29 @@ const resolvers = {
         return bookings;
       } catch (error) {
         console.log(error, "GET_BOOKINGS"); // errorHandler next up
+        throw new GraphQLError(error.message || "Internal Server Error", {
+          extensions: {
+            code: error.code || "INTERNAL_SERVER_ERROR",
+            http: { status: error.status || 500 },
+          },
+        });
+      }
+    },
+    bookingById: async (parent, args, contextValue, info) => {
+      try {
+        const { db, authentication } = contextValue;
+        const auth = await authentication();
+        const { bookingId } = args;
+
+        const booking = await db.collection(COLLECTION_NAME);
+
+        const getBooking = await booking.findOne({
+          _id: new ObjectId(bookingId),
+        });
+
+        return getBooking;
+      } catch (error) {
+        console.log(error, "GET_BOOKING_BY_ID"); // errorHandler next up
         throw new GraphQLError(error.message || "Internal Server Error", {
           extensions: {
             code: error.code || "INTERNAL_SERVER_ERROR",
@@ -85,11 +109,11 @@ const resolvers = {
           })
           .toArray();
 
-        console.log(findExistingBooking, "findExistingBooking");
+        // console.log(findExistingBooking, "findExistingBooking");
 
         const ongoingBooking = findExistingBooking.find(
           (booking) =>
-            booking.bookStatus !== "ended" || booking.bookStatus !== "denied"
+            booking.bookStatus !== "ended" || booking.bookStatus !== "denied" || booking.bookStatus !== "cancelled"
         );
 
         if (ongoingBooking) {
@@ -101,7 +125,7 @@ const resolvers = {
           };
         }
 
-        console.log(newBooking, "newBooking");
+        // console.log(newBooking, "newBooking");
 
         const findTalentName = await db.collection("Talents").findOne({
           _id: new ObjectId(newBooking.TalentId),
@@ -127,12 +151,6 @@ const resolvers = {
           _id: new ObjectId(newBookRequest.insertedId),
         });
 
-        // return {
-        //   ...findCreatedBooking,
-        //   bookDate: formatDate(findCreatedBooking.bookDate),
-        //   createdAt: formatDate(findCreatedBooking.createdAt),
-        //   updatedAt: formatDate(findCreatedBooking.updatedAt),
-        // };
         return findCreatedBooking;
       } catch (error) {
         console.log(error, "POST_BOOK_USER"); // errorHandler next up
@@ -175,7 +193,7 @@ const resolvers = {
 
         const checkTalent = findBookingTalentId.equals(talentId);
 
-        console.log(checkTalent, "checkTalent");
+        // console.log(checkTalent, "checkTalent");
         if (!checkTalent) {
           throw {
             message: "Forbidden, you are not the talent",
@@ -193,6 +211,12 @@ const resolvers = {
             };
           }
 
+          
+
+          // JALANIN CREATE TRANSACTIONS
+
+          //JALANIN BUAT MIDTRANS, MAKE USERID(POSISI SEBAGAI TALENT,HARUS GET USERID)
+
           await bookings.updateOne(
             {
               _id: new ObjectId(bookingId),
@@ -204,16 +228,7 @@ const resolvers = {
               },
             }
           );
-
-          //JALANIN BUAT MIDTRANS, MAKE USERID(POSISI SEBAGAI TALENT,HARUS GET USERID)
         } else if (findBooking.bookStatus === "booked") {
-          if (role !== "talent") {
-            throw {
-              message: "Forbidden, you are not a talent",
-              code: "FORBIDDEN",
-              status: 403,
-            };
-          }
 
           await bookings.updateOne(
             {
@@ -226,6 +241,8 @@ const resolvers = {
               },
             }
           );
+
+
         } else if (findBooking.bookStatus === "in progress") {
           if (role !== "talent") {
             throw {
