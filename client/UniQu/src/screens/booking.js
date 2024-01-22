@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { Picker } from '@react-native-picker/picker';
 
-export default function Booking({navigation}) {
+export default function Booking({ navigation }) {
     const [selectedDate, setSelectedDate] = useState('');
     const [selectedSlot, setSelectedSlot] = useState('');
     const [selectedLocation, setSelectedLocation] = useState('');
@@ -15,7 +15,7 @@ export default function Booking({navigation}) {
     };
 
     const handleSlotSelect = (slot) => {
-        setSelectedSlot(selectedSlot === slot ? '' : slot);
+        setSelectedSlot(slot);
     };
 
     const handleDropdownToggle = () => {
@@ -32,34 +32,36 @@ export default function Booking({navigation}) {
                 style={{ margin: 20 }}
             />
 
-            <View style={{ marginLeft: 40, marginBottom: 10 }}>
-                <Text style={{ fontSize: 20, fontWeight: '300' }}>Select session : </Text>
-            </View>
-
-            <View style={{ flexDirection: 'row', gap: 10, marginHorizontal: 20, justifyContent: 'center' }}>
-                <TouchableOpacity
-                    onPress={() => handleSlotSelect('09.00 - 10.00')}
-                    style={[
-                        styles.slotButton,
-                        selectedSlot === '09.00 - 10.00' && styles.selectedSlotButton,
-                    ]}
-                >
-                    <Text style={{ color: 'white' }}>09.00 - 10.00</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    onPress={() => handleSlotSelect('10.00 - 11.00')}
-                    style={[
-                        styles.slotButton,
-                        selectedSlot === '10.00 - 11.00' && styles.selectedSlotButton,
-                    ]}
-                >
-                    <Text style={{ color: 'white' }}>10.00 - 11.00</Text>
-                </TouchableOpacity>
-            </View>
-
             <View style={{ marginLeft: 40, marginBottom: 10, marginTop: 30 }}>
-                <Text style={{ fontSize: 20, fontWeight: '300' }}>Select Mall : </Text>
+                <Text style={{ fontSize: 15, fontWeight: '300' }}>Select session : </Text>
+            </View>
+
+            <View style={{ borderWidth: 0.5, marginBottom: 10, marginHorizontal: 40, borderRadius: 10 }}>
+                <TouchableOpacity onPress={handleDropdownToggle} style={{ padding: 10 }}>
+                    <Text style={styles.dropdownToggleText}>
+                        {selectedSlot ? selectedLocation : 'Select Session'}
+                    </Text>
+                </TouchableOpacity>
+
+                {isDropdownVisible && (
+                    <Picker
+                        selectedValue={selectedLocation}
+                        onValueChange={(itemValue) => {
+                            setSelectedSlot(itemValue);
+                            setIsDropdownVisible(false);
+                        }}
+                        style={styles.picker}
+                        itemStyle={styles.pickerItem}
+                    >
+                        <Picker.Item label="Select Session" value="" />
+                        <Picker.Item label="09.00 - 10.00" value="09.00 - 10.00" />
+                        <Picker.Item label="10.00 - 11.00" value="10.00 - 11.00" />
+                    </Picker>
+                )}
+            </View>
+
+            <View style={{ marginLeft: 40, marginBottom: 10, marginTop: 15 }}>
+                <Text style={{ fontSize: 15, fontWeight: '300' }}>Select Mall : </Text>
             </View>
 
             <View style={{ borderWidth: 0.5, marginBottom: 10, marginHorizontal: 40, borderRadius: 10 }}>
@@ -103,8 +105,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
     },
     slotButton: {
-        width: 150,
-        height: 50,
+        width: 100,
+        height: 40,
         backgroundColor: 'black',
         borderRadius: 20,
         alignItems: 'center',

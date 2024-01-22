@@ -47,7 +47,7 @@ export default function TalentDetails({navigation, route }) {
 
           <View style={styles.textHeaders}>
             <Text style={styles.name}>{talent.name}</Text>
-            <Ionicons name="star" size={15} style={{ left: 15 }}></Ionicons>
+            <Ionicons name="star" size={13} color={"#85803a"} style={{ left: 5 }}></Ionicons>
             <Text style={styles.rating}>
               {talent.rating} ({talent.reviews.length} reviews)
             </Text>
@@ -66,7 +66,7 @@ export default function TalentDetails({navigation, route }) {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            style={{ flexDirection: "row" }}
+            style={{ flexDirection: "row", maxWidth: 350 }}
           >
             {talent.tags.map((tag, index) => (
               <View style={styles.tagsCard} key={index}>
@@ -75,7 +75,7 @@ export default function TalentDetails({navigation, route }) {
             ))}
           </ScrollView>
 
-          <ScrollView
+          {/* <ScrollView
             vertical
             showsVerticalScrollIndicator={false}
             style={{
@@ -86,7 +86,7 @@ export default function TalentDetails({navigation, route }) {
           >
             <View style={{ gap: 5, height: 50, marginBottom: 300 }}>
               {/* <View style={{marginBottom: 50}}> */}
-                <View
+                {/* <View
                   style={{
                     width: "100%",
                     height: 50,
@@ -150,9 +150,9 @@ export default function TalentDetails({navigation, route }) {
                     borderWidth: 1,
                   }}
                 ></View>
-              </View>
+              </View> */}
             {/* </View> */}
-          </ScrollView>
+          {/* </ScrollView> */}
 
           <View
             style={{
@@ -197,7 +197,8 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 0,
     width: "100%",
-    height: 630,
+    // height: 630,
+    height: 500,
     borderRadius: 40,
     backgroundColor: "white",
     marginBottom: 10,

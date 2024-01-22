@@ -3,10 +3,6 @@ import {
   StyleSheet,
   Text,
   View,
-  SafeAreaView,
-  ScrollView,
-  ImageBackground,
-  Button,
   Image,
   TouchableOpacity,
   FlatList,
@@ -209,14 +205,17 @@ export default function Home({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View style={{}}>
-        {/* <Image
+        <Image
           source={{
-            uri: 'https://images.unsplash.com/photo-1642439048934-27a82f89b866?q=80&w=3328&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+            uri: 'https://images.unsplash.com/photo-1627163439134-7a8c47e08208?q=80&w=3432&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
           }}
-          style={{ width: '100%', height: 130, resizeMode: 'cover', borderBottomLeftRadius: 70, borderBottomRightRadius: 70, zIndex: -1, position:'absolute', opacity: 40}}
-        /> */}
+          style={styles.imageHeader}
+        />
+        <View style={styles.overlay}></View>
+
+
         <View style={styles.contentHeader}>
           <View style={styles.containerHeader}>
             <Text style={styles.textNameHeader}>
@@ -235,7 +234,7 @@ export default function Home({ navigation }) {
                 }}
                 style={styles.avatarHeader}
               />
-              </TouchableOpacity>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -274,9 +273,7 @@ export default function Home({ navigation }) {
           renderItem={renderTalentForYou}
         />
       )}
-
-      <LogoutButton />
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -392,17 +389,20 @@ const styles = StyleSheet.create({
     marginRight: 15,
     marginBottom: 10,
     zIndex: 5,
+    marginTop: 40
   },
   textNameHeader: {
     fontWeight: "bold",
     fontSize: 26,
     marginTop: 10,
+    color: 'white'
   },
   textWelcomingHeader: {
     fontWeight: "bold",
     fontSize: 15,
     marginTop: 10,
     width: 300,
+    color: 'white'
   },
   avatarHeader: {
     width: 45,
@@ -434,4 +434,24 @@ const styles = StyleSheet.create({
     height: 35,
     marginHorizontal: 20,
   },
+  imageHeader: {
+    width: '100%',
+    height: 130,
+    resizeMode: 'cover',
+    borderBottomLeftRadius: 50,
+    borderBottomRightRadius: 50,
+    zIndex: -1,
+    position: 'absolute',
+    opacity: 50,
+    height: 180
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "black",
+    opacity: 0.5,
+    width: '100%',
+    height: 180,
+    borderBottomEndRadius: 50,
+    borderBottomStartRadius: 50,
+  }
 });

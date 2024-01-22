@@ -38,6 +38,14 @@ export default function StackNavigator() {
         gestureDirection: "vertical",
       }}
     >
+        {/* <Stack.Screen
+            name="LandingPage"
+            component={LandingPage}
+            options={{
+              headerShown: false,
+            }}
+          /> */}
+
       {!token && !role && (
         <>
           <Stack.Screen
@@ -88,7 +96,7 @@ export default function StackNavigator() {
             name="Booking"
             component={Booking}
             options={{
-              headerShown: false,
+              headerShown: true,
             }}
           />
 
