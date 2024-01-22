@@ -23,7 +23,7 @@ export default function ProfileTalent() {
     const date = new Date(parseInt(timestamp));
     return date.toLocaleDateString();
   };
-
+//malam guys
   return (
     <ScrollView>
       <View style={styles.container}>
