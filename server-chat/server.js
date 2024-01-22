@@ -10,7 +10,7 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const cloudinary = require('cloudinary').v2;
-
+// iamge upload success
 const PORT = 4000;
 const clientOrigins = "exp://192.168.27.141:8081";
 const mongoUri = process.env.CHAT_DB_URI;
