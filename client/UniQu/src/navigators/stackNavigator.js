@@ -20,6 +20,7 @@ import HomeforTalent from "../screens/homeCMST";
 import StatusBooking from "../screens/statusBooking";
 import ListBookingTalent from "../screens/listBookingDetail";
 import EditStatusBooking from "../screens/editStatusBooking";
+import ProfileTalent from "../screens/profileTalent";
 
 const Stack = createNativeStackNavigator();
 
@@ -36,14 +37,6 @@ export default function StackNavigator() {
     >
       {isLoggedIn ? (
         <>
-          <Stack.Screen
-            name="Register"
-            component={Register}
-            options={{
-              headerShown: false,
-            }}
-          />
-
           <Stack.Screen
             name="List Booking"
             component={HomeforTalent}
@@ -83,6 +76,8 @@ export default function StackNavigator() {
             }}
           />
 
+          <Stack.Screen name="Profile" component={ProfileTalent}  />
+
           <Stack.Screen
             name="Home"
             component={MyTabs}
@@ -93,7 +88,7 @@ export default function StackNavigator() {
 
           <Stack.Screen name="Edit Profile" component={EditProfileUser} />
 
-          <Stack.Screen name="Profile" component={ProfileUser} />
+          {/* <Stack.Screen name="Profile" component={ProfileUser} /> */}
 
           <Stack.Screen
             name="Chat"
@@ -124,6 +119,14 @@ export default function StackNavigator() {
           <Stack.Screen
             name="Login"
             component={Login}
+            options={{
+              headerShown: false,
+            }}
+          />
+
+          <Stack.Screen
+            name="Register"
+            component={Register}
             options={{
               headerShown: false,
             }}

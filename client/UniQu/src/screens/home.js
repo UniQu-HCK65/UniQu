@@ -22,7 +22,6 @@ import {
 } from "../queries/query";
 import Ionicons from "react-native-vector-icons/Feather";
 
-
 const tags = [
   "Sneakers",
   "Wedges",
@@ -80,6 +79,8 @@ export default function Home({ navigation }) {
     refetch: refetchGetUser,
   } = useQuery(GET_USER);
   const nameUser = nameUserData?.whoAmI?.name;
+  const photoUser = nameUserData?.whoAmI?.imgUrl;
+
   const {
     loading: allTalentLoading,
     error: allTalentError,
@@ -100,25 +101,10 @@ export default function Home({ navigation }) {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const forYouResult = await refetchForYou();
-        const allTalentResult = await refetchAllTalent();
-        const getUserResult = await refetchGetUser();
+    refetchGetUser();
+  }, []);
 
-        if (
-          !forYouResult.loading &&
-          !allTalentResult.loading &&
-          !getUserResult.loading
-        ) {
-          setTalentsForYou(forYouResult.data.talentsForMe?.talentsForMe);
-          setAllTalents(allTalentResult.data.talents);
-          setLoading(false);
-        }
-      } catch (error) {
-        console.log(error, "error refatch home");
-      }
-    };
+  useEffect(() => {
     if (!forYouLoading && !allTalentLoading) {
       setLoading(false);
     }
@@ -233,7 +219,9 @@ export default function Home({ navigation }) {
         /> */}
         <View style={styles.contentHeader}>
           <View style={styles.containerHeader}>
-            <Text style={styles.textNameHeader}>Hai, {nameUser}</Text>
+            <Text style={styles.textNameHeader}>
+              Hai, {getUserLoading ? " " : nameUser}{" "}
+            </Text>
             <Text style={styles.textWelcomingHeader}>
               Welcome back, What are you looking for today?
             </Text>
@@ -242,7 +230,7 @@ export default function Home({ navigation }) {
           <View style={{}}>
             <Image
               source={{
-                uri: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fHByb2ZpbGV8ZW58MHx8MHx8fDA%3D",
+                uri: photoUser,
               }}
               style={styles.avatarHeader}
             />

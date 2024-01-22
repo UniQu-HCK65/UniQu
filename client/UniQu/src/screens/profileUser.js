@@ -130,7 +130,10 @@ export default function ProfileUser({ navigation }) {
                       <Text style={styles.historyLabel}>No. Payment</Text>
                     </View>
                     <View style={{ marginLeft: 10 }}>
-                      <Text style={{ width: 273 }}> : {paymentId}</Text>
+                      <Text style={{ width: 273 }}>
+                        {" "}
+                        : {paymentId ? paymentId : "-"}
+                      </Text>
                     </View>
                   </View>
 
@@ -154,9 +157,9 @@ export default function ProfileUser({ navigation }) {
 
                   <View style={styles.historyContainer}>
                     <View>
-                      <Text style={styles.historyLabel}>Book Seesion</Text>
+                      <Text style={styles.historyLabel}>Seesion</Text>
                     </View>
-                    <View style={{ marginLeft: 10 }}>
+                    <View style={{ marginLeft: 42}}>
                       <Text>: Session {booking.bookSession}</Text>
                     </View>
                   </View>
@@ -258,7 +261,7 @@ const styles = StyleSheet.create({
     shadowRadius: 1,
   },
   usernameStyle: {
-    fontSize: 20,
+    fontSize: 18,
     color: "#4e4e4e",
     marginTop: 3,
     marginLeft: 25,

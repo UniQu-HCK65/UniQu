@@ -75,7 +75,84 @@ export default function TalentDetails({ route }) {
             ))}
           </ScrollView>
 
-          {/* <View style={styles.liner}></View> */}
+          <ScrollView
+            vertical
+            showsVerticalScrollIndicator={false}
+            style={{
+              // justifyContent: "center",
+              // alignItems: "center",
+              marginHorizontal: 25,
+            }}
+          >
+            <View style={{ gap: 5, height: 50, marginBottom: 300 }}>
+              {/* <View style={{marginBottom: 50}}> */}
+                <View
+                  style={{
+                    width: "100%",
+                    height: 50,
+                    borderColor: "black",
+                    borderWidth: 1,
+                  }}
+                ></View>
+                <View
+                  style={{
+                    width: "100%",
+                    height: 50,
+                    borderColor: "black",
+                    borderWidth: 1,
+                  }}
+                ></View>
+                <View
+                  style={{
+                    width: "100%",
+                    height: 50,
+                    borderColor: "black",
+                    borderWidth: 1,
+                  }}
+                ></View>
+                <View
+                  style={{
+                    width: "100%",
+                    height: 50,
+                    borderColor: "black",
+                    borderWidth: 1,
+                  }}
+                ></View>
+                <View
+                  style={{
+                    width: "100%",
+                    height: 50,
+                    borderColor: "black",
+                    borderWidth: 1,
+                  }}
+                ></View>
+                <View
+                  style={{
+                    width: "100%",
+                    height: 50,
+                    borderColor: "black",
+                    borderWidth: 1,
+                  }}
+                ></View>
+                <View
+                  style={{
+                    width: "100%",
+                    height: 50,
+                    borderColor: "black",
+                    borderWidth: 1,
+                  }}
+                ></View>
+                <View
+                  style={{
+                    width: "100%",
+                    height: 50,
+                    borderColor: "black",
+                    borderWidth: 1,
+                  }}
+                ></View>
+              </View>
+            {/* </View> */}
+          </ScrollView>
 
           <View
             style={{
@@ -120,7 +197,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 0,
     width: "100%",
-    height: 450,
+    height: 630,
     borderRadius: 40,
     backgroundColor: "white",
     marginBottom: 10,

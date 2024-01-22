@@ -40,7 +40,7 @@ const getStatusColor = (status) => {
 
 export default function HomeforTalent() {
   const { loading, error, data } = useQuery(WHO_AM_I_TALENT);
-
+console.log(data, "homesct");
   if (loading) return <Text>Mengambil data...</Text>;
   if (error) return <Text>Error: {error.message}</Text>;
 
