@@ -3,8 +3,10 @@ import { ApolloClient, createHttpLink, InMemoryCache } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 
 const httpLink = createHttpLink({
+
   // uri:  'http://localhost:5555'
   uri: "https://784e-139-228-111-126.ngrok-free.app",
+
 });
 
 async function getValueFor(key) {

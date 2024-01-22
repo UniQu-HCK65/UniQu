@@ -36,9 +36,10 @@ export default function StackNavigator() {
     >
       {isLoggedIn ? (
         <>
+
           <Stack.Screen
-            name="Register"
-            component={Register}
+            name="Home"
+            component={MyTabs}
             options={{
               headerShown: false,
             }}
@@ -51,6 +52,7 @@ export default function StackNavigator() {
               headerShown: false,
             }}
           />
+
           <Stack.Screen
             name="Konfirmasi Booking"
             component={EditStatusBooking}
@@ -83,13 +85,7 @@ export default function StackNavigator() {
             }}
           />
 
-          <Stack.Screen
-            name="Home"
-            component={MyTabs}
-            options={{
-              headerShown: false,
-            }}
-          />
+
 
           <Stack.Screen name="Edit Profile" component={EditProfileUser} />
 
@@ -124,6 +120,14 @@ export default function StackNavigator() {
           <Stack.Screen
             name="Login"
             component={Login}
+            options={{
+              headerShown: false,
+            }}
+          />
+
+          <Stack.Screen
+            name="Register"
+            component={Register}
             options={{
               headerShown: false,
             }}
