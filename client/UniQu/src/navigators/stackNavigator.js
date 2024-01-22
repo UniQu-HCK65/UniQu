@@ -33,7 +33,7 @@ export default function StackNavigator() {
     >
       {isLoggedIn ? (
         <>
-          <Stack.Screen
+          {/* <Stack.Screen
             name="List Booking"
             component={HomeforTalent}
             options={{
@@ -62,7 +62,7 @@ export default function StackNavigator() {
             options={{
               headerShown: false,
             }}
-          />
+          /> */}
 
           <Stack.Screen
             name="Home"
