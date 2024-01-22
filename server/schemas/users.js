@@ -469,6 +469,7 @@ const resolvers = {
           };
 
           const access_token = signToken(payload);
+          //NGENG
 
           return { access_token, role: payload.role };
         } else if (findTalent) {
