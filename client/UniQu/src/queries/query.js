@@ -202,6 +202,26 @@ export const WHO_AM_I_TALENT = gql`
   }
 `;
 
+
+export const USER_REGISTER = gql`
+  mutation Register($newUser: NewUser) {
+  register(newUser: $newUser) {
+    _id
+    name
+    username
+    email
+    password
+    role
+    gender
+    imgUrl
+    tags
+    userLocations
+    createdAt
+    updatedAt
+  }
+}
+`
+
 export const GET_TALENTS_BY_ID = gql`
   query GetTalentsById($talentId: String) {
     getTalentsById(talentId: $talentId) {
@@ -227,3 +247,4 @@ export const GET_TALENTS_BY_ID = gql`
     }
   }
 `;
+

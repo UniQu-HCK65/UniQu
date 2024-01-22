@@ -1,8 +1,8 @@
 const client = require("../config/configMongo");
 const { GraphQLError } = require("graphql");
 const { ObjectId } = require("mongodb");
-
-const { formatDate } = require("../helpers/dateFormat");
+const midtransClient = require("midtrans-client");
+const axios = require("axios");
 
 const COLLECTION_NAME = "Bookings";
 
@@ -15,6 +15,8 @@ const typeDefs = `#graphql
     UserId: ID
     talentName: String
     userName: String
+    talentImgUrl: String
+    userImgUrl:String
     bookDate: String
     bookSession: String
     bookLocation: String
@@ -88,7 +90,6 @@ const resolvers = {
 
   Mutation: {
     book: async (parent, args, contextValue, info) => {
-      //BELOM JALAN OK, FLOW
       try {
         const { newBooking } = args;
         const { db, authentication } = contextValue;
@@ -113,10 +114,12 @@ const resolvers = {
 
         const ongoingBooking = findExistingBooking.find(
           (booking) =>
-            booking.bookStatus !== "ended" || booking.bookStatus !== "denied" || booking.bookStatus !== "cancelled"
+            booking.bookStatus !== "ended" ||
+            booking.bookStatus !== "denied" ||
+            booking.bookStatus !== "cancelled"
         );
 
-        if (ongoingBooking) {
+        if (!ongoingBooking) {
           throw {
             message:
               "Cannot make another booking with the talent because you have an ongoing booking",
@@ -127,11 +130,11 @@ const resolvers = {
 
         // console.log(newBooking, "newBooking");
 
-        const findTalentName = await db.collection("Talents").findOne({
+        const findTalent = await db.collection("Talents").findOne({
           _id: new ObjectId(newBooking.TalentId),
         });
 
-        const findUserName = await db.collection("Users").findOne({
+        const findUser = await db.collection("Users").findOne({
           _id: new ObjectId(userId),
         });
 
@@ -139,8 +142,10 @@ const resolvers = {
           ...newBooking,
           TalentId: new ObjectId(newBooking.TalentId),
           UserId: new ObjectId(userId),
-          talentName: findTalentName.name,
-          userName: findUserName.name,
+          talentName: findTalent.name,
+          userName: findUser.name,
+          talentImgUrl: findTalent.imgUrl,
+          userImgUrl: findUser.imgUrl,
           bookDate: new Date(newBooking.bookDate),
           bookStatus: "requested",
           createdAt: new Date(),
@@ -193,29 +198,126 @@ const resolvers = {
 
         const checkTalent = findBookingTalentId.equals(talentId);
 
-        // console.log(checkTalent, "checkTalent");
-        if (!checkTalent) {
-          throw {
-            message: "Forbidden, you are not the talent",
-            code: "FORBIDDEN",
-            status: 403,
-          };
-        }
-
         if (findBooking.bookStatus === "requested") {
-          if (role !== "talent") {
+          if (!checkTalent) {
             throw {
-              message: "Forbidden, you are not a talent",
+              message: "Forbidden, you are not the talent",
               code: "FORBIDDEN",
               status: 403,
             };
           }
 
-          
+          const talentId = auth._id;
 
-          // JALANIN CREATE TRANSACTIONS
+          const transaction = await db.collection("Transactions");
 
-          //JALANIN BUAT MIDTRANS, MAKE USERID(POSISI SEBAGAI TALENT,HARUS GET USERID)
+          const findBooking = await db.collection("Bookings").findOne({
+            _id: new ObjectId(bookingId),
+          });
+
+          const findActiveTransaction = await transaction.findOne({
+            BookingId: new ObjectId(bookingId),
+            transactionStatus: "unpaid",
+          });
+
+          if (findActiveTransaction) {
+            throw {
+              message:
+                "You still have an ongoing transaction, please go to this link: " +
+                findActiveTransaction.paymentLink,
+              code: "BAD_REQUEST",
+              status: 400,
+            };
+          }
+
+          const findTalent = await db.collection("Talents").findOne({
+            _id: new ObjectId(talentId),
+          });
+
+          const findUser = await db.collection("Users").findOne({
+            _id: new ObjectId(findBooking.UserId),
+          });
+
+          let snap = new midtransClient.Snap({
+            isProduction: false,
+            serverKey: process.env.MIDTRANS_SERVER_KEY,
+          });
+
+          const currentDate = new Date();
+
+          const options = {
+            year: "2-digit",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          };
+
+          const formattedDate = currentDate.toLocaleDateString(
+            "id-Id",
+            options
+          );
+
+          const twoDigitRandom = Math.floor(Math.random() * 90) + 10;
+
+          const orderId = `TRX-BKNG-${Math.random().toString()}`; //TSTING PURPOSES
+          // const orderId = `TRX-BKNG-${bookingId}-${auth.username}-${twoDigitRandom}`;
+
+          const trxAmount = 500_000;
+
+          const midtransTransaction = await snap.createTransaction({
+            transaction_details: {
+              order_id: orderId,
+              gross_amount: trxAmount,
+            },
+            item_details: [
+              {
+                id: bookingId,
+                price: 500000,
+                quantity: 1,
+                name:
+                  findUser.name +
+                  "'s" +
+                  "Booking Session with " +
+                  findTalent.name,
+              },
+            ],
+            customer_details: {
+              first_name: findUser.name,
+              email: findUser.email,
+            },
+          });
+
+          // console.log(midtransTransaction, "AAAAAAA");
+
+          const expiryDate = new Date(new Date().getTime() + 2 * 60 * 1000); //NANTI GANTI OI, ini 2 mnt
+          //  const expiryDate = new Date(new Date().getTime() + 60 * 60 * 1000);
+
+          const createTransaction = await transaction.insertOne({
+            TalentId: new ObjectId(talentId),
+            UserId: new ObjectId(findBooking.UserId),
+            BookingId: new ObjectId(bookingId),
+            talentName: findBooking.talentName,
+            userName: findBooking.userName,
+            paymentId: midtransTransaction.token,
+            orderId: orderId,
+            paymentLink: midtransTransaction.redirect_url,
+            transactionStatus: "unpaid",
+            expiryDate: expiryDate,
+            paidByAdmin: false,
+            updatedAt: new Date(),
+            createdAt: new Date(),
+          });
+
+          const findCreatedTransaction = await transaction.findOne({
+            _id: new ObjectId(createTransaction.insertedId),
+          });
+
+          console.log(
+            findCreatedTransaction,
+            "findCreatedTransaction FROM UPDATE BOOKING"
+          );
 
           await bookings.updateOne(
             {
@@ -229,20 +331,128 @@ const resolvers = {
             }
           );
         } else if (findBooking.bookStatus === "booked") {
+          //UPDATE FROM BOOKED TO IN PROGRESS
 
-          await bookings.updateOne(
-            {
-              _id: new ObjectId(bookingId),
+          const transaction = await db.collection("Transactions");
+
+          const findActiveTransaction = await transaction.findOne({
+            BookingId: new ObjectId(bookingId),
+            transactionStatus: "unpaid",
+          });
+
+          if (!findActiveTransaction) {
+            throw {
+              message:
+                "No active transaction found, please check your booking id or place a new booking",
+              code: "BAD_REQUEST",
+              status: 400,
+            };
+          }
+
+          const orderId = findActiveTransaction.orderId;
+
+          const midtransStatusUrl = `https://api.sandbox.midtrans.com/v2/${orderId}/status`;
+          // console.log(midtransStatusUrl, "midtransStatusUrl");
+
+          const midtransOptions = {
+            method: "GET",
+            headers: {
+              accept: "application/json",
+              Authorization: `Basic ${Buffer.from(
+                `${process.env.MIDTRANS_SERVER_KEY}:`
+              ).toString("base64")}`,
             },
-            {
-              $set: {
-                bookStatus: "in progress",
-                updatedAt: new Date(),
-              },
-            }
+          };
+
+          const midtransResponse = await axios.get(
+            midtransStatusUrl,
+            midtransOptions
           );
+          const midtransData = midtransResponse.data;
 
+          // console.log(midtransData, "BBBBBB");
 
+          if (midtransData.status_code === "404") {
+            throw {
+              message:
+                "You have an unstarted transaction, please visit this link: " +
+                findActiveTransaction.paymentLink,
+              code: "NOT_FOUND",
+              status: 404,
+            };
+          } else if (
+            midtransData.status_code === "201" &&
+            midtransData.transaction_status === "pending"
+          ) {
+            throw {
+              message:
+                "You have an unfinished transaction, please visit this link: " +
+                findActiveTransaction.paymentLink,
+              code: "UNAUTHORIZED",
+              status: 401,
+            };
+          } else if (midtransData.transaction_status === "expire") {
+            const espireTransaction = await transaction.updateOne(
+              {
+                _id: new ObjectId(findActiveTransaction._id),
+              },
+              {
+                $set: {
+                  transactionStatus: "expired",
+                  updatedAt: new Date(),
+                },
+              }
+            );
+
+            throw {
+              message:
+                "Your transaction has expired, please place an order again",
+              code: "UNAUTHORIZED",
+              status: 401,
+            };
+          } else if (
+            midtransData.status_code === "200" &&
+            (midtransData.transaction_status === "settlement" ||
+              midtransData.transaction_status === "capture")
+          ) {
+            await transaction.updateOne(
+              {
+                _id: new ObjectId(findActiveTransaction._id),
+              },
+              {
+                $set: {
+                  transactionStatus: "paid",
+                  updatedAt: new Date(),
+                },
+              }
+            );
+          }
+
+          const findUpdatedTransaction = await transaction.findOne({
+            _id: new ObjectId(findActiveTransaction._id),
+          });
+
+          if (findUpdatedTransaction.transactionStatus === "paid") {
+            await bookings.updateOne(
+              {
+                _id: new ObjectId(bookingId),
+              },
+              {
+                $set: {
+                  bookStatus: "in progress",
+                  updatedAt: new Date(),
+                },
+              }
+            );
+          } else {
+            throw {
+              message:
+                "You have an unpaid transaction, please visit this link: " +
+                findActiveTransaction.paymentLink,
+              code: "BAD_REQUEST",
+              status: 400,
+            };
+          }
         } else if (findBooking.bookStatus === "in progress") {
           if (role !== "talent") {
             throw {
@@ -272,6 +482,46 @@ const resolvers = {
             };
           }
 
+          const transaction = await db.collection("Transactions");
+
+          const findResolvedTransaction = await transaction.findOne({
+            BookingId: new ObjectId(bookingId),
+            transactionStatus: "paid",
+          });
+
+          if (!findResolvedTransaction) {
+            throw {
+              message:
+                "No transactions needed to be resolved, please check your booking id and try again",
+              code: "BAD_REQUEST",
+              status: 400,
+            };
+          }
+
+          //BAYAR KE TALENT
+          const payTalents = db.collection("Talents").updateOne(
+            {
+              _id: new ObjectId(findResolvedTransaction.TalentId),
+            },
+            { $inc: { balance: 500000 } },
+            { $set: { updatedAt: new Date() } }
+          );
+
+          //GANTI STATUS TRANSACTION KE PAIDADMIN
+          const updateTransaction = await transaction.updateOne(
+            {
+              _id: new ObjectId(findResolvedTransaction._id),
+            },
+            {
+              $set: {
+                transactionStatus: "paidAdmin",
+                paidByAdmin: true,
+                updatedAt: new Date(),
+              },
+            }
+          );
+
+          //GANTI STATUS BOOKING KE ENDED
           await bookings.updateOne(
             {
               _id: new ObjectId(bookingId),
@@ -286,21 +536,21 @@ const resolvers = {
         } else if (findBooking.bookStatus === "ended") {
           throw {
             message:
-              "Booking has already ended or denied, please check your booking id and try again",
+              "Booking session has already ended, please check your booking id and try again",
             code: "BAD_REQUEST",
             status: 400,
           };
         } else if (findBooking.bookStatus === "denied") {
           throw {
             message:
-              "Booking has been denied, please reconfirm with the talent and try booking again",
+              "Booking ession has been denied, please reconfirm with the talent and try booking again",
             code: "BAD_REQUEST",
             status: 400,
           };
         } else if (findBooking.bookStatus === "cancelled") {
           throw {
             message:
-              "Booking has been cancelled, please reconfirm with the talent and try booking again",
+              "Booking session has been cancelled, please reconfirm with the talent and try booking again",
             code: "BAD_REQUEST",
             status: 400,
           };

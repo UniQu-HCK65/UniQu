@@ -34,9 +34,17 @@ export default function StackNavigator() {
       screenOptions={{
         gestureDirection: "vertical",
       }}
-    >
+      >
       {isLoggedIn ? (
         <>
+          <Stack.Screen
+            name="Home"
+            component={MyTabs}
+            options={{
+              headerShown: false,
+            }}
+          />
+
           <Stack.Screen
             name="List Booking"
             component={HomeforTalent}
@@ -44,6 +52,7 @@ export default function StackNavigator() {
               headerShown: false,
             }}
           />
+
           <Stack.Screen
             name="Konfirmasi Booking"
             component={EditStatusBooking}
@@ -78,13 +87,6 @@ export default function StackNavigator() {
 
           <Stack.Screen name="Profile" component={ProfileTalent}  />
 
-          <Stack.Screen
-            name="Home"
-            component={MyTabs}
-            options={{
-              headerShown: false,
-            }}
-          />
 
           <Stack.Screen name="Edit Profile" component={EditProfileUser} />
 
