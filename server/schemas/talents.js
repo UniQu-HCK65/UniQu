@@ -47,6 +47,7 @@ const typeDefs = `#graphql
   }
 
   type Review {
+  BookingId: ID
   message: String
   reviewerName: String
   rating: Float
@@ -58,6 +59,7 @@ const typeDefs = `#graphql
   talentId: ID
   message: String
   rating: Float
+  bookId: ID
   }
 
   input SearchTalent {
@@ -307,9 +309,7 @@ const resolvers = {
           };
         }
 
-        const reviewerName = auth.username;
-
-        if (!reviewerName)
+        if (!auth._id)
           throw {
             message: "Can't add the review, you are not logged in",
             code: "UNAUTHORIZED",
@@ -317,6 +317,16 @@ const resolvers = {
           };
 
         const talents = await db.collection(COLLECTION_NAME);
+
+        const bookings = await db.collection("Bookings");
+
+        const users = await db.collection("Users");
+
+        const findUser = await users.findOne({
+          _id: new ObjectId(auth._id),
+        });
+
+        const reviewerName = findUser.name;
 
         const findTalent = await talents.findOne({
           _id: new ObjectId(newReview.talentId),
@@ -329,10 +339,39 @@ const resolvers = {
             status: 404,
           };
 
+        const findBooking = await bookings.findOne({
+          _id: new ObjectId(newReview.bookId),
+        });
+
+        if (!findBooking)
+          throw {
+            message:
+              "Booking not found, please check your BookingId and try again",
+            code: "NOT_FOUND",
+            status: 404,
+          };
+
+        if (findBooking.bookStatus === "endedReviewed") {
+          throw {
+            message: "Can't add review, the booking has been reviewed",
+            code: "FORBIDDEN",
+            status: 403,
+          };
+        }
+
+        if (findBooking.TalentId.toString() !== newReview.talentId) {
+          throw {
+            message: "Forbidden, booking does not belong to the talent",
+            code: "FORBIDDEN",
+            status: 403,
+          };
+        }
+
         const reviewToPush = {
           message: newReview.content,
           reviewerName: reviewerName,
           rating: newReview.rating,
+          BookingId: new ObjectId(newReview.bookId),
           updatedAt: new Date(),
           createdAt: new Date(),
         };
@@ -350,10 +389,32 @@ const resolvers = {
             },
           }
         );
+        console.log(insertedReview, "AAAA");
+
+        if (insertedReview.acknowledged === false) {
+          throw {
+            message: "Failed to add review, please try again",
+            code: "BAD_REQUEST",
+            status: 400,
+          };
+        }
+
+        const updateBookingStatus = await bookings.updateOne(
+          {
+            _id: new ObjectId(newReview.bookId),
+          },
+          {
+            $set: {
+              bookStatus: "endedReviewed",
+              updatedAt: new Date(),
+            },
+          }
+        );
 
         return {
           ...newReview,
           reviewerName: reviewerName,
+          BookingId: new ObjectId(newReview.bookId),
           updatedAt: new Date().toISOString(),
           createdAt: new Date().toISOString(),
         };

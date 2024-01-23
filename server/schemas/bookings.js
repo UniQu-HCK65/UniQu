@@ -146,7 +146,8 @@ const resolvers = {
           (booking) =>
             booking.bookStatus !== "ended" &&
             booking.bookStatus !== "denied" &&
-            booking.bookStatus !== "cancelled"
+            booking.bookStatus !== "cancelled" &&
+            booking.bookStatus !== "expired"
         );
 
         console.log(ongoingBooking, "AAAAAAA");
@@ -365,7 +366,6 @@ const resolvers = {
           );
         } else if (findBooking.bookStatus === "booked") {
           //UPDATE FROM BOOKED TO IN PROGRESS
-
           const transaction = await db.collection("Transactions");
 
           const findActiveTransaction = await transaction.findOne({
@@ -439,7 +439,7 @@ const resolvers = {
 
             const expireBooking = await bookings.updateOne(
               {
-                _id: new ObjectId(findActiveTransaction._id),
+                _id: new ObjectId(findActiveTransaction.BookingId),
               },
               {
                 $set: {
