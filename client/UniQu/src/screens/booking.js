@@ -91,15 +91,13 @@ export default function Booking({ route, navigation }) {
             <View style={{ marginLeft: 40, marginBottom: 10, marginTop: 20 }}>
                 <Text style={{ fontSize: 15, fontWeight: '400' }}>Select session : </Text>
             </View>
-            <View style={{marginHorizontal: 30, backgroundColor: 'white', zIndex: 3}}>
+            <View style={{marginHorizontal: 30, backgroundColor: 'white'}}>
                 <SelectList
                     setSelected={(val) => setSelectedSlot(val)}
                     data={session}
                     save="value"
                     defaultValue={selectedSlot}
-                    // boxStyles={{ borderColor: "white", backgroundColor: 'white', width: "100%", height: "100%",  }}
                     inputStyles={{ fontSize: 12 }}
-                    // dropdownTextStyles={{ color: "black" }}
                     placeholder="Select your location"
                 />
             </View>
@@ -116,9 +114,6 @@ export default function Booking({ route, navigation }) {
                     save="value"
                     defaultValue={selectedLocation}
                     inputStyles={{ fontSize: 12 }}
-                    // boxStyles={{ borderColor: "transparent" }}
-                    // inputStyles={{ color: "#a0a0a0", borderColor: 'transparent', fontSize: 12 }}
-                    // dropdownTextStyles={{ color: "#a0a0a0" }}
                     placeholder="Select your location"
 
                 />
