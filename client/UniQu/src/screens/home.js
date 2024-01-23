@@ -79,6 +79,8 @@ export default function Home({ navigation }) {
     skip: !search,
   });
 
+  // update search
+  
   const handleSearch = async () => {
     console.log(search, "<< bfr search");
     // await refetchSearch();
