@@ -15,6 +15,7 @@ import {
   FOR_YOU_TALENT_PAGE,
   GET_ALL_TALENT,
   GET_USER,
+  SEARCH_TALENT,
 } from "../queries/query";
 import Ionicons from "react-native-vector-icons/Feather";
 
@@ -61,6 +62,33 @@ export default function Home({ navigation }) {
   const [talentsForYou, setTalentsForYou] = useState([]);
   const [selectedDataType, setSelectedDataType] = useState("all");
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+
+  const {
+    loading: searchLoading,
+    error: searchError,
+    data: searchData,
+    refetch: refetchSearch,
+  } = useQuery(SEARCH_TALENT, {
+    variables: {
+      searchParam: {
+        name: search,
+        username: search,
+      },
+    },
+    skip: !search,
+  });
+
+  const handleSearch = async () => {
+    console.log(search, "<< bfr search");
+    // await refetchSearch();
+    if (searchData && searchData.searchTalent) {
+      setAllTalents(searchData.searchTalent);
+    }
+    console.log(searchData, "<< aft search");
+
+    // setAllTalents(searchData.searchTalent);
+  };
 
   const {
     loading: forYouLoading,
@@ -99,6 +127,10 @@ export default function Home({ navigation }) {
   useEffect(() => {
     refetchGetUser();
   }, []);
+
+  useEffect(() => {
+    handleSearch();
+  }, [search]);
 
   useEffect(() => {
     if (!forYouLoading && !allTalentLoading) {
@@ -209,12 +241,11 @@ export default function Home({ navigation }) {
       <View style={{}}>
         <Image
           source={{
-            uri: 'https://images.unsplash.com/photo-1627163439134-7a8c47e08208?q=80&w=3432&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+            uri: "https://images.unsplash.com/photo-1627163439134-7a8c47e08208?q=80&w=3432&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
           }}
           style={styles.imageHeader}
         />
         <View style={styles.overlay}></View>
-
 
         <View style={styles.contentHeader}>
           <View style={styles.containerHeader}>
@@ -240,8 +271,13 @@ export default function Home({ navigation }) {
 
         <View style={styles.searchContainer}>
           <View style={styles.searchContainerText}>
-            <TextInput placeholder="Search" style={styles.textInputSearch} />
-            <TouchableOpacity onPress={() => navigation.navigate("All Talent")}>
+            <TextInput
+              placeholder="Search"
+              value={search}
+              onChangeText={(text) => setSearch(text)}
+              style={styles.textInputSearch}
+            />
+            <TouchableOpacity onPress={handleSearch}>
               <Ionicons name="search" size={20} style={{ marginRight: 10 }} />
             </TouchableOpacity>
           </View>
@@ -268,7 +304,16 @@ export default function Home({ navigation }) {
         <ActivityIndicator size="large" color="#5a84a5" />
       ) : (
         <FlatList
-          data={!dataRender ? forYouData.talentsForMe.talentsForMe : dataRender}
+          // data={!dataRender ? forYouData.talentsForMe.talentsForMe : dataRender}
+          data={
+            !dataRender
+              ? forYouData.talentsForMe.talentsForMe
+              : dataRender.filter(
+                  (talent) =>
+                    talent.name.toLowerCase().includes(search.toLowerCase()) ||
+                    talent.username.toLowerCase().includes(search.toLowerCase())
+                )
+          }
           keyExtractor={(item) => item._id}
           renderItem={renderTalentForYou}
         />
@@ -389,20 +434,20 @@ const styles = StyleSheet.create({
     marginRight: 15,
     marginBottom: 10,
     zIndex: 5,
-    marginTop: 40
+    marginTop: 40,
   },
   textNameHeader: {
     fontWeight: "bold",
     fontSize: 26,
     marginTop: 10,
-    color: 'white'
+    color: "white",
   },
   textWelcomingHeader: {
     fontWeight: "bold",
     fontSize: 15,
     marginTop: 10,
     width: 300,
-    color: 'white'
+    color: "white",
   },
   avatarHeader: {
     width: 45,
@@ -435,23 +480,23 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
   },
   imageHeader: {
-    width: '100%',
+    width: "100%",
     height: 130,
-    resizeMode: 'cover',
+    resizeMode: "cover",
     borderBottomLeftRadius: 50,
     borderBottomRightRadius: 50,
     zIndex: -1,
-    position: 'absolute',
+    position: "absolute",
     opacity: 50,
-    height: 180
+    height: 180,
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: "black",
     opacity: 0.5,
-    width: '100%',
+    width: "100%",
     height: 180,
     borderBottomEndRadius: 50,
     borderBottomStartRadius: 50,
-  }
+  },
 });
