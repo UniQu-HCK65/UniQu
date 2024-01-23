@@ -226,7 +226,7 @@ export default function Home({ navigation }) {
               </View>
 
               <View style={styles.ratingContainer}>
-                <Text style={styles.ratingText}>{item.rating}</Text>
+                <Text style={styles.ratingText}>{item.rating/item.reviews?.length}</Text>
                 <Text style={styles.reviewsText}>
                   ({totalReviewers.size} reviews)
                 </Text>

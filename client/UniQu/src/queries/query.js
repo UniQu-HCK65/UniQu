@@ -288,3 +288,23 @@ export const BOOKING_TALENT = gql`
     }
   }
 `;
+
+export const GET_BOOKING_BY_ID = gql`
+  query BookingById($bookingId: ID) {
+  bookingById(bookingId: $bookingId) {
+    _id
+    TalentId
+    UserId
+    talentName
+    userName
+    talentImgUrl
+    userImgUrl
+    bookDate
+    bookSession
+    bookLocation
+    bookStatus
+    updatedAt
+    createdAt
+  }
+}
+`
