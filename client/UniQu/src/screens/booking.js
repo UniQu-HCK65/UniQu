@@ -27,6 +27,7 @@ export default function Booking({ route, navigation }) {
     const [selectedLocation, setSelectedLocation] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
 
+    console.log(error)
 
     const handleBooking = async () => {
         const response = await book({
@@ -38,22 +39,19 @@ export default function Booking({ route, navigation }) {
                     bookLocation: selectedLocation
                 }
             },
-            refetchQueries: [
-                BOOKING_TALENT
-            ],
-            onComplete: () => {
-                console.log('masuk')
-                setSelectedDate('')
-                setSelectedSlot('')
-                setSelectedLocation('')
-                navigation.navigate('Status Booking')
+            onCompleted: (data) => {
+                console.log(data.book._id, '<<< woiiiii id')
+                 setSelectedDate('')
+                 setSelectedSlot('')
+                 setSelectedLocation('')
+                navigation.navigate('Status Booking', {bookingId : data.book._id})
             },
             onError: (error) => {
                 console.log(error)
             }
         })
         const error = JSON.stringify(response.errors.networkError.result.errors[0].message, null, 2)
-
+        console.log(JSON.stringify(response, null, 2))
         if (error) {
             setErrorMessage(error.slice(1, -1))
         }
