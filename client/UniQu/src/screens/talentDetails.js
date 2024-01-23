@@ -12,7 +12,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import { GET_TALENTS_BY_ID } from "../queries/query";
 import { useQuery } from "@apollo/client";
 
-export default function TalentDetails({ route }) {
+export default function TalentDetails({navigation, route }) {
   const { talentId } = route.params;
   const { loading, error, data } = useQuery(GET_TALENTS_BY_ID, {
     variables: { talentId },
@@ -47,7 +47,7 @@ export default function TalentDetails({ route }) {
 
           <View style={styles.textHeaders}>
             <Text style={styles.name}>{talent.name}</Text>
-            <Ionicons name="star" size={15} style={{ left: 15 }}></Ionicons>
+            <Ionicons name="star" size={13} color={"#85803a"} style={{ left: 5 }}></Ionicons>
             <Text style={styles.rating}>
               {talent.rating} ({talent.reviews.length} reviews)
             </Text>
@@ -66,7 +66,7 @@ export default function TalentDetails({ route }) {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            style={{ flexDirection: "row" }}
+            style={{ flexDirection: "row", maxWidth: 350 }}
           >
             {talent.tags.map((tag, index) => (
               <View style={styles.tagsCard} key={index}>
@@ -75,7 +75,7 @@ export default function TalentDetails({ route }) {
             ))}
           </ScrollView>
 
-          <ScrollView
+          {/* <ScrollView
             vertical
             showsVerticalScrollIndicator={false}
             style={{
@@ -86,7 +86,7 @@ export default function TalentDetails({ route }) {
           >
             <View style={{ gap: 5, height: 50, marginBottom: 300 }}>
               {/* <View style={{marginBottom: 50}}> */}
-                <View
+                {/* <View
                   style={{
                     width: "100%",
                     height: 50,
@@ -150,9 +150,9 @@ export default function TalentDetails({ route }) {
                     borderWidth: 1,
                   }}
                 ></View>
-              </View>
+              </View> */}
             {/* </View> */}
-          </ScrollView>
+          {/* </ScrollView> */}
 
           <View
             style={{
@@ -161,14 +161,14 @@ export default function TalentDetails({ route }) {
               marginRight: 50,
             }}
           >
-            <TouchableOpacity style={styles.chatButton}>
+            <TouchableOpacity onPress={() => navigation.navigate("Chat")} style={styles.chatButton}>
               <Ionicons
                 name="chatbubbles-outline"
                 color="white"
                 size={23}
               ></Ionicons>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.bookingButton}>
+            <TouchableOpacity onPress={() => navigation.navigate("Booking")} style={styles.bookingButton}>
               <Text style={styles.textButton}>Booking Now</Text>
             </TouchableOpacity>
           </View>
@@ -197,7 +197,8 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 0,
     width: "100%",
-    height: 630,
+    // height: 630,
+    height: 500,
     borderRadius: 40,
     backgroundColor: "white",
     marginBottom: 10,
