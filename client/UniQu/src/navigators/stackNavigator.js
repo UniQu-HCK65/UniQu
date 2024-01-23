@@ -30,90 +30,188 @@ export default function StackNavigator() {
   const { isLoggedIn } = useContext(LoginContext);
   const role = isLoggedIn.role
   const token = isLoggedIn.accessToken
-
+  console.log(role, token)
 
   return (
-    <Stack.Navigator
-      screenOptions={{
-        gestureDirection: "vertical",
-      }}
-    >
-        {/* <Stack.Screen
-            name="LandingPage"
-            component={LandingPage}
-            options={{
-              headerShown: false,
-            }}
-          /> */}
+    // <Stack.Navigator
+    //   screenOptions={{
+    //     gestureDirection: "vertical",
+    //   }}
+    // >
+    //     {/* <Stack.Screen
+    //         name="LandingPage"
+    //         component={LandingPage}
+    //         options={{
+    //           headerShown: false,
+    //         }}
+    //       /> */}
 
-      {!token && !role && (
+    //   {!token && !role && (
+    //     <>
+    //       <Stack.Screen
+    //         name="LandingPage"
+    //         component={LandingPage}
+    //         options={{
+    //           headerShown: false,
+    //         }}
+    //       />
+
+    //       <Stack.Screen
+    //         name="Login"
+    //         component={Login}
+    //         options={{
+    //           headerShown: false,
+    //         }}
+    //       />
+
+    //       <Stack.Screen
+    //         name="Register"
+    //         component={Register}
+    //         options={{
+    //           headerShown: false,
+    //         }}
+    //       />
+    //     </>
+    //   )}
+
+    //   {token && role === 'user' && (
+    //     <>
+    //       <Stack.Screen
+    //         name="Home"
+    //         component={MyTabs}
+    //         options={{
+    //           headerShown: false,
+    //         }}
+    //       />
+
+    //       <Stack.Screen
+    //         name="TalentDetails"
+    //         component={TalentDetails}
+    //         options={{
+    //           headerShown: false,
+    //         }}
+    //       />
+
+    //       <Stack.Screen
+    //         name="Booking"
+    //         component={Booking}
+    //         options={{
+    //           headerShown: true,
+    //         }}
+    //       />
+
+    //       <Stack.Screen
+    //         name="Status Booking"
+    //         component={StatusBooking}
+    //         options={{
+    //           headerShown: false,
+    //         }}
+    //       />
+
+    //       <Stack.Screen
+    //         name="Chat"
+    //         component={Chat}
+    //         options={{
+    //           headerShown: false,
+    //         }}
+    //       />
+
+    //       <Stack.Screen
+    //         name="Edit Profile"
+    //         component={EditProfileUser}
+    //       />
+
+    //       <Stack.Screen
+    //         name="Profile"
+    //         component={ProfileUser}
+    //       />
+    //     </>
+    //   )}
+
+    //   {token && role === 'talent' && (
+    //     <>
+    //       <Stack.Screen
+    //         name="List Booking"
+    //         component={HomeforTalent}
+    //         options={{
+    //           headerShown: false,
+    //         }}
+    //       />
+
+    //       <Stack.Screen
+    //         name="List Booking Detail"
+    //         component={ListBookingTalent}
+    //         options={{
+    //           headerShown: false,
+    //         }}
+    //       />
+
+    //       <Stack.Screen
+    //         name="Konfirmasi Booking"
+    //         component={EditStatusBooking}
+    //         options={{
+    //           headerShown: false,
+    //         }}
+    //       />
+
+    //       <Stack.Screen
+    //         name="Profile"
+    //         component={ProfileTalent}
+    //       />
+    //     </>
+    //   )}
+    // </Stack.Navigator>
+    <Stack.Navigator screenOptions={{ gestureDirection: 'vertical' }}>
+      {(!token || !role) ? (
         <>
           <Stack.Screen
             name="LandingPage"
             component={LandingPage}
-            options={{
-              headerShown: false,
-            }}
+            options={{ headerShown: false }}
           />
 
           <Stack.Screen
             name="Login"
             component={Login}
-            options={{
-              headerShown: false,
-            }}
+            options={{ headerShown: false }}
           />
 
           <Stack.Screen
             name="Register"
             component={Register}
-            options={{
-              headerShown: false,
-            }}
+            options={{ headerShown: false }}
           />
         </>
-      )}
-
-      {token && role === 'user' && (
+      ) : (role === 'user') ? (
         <>
           <Stack.Screen
             name="Home"
             component={MyTabs}
-            options={{
-              headerShown: false,
-            }}
+            options={{ headerShown: false }}
           />
 
           <Stack.Screen
             name="TalentDetails"
             component={TalentDetails}
-            options={{
-              headerShown: false,
-            }}
+            options={{ headerShown: false }}
           />
 
           <Stack.Screen
             name="Booking"
             component={Booking}
-            options={{
-              headerShown: true,
-            }}
+            options={{ headerShown: true }}
           />
 
           <Stack.Screen
             name="Status Booking"
             component={StatusBooking}
-            options={{
-              headerShown: false,
-            }}
+            options={{ headerShown: false }}
           />
 
           <Stack.Screen
             name="Chat"
             component={Chat}
-            options={{
-              headerShown: false,
-            }}
+            options={{ headerShown: false }}
           />
 
           <Stack.Screen
@@ -126,32 +224,24 @@ export default function StackNavigator() {
             component={ProfileUser}
           />
         </>
-      )}
-
-      {token && role === 'talent' && (
+      ) : (role === 'talent') ? (
         <>
           <Stack.Screen
             name="List Booking"
             component={HomeforTalent}
-            options={{
-              headerShown: false,
-            }}
+            options={{ headerShown: false }}
           />
 
           <Stack.Screen
             name="List Booking Detail"
             component={ListBookingTalent}
-            options={{
-              headerShown: false,
-            }}
+            options={{ headerShown: false }}
           />
 
           <Stack.Screen
             name="Konfirmasi Booking"
             component={EditStatusBooking}
-            options={{
-              headerShown: false,
-            }}
+            options={{ headerShown: false }}
           />
 
           <Stack.Screen
@@ -159,7 +249,7 @@ export default function StackNavigator() {
             component={ProfileTalent}
           />
         </>
-      )}
+      ) : null}
     </Stack.Navigator>
   );
 }
