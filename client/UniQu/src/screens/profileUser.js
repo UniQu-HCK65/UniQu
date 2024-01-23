@@ -11,20 +11,24 @@ import { Feather } from "@expo/vector-icons";
 import { WHO_AM_I_USER } from "../queries/query";
 import { useQuery } from "@apollo/client";
 import LogoutButton from "../components/logoutButton";
+import { useFocusEffect } from "@react-navigation/native";
+
 
 export default function ProfileUser({ navigation }) {
-  const { loading, error, data, refetch } = useQuery(WHO_AM_I_USER);
+  const { loading, error, data, refetch } = useQuery(WHO_AM_I_USER, {refetcQueries: [WHO_AM_I_USER]});
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        await refetch();
-      } catch (error) {
-        console.log(error, "error refetch");
-      }
-    };
-    fetchData();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchData = async () => {
+        try {
+          await refetch();
+        } catch (error) {
+          console.log(error, "error refetch");
+        }
+      };
+      fetchData();
+    }, [])
+  );
 
   if (loading) {
     return <Text>Loading...</Text>;
@@ -35,6 +39,7 @@ export default function ProfileUser({ navigation }) {
   }
 
   const { whoAmI } = data;
+  console.log(whoAmI.userBookings.length, '<<< oiiii')
   const paymentId = whoAmI.userTransactions[0]?.paymentId;
 
   // console.log(paymentId, ">> hai");
@@ -126,7 +131,7 @@ export default function ProfileUser({ navigation }) {
             <View style={styles.cardTagsStyle}>
               {whoAmI.userBookings.map((booking, index) => (
                 
-                <View style={styles.historyStyle} key={index}>
+                <TouchableOpacity onPress={() => navigation.navigate("Status Booking", {bookingId: booking._id})} style={styles.historyStyle} key={index}>
                   <View style={styles.historyContainer}>
                     <View>
                       <Text style={styles.historyLabel}>No. Payment</Text>
@@ -183,7 +188,7 @@ export default function ProfileUser({ navigation }) {
                       <Text>: {booking.bookLocation}</Text>
                     </View>
                   </View>
-                </View>
+                </TouchableOpacity>
               ))}
             </View>
           </View>
