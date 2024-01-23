@@ -199,7 +199,7 @@ export default function StackNavigator() {
           <Stack.Screen
             name="Booking"
             component={Booking}
-            options={{ headerShown: true }}
+            options={{ headerShown: false }}
           />
 
           <Stack.Screen
