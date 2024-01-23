@@ -173,18 +173,13 @@ const startServer = async () => {
         currency: 'IDR'
         }
         */
-
+        //COOOOOOOOOOOOOOOOOOOOOOMEEEEEEE BREEEAAAKK ME DOWWWWWWWWNNNNNNN!!!!!!!!
         const findTransaction = await db.collection("Transactions").findOne({
           _id: new ObjectId(req.body.order_id),
         });
 
-        if(findTransaction.transactionStatus !== "unpaid")
-
-
-
-
-
-        res.status(200).json("Webhook received successfully");
+        if (findTransaction.transactionStatus !== "unpaid")
+          res.status(200).json("Webhook received successfully");
       } catch (error) {
         console.error("Error handling Midtrans Webhook:", error);
         res.status(500).send("Internal Server Error");
