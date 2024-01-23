@@ -132,10 +132,11 @@ const resolvers = {
 
         const findExistingBooking = await bookings
           .find({
-            $and: [
-              { TalentId: new ObjectId(newBooking.TalentId) },
-              { UserId: new ObjectId(userId) },
-            ],
+            // $and: [
+            //   { TalentId: new ObjectId(newBooking.TalentId) },
+            //   { UserId: new ObjectId(userId) },
+            // ],
+            UserId: new ObjectId(userId),
           })
           .toArray();
 
