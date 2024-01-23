@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Image, StyleSheet, View, Text } from "react-native";
 import { GET_BOOKING_BY_ID } from "../queries/query";
 
@@ -7,27 +7,77 @@ export default function StatusBooking({ route }) {
     const { bookingId } = route.params
     const { loading, error, data, refetch } = useQuery(GET_BOOKING_BY_ID, { variables: { bookingId: bookingId } })
 
-    const statusBooking = data.bookingById.bookStatus
+    const statusBooking = data?.bookingById?.bookStatus;
+    const [status, setStatus] = useState({
+        requested: false,
+        booked: false,
+        startSession: false,
+        endSession: false,
+      });
+    
+      const convertTemp = () => {
+        if (statusBooking === 'requested') {
+          setStatus({
+            requested: true,
+            booked: false,
+            startSession: false,
+            endSession: false,
+          });
+        } else if (statusBooking === 'booked') {
+          setStatus({
+            requested: true,
+            booked: true,
+            startSession: false,
+            endSession: false,
+          });
+        } else if (statusBooking === 'startSession') {
+          setStatus({
+            requested: true,
+            booked: true,
+            startSession: true,
+            endSession: false,
+          });
+        } else if (statusBooking === 'ended') {
+          setStatus({
+            requested: true,
+            booked: true,
+            startSession: true,
+            endSession: true,
+          });
+        }
+      };
+    
+      useEffect(() => {
+        convertTemp();
+      }, [statusBooking])
 
-    const convertStatusBooking = (statusBooking) => {
-        return {
-            requested: statusBooking === 'requested',
-            booked: statusBooking === 'booked',
-            startSession: statusBooking === 'startSession',
-            endSession: statusBooking === 'endSession',
-        };
-    };
+    // const convertStatusBooking = (statusBooking) => {
+    //     return {
+    //         requested: statusBooking === 'requested' ? true : false,
+    //         booked: statusBooking === 'booked' ? true : false,
+    //         startSession: statusBooking === 'startSession' ? true : false,
+    //         endSession: statusBooking === 'ended' ? true : false,
+    //     };
+    // };
 
-    const initialStatus = convertStatusBooking(statusBooking);
+    // const initialStatus = convertStatusBooking(statusBooking);
 
-    const [status, setStatus] = useState(initialStatus);
+    // const [status, setStatus] = useState(initialStatus);
 
-    // const [status, setStatus] = useState({
-    //     requested: true,
-    //     booked: true,
-    //     startSession: true,
-    //     endSession: true,
-    // });
+    // useEffect(() => {
+    //     const updatedStatus = convertStatusBooking(statusBooking);
+    //     setStatus(updatedStatus);
+    // }, [statusBooking]);
+
+    if (loading) {
+        return <Text>Loading...</Text>
+    }
+
+    if (error) {
+        return <Text>Error fetching data</Text>
+    }
+
+   
 
 
     return (
