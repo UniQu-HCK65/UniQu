@@ -22,7 +22,8 @@ export default function TalentDetails({navigation, route }) {
   if (error) return <Text>Error: {error.message}</Text>;
 
   const talent = data.getTalentsById;
-  //   console.log(talent, "menungsoooo");
+
+  // console.log(talent, "menungsoooo");
 
   return (
     <View style={styles.container}>
@@ -168,7 +169,7 @@ export default function TalentDetails({navigation, route }) {
                 size={23}
               ></Ionicons>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate("Booking")} style={styles.bookingButton}>
+            <TouchableOpacity onPress={() => navigation.navigate("Booking", talentId)} style={styles.bookingButton}>
               <Text style={styles.textButton}>Booking Now</Text>
             </TouchableOpacity>
           </View>

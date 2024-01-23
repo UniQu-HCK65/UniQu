@@ -1,29 +1,79 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { Picker } from '@react-native-picker/picker';
+import { BOOKING_TALENT } from '../queries/query';
+import { useMutation } from '@apollo/client';
+import { SelectList } from "react-native-dropdown-select-list";
 
-export default function Booking({ navigation }) {
+const session = [
+    "10.00 - 15.00",
+    "16.00 - 21.00"
+];
+
+const location = [
+    "Jakarta Pusat",
+    "Jakarta Barat",
+    "Jakarta Timur",
+    "Jakarta Selatan",
+]
+
+export default function Booking({ route, navigation }) {
+    const talentId = route.params
+
+    const [book, { loading, error, data }] = useMutation(BOOKING_TALENT);
     const [selectedDate, setSelectedDate] = useState('');
     const [selectedSlot, setSelectedSlot] = useState('');
     const [selectedLocation, setSelectedLocation] = useState('');
-    const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+
+
+    const handleBooking = async () => {
+        const response = await book({
+            variables: {
+                newBooking: {
+                    TalentId: talentId,
+                    bookDate: selectedDate,
+                    bookSession: selectedSlot,
+                    bookLocation: selectedLocation
+                }
+            },
+            refetchQueries: [
+                BOOKING_TALENT
+            ],
+            onComplete: () => {
+                console.log('masuk')
+                setSelectedDate('')
+                setSelectedSlot('')
+                setSelectedLocation('')
+                navigation.navigate('Status Booking')
+            },
+            onError: (error) => {
+                console.log(error)
+            }
+        })
+        const error = JSON.stringify(response.errors.networkError.result.errors[0].message, null, 2)
+
+        if (error) {
+            setErrorMessage(error.slice(1, -1))
+        }
+    };
 
     const handleDateSelect = (day) => {
         setSelectedDate(day.dateString);
         setSelectedSlot('');
     };
 
-    const handleSlotSelect = (slot) => {
-        setSelectedSlot(slot);
-    };
-
-    const handleDropdownToggle = () => {
-        setIsDropdownVisible(!isDropdownVisible);
-    };
 
     return (
         <View style={styles.container}>
+            <Text style={{fontWeight: 'bold', fontSize: 20, marginLeft: 30, marginTop: 70}}>Select Schedule </Text>
+            <View style={{ marginLeft: 90, position: 'absolute', marginTop: 130 }}>
+                <Image
+                    source={require('../../assets/bookingAnimation.png')}
+                    style={styles.bookingAnimation}
+                />
+            </View>
             <Calendar
                 onDayPress={(day) => handleDateSelect(day)}
                 markedDates={{
@@ -31,66 +81,48 @@ export default function Booking({ navigation }) {
                 }}
                 style={{ margin: 20 }}
             />
-
-            <View style={{ marginLeft: 40, marginBottom: 10, marginTop: 30 }}>
-                <Text style={{ fontSize: 15, fontWeight: '300' }}>Select session : </Text>
+            <View style={{ justifyContent: 'center', alignItems: 'center', marginHorizontal: 30 }}>
+                <View style={{ height: 3, width: '100%', borderWidth: 1, backgroundColor: 'grey', }}></View>
             </View>
 
-            <View style={{ borderWidth: 0.5, marginBottom: 10, marginHorizontal: 40, borderRadius: 10 }}>
-                <TouchableOpacity onPress={handleDropdownToggle} style={{ padding: 10 }}>
-                    <Text style={styles.dropdownToggleText}>
-                        {selectedSlot ? selectedLocation : 'Select Session'}
-                    </Text>
-                </TouchableOpacity>
-
-                {isDropdownVisible && (
-                    <Picker
-                        selectedValue={selectedLocation}
-                        onValueChange={(itemValue) => {
-                            setSelectedSlot(itemValue);
-                            setIsDropdownVisible(false);
-                        }}
-                        style={styles.picker}
-                        itemStyle={styles.pickerItem}
-                    >
-                        <Picker.Item label="Select Session" value="" />
-                        <Picker.Item label="09.00 - 10.00" value="09.00 - 10.00" />
-                        <Picker.Item label="10.00 - 11.00" value="10.00 - 11.00" />
-                    </Picker>
-                )}
+            {errorMessage ? (
+                <Text style={{ color: 'red', marginLeft: 35, fontSize: 10, marginTop: 10 }}>*{errorMessage}</Text>
+            ) : null}
+            <View style={{ marginLeft: 40, marginBottom: 10, marginTop: 20 }}>
+                <Text style={{ fontSize: 15, fontWeight: '400' }}>Select session : </Text>
             </View>
+            <View style={{marginHorizontal: 30, backgroundColor: 'white'}}>
+                <SelectList
+                    setSelected={(val) => setSelectedSlot(val)}
+                    data={session}
+                    save="value"
+                    defaultValue={selectedSlot}
+                    inputStyles={{ fontSize: 12 }}
+                    placeholder="Select your location"
+                />
+            </View>
+
 
             <View style={{ marginLeft: 40, marginBottom: 10, marginTop: 15 }}>
-                <Text style={{ fontSize: 15, fontWeight: '300' }}>Select Mall : </Text>
+                <Text style={{ fontSize: 15, fontWeight: '400' }}>Select Location : </Text>
             </View>
 
-            <View style={{ borderWidth: 0.5, marginBottom: 10, marginHorizontal: 40, borderRadius: 10 }}>
-                <TouchableOpacity onPress={handleDropdownToggle} style={{ padding: 10 }}>
-                    <Text style={styles.dropdownToggleText}>
-                        {selectedLocation ? selectedLocation : 'Select Location'}
-                    </Text>
-                </TouchableOpacity>
+            <View style={{marginHorizontal: 30, backgroundColor: 'white'}}>
+                <SelectList
+                    setSelected={(val) => setSelectedLocation(val)}
+                    data={location}
+                    save="value"
+                    defaultValue={selectedLocation}
+                    inputStyles={{ fontSize: 12 }}
+                    placeholder="Select your location"
 
-                {isDropdownVisible && (
-                    <Picker
-                        selectedValue={selectedLocation}
-                        onValueChange={(itemValue) => {
-                            setSelectedLocation(itemValue);
-                            setIsDropdownVisible(false); // Hide the dropdown after selection
-                        }}
-                        style={styles.picker}
-                        itemStyle={styles.pickerItem}
-                    >
-                        <Picker.Item label="Select Location" value="" />
-                        <Picker.Item label="Jakarta Barat" value="Jakarta Barat" />
-                        <Picker.Item label="Jakarta Utara" value="Jakarta Utara" />
-                        <Picker.Item label="Jakarta Selatan" value="Jakarta Selatan" />
-                    </Picker>
-                )}
+                />
             </View>
 
-            <View style={{ flexDirection: 'row', gap: 10, marginHorizontal: 20, justifyContent: 'center' }}>
-                <TouchableOpacity onPress={() => navigation.navigate('Status Booking')} style={styles.submitButton}>
+
+
+            <View style={{ flexDirection: 'row', gap: 10, marginHorizontal: 20, justifyContent: 'center', marginTop: 20 }}>
+                <TouchableOpacity onPress={handleBooking} style={styles.submitButton}>
                     <Text style={{ color: 'white' }}>Submit</Text>
                 </TouchableOpacity>
             </View>
@@ -146,5 +178,19 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         marginTop: 10,
-    }
+    },
+    dropDownSession: {
+        height: 40,
+        borderRadius: 15,
+        marginTop: 2,
+        marginHorizontal: 30,
+        marginBottom: 4,
+    },
+    bookingAnimation: {
+        width: 200,
+        height: 250,
+        // position: 'absolute',
+        marginTop: 240,
+        opacity: 0.1,
+    },
 });
