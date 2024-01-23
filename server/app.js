@@ -6,6 +6,13 @@ const { verifyToken } = require("./helpers/jwt");
 const { ApolloServer } = require("@apollo/server");
 const { startStandaloneServer } = require("@apollo/server/standalone");
 
+// const express = require("express");
+// const bodyParser = require("body-parser");
+
+// const app = express();
+// app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(bodyParser.json());
+
 const {
   typeDefs: userTypeDefs,
   resolvers: userResolvers,
@@ -128,3 +135,17 @@ const server = new ApolloServer({
     console.error(error);
   }
 })();
+
+// app.post("/midtrans-webhook", async (req, res) => {
+//   try {
+//     // You can handle the Midtrans response here and update your database
+//     console.log("Received Midtrans Webhook:", req.body);
+
+//     // Perform your database update logic here
+
+//     res.status(200).send("Webhook received successfully");
+//   } catch (error) {
+//     console.error("Error handling Midtrans Webhook:", error);
+//     res.status(500).send("Internal Server Error");
+//   }
+// });

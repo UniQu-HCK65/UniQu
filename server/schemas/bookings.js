@@ -119,7 +119,9 @@ const resolvers = {
             booking.bookStatus !== "cancelled"
         );
 
-        if (!ongoingBooking) {
+        // console.log(ongoingBooking, "AAAAAAA");
+
+        if (ongoingBooking) {
           throw {
             message:
               "Cannot make another booking with the talent because you have an ongoing booking",
@@ -199,6 +201,7 @@ const resolvers = {
         const checkTalent = findBookingTalentId.equals(talentId);
 
         if (findBooking.bookStatus === "requested") {
+          //UPDATE FROM REQUESTED TO BOOKED BY TALENT
           if (!checkTalent) {
             throw {
               message: "Forbidden, you are not the talent",
@@ -404,6 +407,18 @@ const resolvers = {
               }
             );
 
+            const expireBooking = await bookings.updateOne(
+              {
+                _id: new ObjectId(findActiveTransaction._id),
+              },
+              {
+                $set: {
+                  bookStatus: "expired",
+                  updatedAt: new Date(),
+                },
+              }
+            );
+
             throw {
               message:
                 "Your transaction has expired, please place an order again",
@@ -551,6 +566,13 @@ const resolvers = {
           throw {
             message:
               "Booking session has been cancelled, please reconfirm with the talent and try booking again",
+            code: "BAD_REQUEST",
+            status: 400,
+          };
+        } else if (findBooking.bookStatus === "expired") {
+          throw {
+            message:
+              "Booking session has been expired, please try booking again",
             code: "BAD_REQUEST",
             status: 400,
           };
