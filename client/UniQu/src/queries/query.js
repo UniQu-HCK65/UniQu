@@ -202,25 +202,24 @@ export const WHO_AM_I_TALENT = gql`
   }
 `;
 
-
 export const USER_REGISTER = gql`
   mutation Register($newUser: NewUser) {
-  register(newUser: $newUser) {
-    _id
-    name
-    username
-    email
-    password
-    role
-    gender
-    imgUrl
-    tags
-    userLocations
-    createdAt
-    updatedAt
+    register(newUser: $newUser) {
+      _id
+      name
+      username
+      email
+      password
+      role
+      gender
+      imgUrl
+      tags
+      userLocations
+      createdAt
+      updatedAt
+    }
   }
-}
-`
+`;
 
 export const GET_TALENTS_BY_ID = gql`
   query GetTalentsById($talentId: String) {
@@ -248,22 +247,44 @@ export const GET_TALENTS_BY_ID = gql`
   }
 `;
 
+export const SEARCH_TALENT = gql`
+  query SearchTalent($searchParam: SearchTalent) {
+    searchTalent(searchParam: $searchParam) {
+      _id
+      name
+      username
+      email
+      password
+      aboutme
+      role
+      gender
+      imgUrl
+      tags
+      rating
+      talentLocations
+      balance
+      updatedAt
+      createdAt
+    }
+  }
+`;
+
 export const BOOKING_TALENT = gql`
   mutation Book($newBooking: NewBooking) {
-  book(newBooking: $newBooking) {
-    _id
-    TalentId
-    UserId
-    talentName
-    userName
-    talentImgUrl
-    userImgUrl
-    bookDate
-    bookSession
-    bookLocation
-    bookStatus
-    updatedAt
-    createdAt
+    book(newBooking: $newBooking) {
+      _id
+      TalentId
+      UserId
+      talentName
+      userName
+      talentImgUrl
+      userImgUrl
+      bookDate
+      bookSession
+      bookLocation
+      bookStatus
+      updatedAt
+      createdAt
+    }
   }
-}
-`
+`;
