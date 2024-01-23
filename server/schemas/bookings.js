@@ -99,6 +99,35 @@ const resolvers = {
         const role = auth.role;
         const userId = auth._id;
 
+        if (!newBooking.TalentId) {
+          throw {
+            message: "TalentId is required",
+            code: "BAD_REQUEST",
+            status: 400,
+          };
+        }
+        if (!newBooking.bookLocation) {
+          throw {
+            message: "bookLocation is required",
+            code: "BAD_REQUEST",
+            status: 400,
+          };
+        }
+        if (!newBooking.bookSession) {
+          throw {
+            message: "bookSession is required",
+            code: "BAD_REQUEST",
+            status: 400,
+          };
+        }
+        if (!newBooking.TalentId) {
+          throw {
+            message: "TalentId is required",
+            code: "BAD_REQUEST",
+            status: 400,
+          };
+        }
+
         const bookings = await db.collection(COLLECTION_NAME);
 
         const findExistingBooking = await bookings
@@ -114,12 +143,12 @@ const resolvers = {
 
         const ongoingBooking = findExistingBooking.find(
           (booking) =>
-            booking.bookStatus !== "ended" ||
-            booking.bookStatus !== "denied" ||
+            booking.bookStatus !== "ended" &&
+            booking.bookStatus !== "denied" &&
             booking.bookStatus !== "cancelled"
         );
 
-        // console.log(ongoingBooking, "AAAAAAA");
+        console.log(ongoingBooking, "AAAAAAA");
 
         if (ongoingBooking) {
           throw {
