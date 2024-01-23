@@ -268,3 +268,23 @@ export const SEARCH_TALENT = gql`
     }
   }
 `;
+
+export const BOOKING_TALENT = gql`
+  mutation Book($newBooking: NewBooking) {
+    book(newBooking: $newBooking) {
+      _id
+      TalentId
+      UserId
+      talentName
+      userName
+      talentImgUrl
+      userImgUrl
+      bookDate
+      bookSession
+      bookLocation
+      bookStatus
+      updatedAt
+      createdAt
+    }
+  }
+`;
