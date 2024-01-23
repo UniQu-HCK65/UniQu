@@ -3,8 +3,8 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function ListBookingTalent() {
     const [status, setStatus] = useState('Requested');
-    const [payment, setPayment] = useState(false)
-    const [time, setTime] = useState(false)
+    const [payment, setPayment] = useState(true)
+    const [time, setTime] = useState(true)
     const [showButton, setShowButton] = useState(true)
 
 

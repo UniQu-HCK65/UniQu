@@ -1,13 +1,84 @@
-import React, { useState } from "react";
+import { useQuery } from "@apollo/client";
+import React, { useEffect, useState } from "react";
 import { Image, StyleSheet, View, Text } from "react-native";
+import { GET_BOOKING_BY_ID } from "../queries/query";
 
-export default function StatusBooking() {
+export default function StatusBooking({ route }) {
+    const { bookingId } = route.params
+    const { loading, error, data, refetch } = useQuery(GET_BOOKING_BY_ID, { variables: { bookingId: bookingId } })
+
+    const statusBooking = data?.bookingById?.bookStatus;
     const [status, setStatus] = useState({
-        requested: true,
-        booked: true,
-        startSession: true,
-        endSession: true,
-    });
+        requested: false,
+        booked: false,
+        startSession: false,
+        endSession: false,
+      });
+    
+      const convertTemp = () => {
+        if (statusBooking === 'requested') {
+          setStatus({
+            requested: true,
+            booked: false,
+            startSession: false,
+            endSession: false,
+          });
+        } else if (statusBooking === 'booked') {
+          setStatus({
+            requested: true,
+            booked: true,
+            startSession: false,
+            endSession: false,
+          });
+        } else if (statusBooking === 'startSession') {
+          setStatus({
+            requested: true,
+            booked: true,
+            startSession: true,
+            endSession: false,
+          });
+        } else if (statusBooking === 'ended') {
+          setStatus({
+            requested: true,
+            booked: true,
+            startSession: true,
+            endSession: true,
+          });
+        }
+      };
+    
+      useEffect(() => {
+        convertTemp();
+      }, [statusBooking])
+
+    // const convertStatusBooking = (statusBooking) => {
+    //     return {
+    //         requested: statusBooking === 'requested' ? true : false,
+    //         booked: statusBooking === 'booked' ? true : false,
+    //         startSession: statusBooking === 'startSession' ? true : false,
+    //         endSession: statusBooking === 'ended' ? true : false,
+    //     };
+    // };
+
+    // const initialStatus = convertStatusBooking(statusBooking);
+
+    // const [status, setStatus] = useState(initialStatus);
+
+    // useEffect(() => {
+    //     const updatedStatus = convertStatusBooking(statusBooking);
+    //     setStatus(updatedStatus);
+    // }, [statusBooking]);
+
+    if (loading) {
+        return <Text>Loading...</Text>
+    }
+
+    if (error) {
+        return <Text>Error fetching data</Text>
+    }
+
+   
+
 
     return (
         <View style={styles.container}>
@@ -24,7 +95,7 @@ export default function StatusBooking() {
                     <View style={{ flexDirection: "row", alignItems: "start", gap: 10 }}>
                         <StatusCircle active={status.requested} />
                         <View style={{}}>
-                            <StatusText active={status.requested} style={{fontWeight: 'bold'}}>Requested</StatusText>
+                            <StatusText active={status.requested} style={{ fontWeight: 'bold' }}>Requested</StatusText>
                             <CopyWritingText active={status.requested}>Your request is being processed. We will provide confirmation shortly</CopyWritingText>
                         </View>
                         <View style={styles.connector} />
@@ -33,7 +104,7 @@ export default function StatusBooking() {
                     <View style={{ flexDirection: "row", alignItems: "start", gap: 10 }}>
                         <StatusCircle active={status.booked} />
                         <View style={{}}>
-                            <StatusText active={status.booked} style={{fontWeight: 'bold'}}>Booked</StatusText>
+                            <StatusText active={status.booked} style={{ fontWeight: 'bold' }}>Booked</StatusText>
                             <CopyWritingText active={status.booked}>Your session has been booked. We will provide confirmation shortly</CopyWritingText>
                         </View>
                         <View style={styles.connector} />
@@ -42,7 +113,7 @@ export default function StatusBooking() {
                     <View style={{ flexDirection: "row", alignItems: "start", gap: 10 }}>
                         <StatusCircle active={status.startSession} />
                         <View style={{}}>
-                            <StatusText active={status.startSession} style={{fontWeight: 'bold'}}>Start Session</StatusText>
+                            <StatusText active={status.startSession} style={{ fontWeight: 'bold' }}>Start Session</StatusText>
                             <CopyWritingText active={status.startSession}>Your session has started. We will provide confirmation shortly</CopyWritingText>
                         </View>
                         <View style={styles.connector} />
@@ -51,7 +122,7 @@ export default function StatusBooking() {
                     <View style={{ flexDirection: "row", alignItems: "start", gap: 10 }}>
                         <StatusCircle active={status.endSession} />
                         <View style={{}}>
-                            <StatusText active={status.endSession} style={{fontWeight: 'bold'}}>End Session</StatusText>
+                            <StatusText active={status.endSession} style={{ fontWeight: 'bold' }}>End Session</StatusText>
                             <CopyWritingText active={status.endSession}>Session complete! Thank you for using our service. We hope you had a satisfying experience.</CopyWritingText>
                         </View>
 
