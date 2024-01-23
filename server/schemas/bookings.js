@@ -14,7 +14,9 @@ const typeDefs = `#graphql
     TalentId: ID
     UserId: ID
     talentName: String
+    talentNick: String
     userName: String
+    userNick: String
     talentImgUrl: String
     userImgUrl:String
     bookDate: String
@@ -147,10 +149,11 @@ const resolvers = {
             booking.bookStatus !== "ended" &&
             booking.bookStatus !== "denied" &&
             booking.bookStatus !== "cancelled" &&
+            booking.bookStatus !== "Reviewed" &&
             booking.bookStatus !== "expired"
         );
 
-        console.log(ongoingBooking, "AAAAAAA");
+        // console.log(ongoingBooking, "AAAAAAA");
 
         if (ongoingBooking) {
           throw {
@@ -176,7 +179,9 @@ const resolvers = {
           TalentId: new ObjectId(newBooking.TalentId),
           UserId: new ObjectId(userId),
           talentName: findTalent.name,
+          talentNick: findTalent.username,
           userName: findUser.name,
+          userNick: findUser.username,
           talentImgUrl: findTalent.imgUrl,
           userImgUrl: findUser.imgUrl,
           bookDate: new Date(newBooking.bookDate),
@@ -385,8 +390,6 @@ const resolvers = {
           const orderId = findActiveTransaction.orderId;
 
           const midtransStatusUrl = `https://api.sandbox.midtrans.com/v2/${orderId}/status`;
-          // console.log(midtransStatusUrl, "midtransStatusUrl");
-
           const midtransOptions = {
             method: "GET",
             headers: {

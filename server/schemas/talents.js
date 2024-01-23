@@ -351,7 +351,7 @@ const resolvers = {
             status: 404,
           };
 
-        if (findBooking.bookStatus === "endedReviewed") {
+        if (findBooking.bookStatus === "Reviewed") {
           throw {
             message: "Can't add review, the booking has been reviewed",
             code: "FORBIDDEN",
@@ -405,7 +405,7 @@ const resolvers = {
           },
           {
             $set: {
-              bookStatus: "endedReviewed",
+              bookStatus: "Reviewed",
               updatedAt: new Date(),
             },
           }
