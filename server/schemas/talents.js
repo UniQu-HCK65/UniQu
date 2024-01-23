@@ -31,6 +31,7 @@ const typeDefs = `#graphql
     email: String
     password: String
     aboutme: String
+    role: String
     gender: String
     imgUrl: String
     tags: [String]
@@ -59,8 +60,14 @@ const typeDefs = `#graphql
   rating: Float
   }
 
+  input SearchTalent {
+    name: String
+    username: String
+  }
+
   type Query {
     talents: [Talent]
+    searchTalent(searchParam:SearchTalent): [Talent]
     getTalentsById(talentId:String): ProfileTalent
     whoAmITalent: ProfileTalent
   }
@@ -215,6 +222,61 @@ const resolvers = {
           };
 
         return findTalent[0];
+      } catch (error) {
+        console.log(error, "GET_POST_BY_ID"); // errorHandler next up
+        throw new GraphQLError(error.message || "Internal Server Error", {
+          extensions: {
+            code: error.code || "INTERNAL_SERVER_ERROR",
+            http: { status: error.status || 500 },
+          },
+        });
+      }
+    },
+
+    searchTalent: async (parent, args, contextValue, info) => {
+      try {
+        const { db, authentication } = contextValue;
+        const auth = await authentication();
+
+        const role = auth.role;
+
+        if (role !== "user") {
+          throw {
+            message: "Forbidden, you are not a user",
+            code: "NOT_FOUND",
+            status: 403,
+          };
+        }
+
+        const { searchParam } = args;
+
+        const query = [];
+
+        if (searchParam.name) {
+          query.push({ name: new RegExp(searchParam.name, "i") });
+        }
+        if (searchParam.username) {
+          query.push({ username: new RegExp(searchParam.username, "i") });
+        }
+
+        if (query.length === 0)
+          throw {
+            message: "Search parameters are empty",
+            code: "BAD_REQUEST",
+            status: 400,
+          };
+
+        const talents = await db.collection(COLLECTION_NAME);
+        const searchTalents = await talents
+          .find({ $or: query })
+          .project({ password: 0 })
+          .toArray();
+
+        if (searchTalents.length === 0) {
+          return null;
+        }
+
+        return searchTalents;
       } catch (error) {
         console.log(error, "GET_POST_BY_ID"); // errorHandler next up
         throw new GraphQLError(error.message || "Internal Server Error", {

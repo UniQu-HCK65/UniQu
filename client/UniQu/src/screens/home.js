@@ -3,10 +3,6 @@ import {
   StyleSheet,
   Text,
   View,
-  SafeAreaView,
-  ScrollView,
-  ImageBackground,
-  Button,
   Image,
   TouchableOpacity,
   FlatList,
@@ -21,7 +17,6 @@ import {
   GET_USER,
 } from "../queries/query";
 import Ionicons from "react-native-vector-icons/Feather";
-
 
 const tags = [
   "Sneakers",
@@ -80,6 +75,8 @@ export default function Home({ navigation }) {
     refetch: refetchGetUser,
   } = useQuery(GET_USER);
   const nameUser = nameUserData?.whoAmI?.name;
+  const photoUser = nameUserData?.whoAmI?.imgUrl;
+
   const {
     loading: allTalentLoading,
     error: allTalentError,
@@ -100,25 +97,10 @@ export default function Home({ navigation }) {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const forYouResult = await refetchForYou();
-        const allTalentResult = await refetchAllTalent();
-        const getUserResult = await refetchGetUser();
+    refetchGetUser();
+  }, []);
 
-        if (
-          !forYouResult.loading &&
-          !allTalentResult.loading &&
-          !getUserResult.loading
-        ) {
-          setTalentsForYou(forYouResult.data.talentsForMe?.talentsForMe);
-          setAllTalents(allTalentResult.data.talents);
-          setLoading(false);
-        }
-      } catch (error) {
-        console.log(error, "error refatch home");
-      }
-    };
+  useEffect(() => {
     if (!forYouLoading && !allTalentLoading) {
       setLoading(false);
     }
@@ -223,29 +205,36 @@ export default function Home({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View style={{}}>
-        {/* <Image
+        <Image
           source={{
-            uri: 'https://images.unsplash.com/photo-1642439048934-27a82f89b866?q=80&w=3328&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+            uri: 'https://images.unsplash.com/photo-1627163439134-7a8c47e08208?q=80&w=3432&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
           }}
-          style={{ width: '100%', height: 130, resizeMode: 'cover', borderBottomLeftRadius: 70, borderBottomRightRadius: 70, zIndex: -1, position:'absolute', opacity: 40}}
-        /> */}
+          style={styles.imageHeader}
+        />
+        <View style={styles.overlay}></View>
+
+
         <View style={styles.contentHeader}>
           <View style={styles.containerHeader}>
-            <Text style={styles.textNameHeader}>Hai, {nameUser}</Text>
+            <Text style={styles.textNameHeader}>
+              Hai, {getUserLoading ? " " : nameUser}{" "}
+            </Text>
             <Text style={styles.textWelcomingHeader}>
               Welcome back, What are you looking for today?
             </Text>
           </View>
 
           <View style={{}}>
-            <Image
-              source={{
-                uri: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fHByb2ZpbGV8ZW58MHx8MHx8fDA%3D",
-              }}
-              style={styles.avatarHeader}
-            />
+            <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
+              <Image
+                source={{
+                  uri: photoUser,
+                }}
+                style={styles.avatarHeader}
+              />
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -284,9 +273,7 @@ export default function Home({ navigation }) {
           renderItem={renderTalentForYou}
         />
       )}
-
-      <LogoutButton />
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -402,17 +389,20 @@ const styles = StyleSheet.create({
     marginRight: 15,
     marginBottom: 10,
     zIndex: 5,
+    marginTop: 40
   },
   textNameHeader: {
     fontWeight: "bold",
     fontSize: 26,
     marginTop: 10,
+    color: 'white'
   },
   textWelcomingHeader: {
     fontWeight: "bold",
     fontSize: 15,
     marginTop: 10,
     width: 300,
+    color: 'white'
   },
   avatarHeader: {
     width: 45,
@@ -444,4 +434,24 @@ const styles = StyleSheet.create({
     height: 35,
     marginHorizontal: 20,
   },
+  imageHeader: {
+    width: '100%',
+    height: 130,
+    resizeMode: 'cover',
+    borderBottomLeftRadius: 50,
+    borderBottomRightRadius: 50,
+    zIndex: -1,
+    position: 'absolute',
+    opacity: 50,
+    height: 180
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "black",
+    opacity: 0.5,
+    width: '100%',
+    height: 180,
+    borderBottomEndRadius: 50,
+    borderBottomStartRadius: 50,
+  }
 });

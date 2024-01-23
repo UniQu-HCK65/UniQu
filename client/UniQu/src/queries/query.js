@@ -42,6 +42,7 @@ export const GET_USER = gql`
   query WhoAmI {
     whoAmI {
       name
+      imgUrl
     }
   }
 `;

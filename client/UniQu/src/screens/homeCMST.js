@@ -5,6 +5,7 @@ import {
   SafeAreaView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { WHO_AM_I_TALENT } from "../queries/query";
@@ -20,27 +21,27 @@ const convertToDate = (timestamp) => {
 const getStatusColor = (status) => {
   switch (status) {
     case "requested":
-      return "#819867"; 
+      return "#819867";
     case "denied":
-      return "#e61c19"; 
+      return "#e61c19";
     case "booked":
-      return "#cd6b32"; 
+      return "#cd6b32";
     case "in progress":
-      return "#b6b649"; 
+      return "#b6b649";
     case "cancelled":
-      return "#4e4e4e"; 
+      return "#4e4e4e";
     case "started":
-      return "#74649b"; 
+      return "#74649b";
     case "ended":
-      return "#5a84a5"; 
+      return "#5a84a5";
     default:
       return "##000000";
   }
 };
 
-export default function HomeforTalent() {
+export default function HomeforTalent({ navigation }) {
   const { loading, error, data } = useQuery(WHO_AM_I_TALENT);
-
+  console.log(data, "homesct");
   if (loading) return <Text>Mengambil data...</Text>;
   if (error) return <Text>Error: {error.message}</Text>;
 
@@ -66,7 +67,7 @@ export default function HomeforTalent() {
 
     return (
       <View style={styles.containerHeader}>
-        <View style={styles.cardContainer}>
+        <TouchableOpacity onPress={() => navigation.navigate('Konfirmasi Booking')} style={styles.cardContainer}>
           <View style={{ flexDirection: "row" }}>
             <View style={styles.image}>
               <Image
@@ -146,7 +147,7 @@ export default function HomeforTalent() {
               </View>
             </View>
           </View>
-        </View>
+        </TouchableOpacity>
       </View>
     );
   };
