@@ -1,11 +1,29 @@
 import React, { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { GET_BOOKING_BY_ID } from "../queries/query";
+import { useQuery } from "@apollo/client";
 
-export default function ListBookingTalent() {
-    const [status, setStatus] = useState('Requested');
+export default function ListBookingTalent({route}) {
+    const bookingId = route.params.bookingId
+    const { loading, error, data } = useQuery(GET_BOOKING_BY_ID, {
+        variables: {
+            bookingId: bookingId
+        }
+    })
+
+    console.log(JSON.stringify(data, null, 2))
+    // console.log(data.bookingById, "<<< status")dat
+    // console.log(data?.bookingById?.bookStatus)
+
+    
+    
+
+    const [status, setStatus] = useState(data?.bookingById?.bookStatus);
     const [payment, setPayment] = useState(true)
     const [time, setTime] = useState(true)
     const [showButton, setShowButton] = useState(true)
+
+    // console.log(status)
 
 
     const handleOnAccept = () => {
@@ -59,7 +77,7 @@ export default function ListBookingTalent() {
                     style={styles.topImage}
                 />
                 <View style={styles.overlay}></View>
-                <Text style={styles.welcomingName}>Hi, Maldini!</Text>
+                <Text style={styles.welcomingName}>Hi, {data?.bookingById.talentName}!</Text>
                 <Text style={styles.welcoming}>How are you?</Text>
 
             </View>
@@ -85,14 +103,14 @@ export default function ListBookingTalent() {
                         <View style={styles.infoUser}>
                             <Image
                                 source={{
-                                    uri: "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=3322&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                    uri: data?.bookingById?.talentImgUrl
                                 }}
                                 style={styles.avatar}
                             />
                             <View>
                                 <View style={styles.userDetail}>
-                                    <Text style={styles.name}>Maldini Junior</Text>
-                                    <Text style={styles.status}>{status}</Text>
+                                    <Text style={styles.name}>{data?.bookingById?.userName}</Text>
+                                    <Text style={styles.status}>{data?.bookingById?.bookStatus}</Text>
                                 </View>
 
                                 <Text style={styles.status}>@maldinigay</Text>

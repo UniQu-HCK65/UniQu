@@ -21,6 +21,7 @@ import StatusBooking from "../screens/statusBooking";
 import ListBookingTalent from "../screens/listBookingDetail";
 import EditStatusBooking from "../screens/editStatusBooking";
 import ProfileTalent from "../screens/profileTalent";
+import MyTabsTalent from "./tabNavigatorTalent";
 
 const Stack = createNativeStackNavigator();
 
@@ -33,134 +34,6 @@ export default function StackNavigator() {
   console.log(role, token)
 
   return (
-    // <Stack.Navigator
-    //   screenOptions={{
-    //     gestureDirection: "vertical",
-    //   }}
-    // >
-    //     {/* <Stack.Screen
-    //         name="LandingPage"
-    //         component={LandingPage}
-    //         options={{
-    //           headerShown: false,
-    //         }}
-    //       /> */}
-
-    //   {!token && !role && (
-    //     <>
-    //       <Stack.Screen
-    //         name="LandingPage"
-    //         component={LandingPage}
-    //         options={{
-    //           headerShown: false,
-    //         }}
-    //       />
-
-    //       <Stack.Screen
-    //         name="Login"
-    //         component={Login}
-    //         options={{
-    //           headerShown: false,
-    //         }}
-    //       />
-
-    //       <Stack.Screen
-    //         name="Register"
-    //         component={Register}
-    //         options={{
-    //           headerShown: false,
-    //         }}
-    //       />
-    //     </>
-    //   )}
-
-    //   {token && role === 'user' && (
-    //     <>
-    //       <Stack.Screen
-    //         name="Home"
-    //         component={MyTabs}
-    //         options={{
-    //           headerShown: false,
-    //         }}
-    //       />
-
-    //       <Stack.Screen
-    //         name="TalentDetails"
-    //         component={TalentDetails}
-    //         options={{
-    //           headerShown: false,
-    //         }}
-    //       />
-
-    //       <Stack.Screen
-    //         name="Booking"
-    //         component={Booking}
-    //         options={{
-    //           headerShown: true,
-    //         }}
-    //       />
-
-    //       <Stack.Screen
-    //         name="Status Booking"
-    //         component={StatusBooking}
-    //         options={{
-    //           headerShown: false,
-    //         }}
-    //       />
-
-    //       <Stack.Screen
-    //         name="Chat"
-    //         component={Chat}
-    //         options={{
-    //           headerShown: false,
-    //         }}
-    //       />
-
-    //       <Stack.Screen
-    //         name="Edit Profile"
-    //         component={EditProfileUser}
-    //       />
-
-    //       <Stack.Screen
-    //         name="Profile"
-    //         component={ProfileUser}
-    //       />
-    //     </>
-    //   )}
-
-    //   {token && role === 'talent' && (
-    //     <>
-    //       <Stack.Screen
-    //         name="List Booking"
-    //         component={HomeforTalent}
-    //         options={{
-    //           headerShown: false,
-    //         }}
-    //       />
-
-    //       <Stack.Screen
-    //         name="List Booking Detail"
-    //         component={ListBookingTalent}
-    //         options={{
-    //           headerShown: false,
-    //         }}
-    //       />
-
-    //       <Stack.Screen
-    //         name="Konfirmasi Booking"
-    //         component={EditStatusBooking}
-    //         options={{
-    //           headerShown: false,
-    //         }}
-    //       />
-
-    //       <Stack.Screen
-    //         name="Profile"
-    //         component={ProfileTalent}
-    //       />
-    //     </>
-    //   )}
-    // </Stack.Navigator>
     <Stack.Navigator screenOptions={{ gestureDirection: 'vertical' }}>
       {(!token || !role) ? (
         <>
@@ -227,8 +100,8 @@ export default function StackNavigator() {
       ) : (role === 'talent') ? (
         <>
           <Stack.Screen
-            name="List Booking"
-            component={HomeforTalent}
+            name="Home"
+            component={MyTabsTalent}
             options={{ headerShown: false }}
           />
 
