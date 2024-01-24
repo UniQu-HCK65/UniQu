@@ -64,10 +64,18 @@ export default function HomeforTalent({ navigation }) {
   //   }, [])
   // );
 
-  useEffect(() => {
-    refetch();
-  }, []);
-
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchData = async () => {
+        try {
+          await refetch();
+        } catch (error) {
+          console.log(error, "error refetch");
+        }
+      };
+      fetchData();
+    }, [])
+  );
   console.log(JSON.stringify(data, null, 2), "homesct");
   if (loading) return <Text>Mengambil data...</Text>;
   if (error) return <Text>Error: {error.message}</Text>;
@@ -94,7 +102,7 @@ export default function HomeforTalent({ navigation }) {
 
     return (
       <View style={styles.containerHeader}>
-        <LogoutButton />
+
         <TouchableOpacity
           onPress={() =>
             navigation.navigate("Konfirmasi Booking", { bookingId: item._id })
