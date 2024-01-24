@@ -15,16 +15,14 @@ export default function MyTabs({ navigation }) {
     const role = isLoggedIn.role
     const token = isLoggedIn.accessToken
     
-
     return (
         <Tab.Navigator
             screenOptions={({ route }) => ({
                 tabBarIcon: ({ focused, color, size }) => {
                     let iconName;
-
                     if (route.name === 'Home') {
                         iconName = focused ? 'home' : 'home';
-                    } else if (route.name === 'ProfileUser') {
+                    } else if (route.name === 'Profile') {
                         iconName = focused ? 'user' : 'user';
                     } else if (route.name === 'ListChat') {
                         iconName = focused ? 'wechat' : 'wechat';
@@ -35,7 +33,6 @@ export default function MyTabs({ navigation }) {
                 },
                 tabBarShowLabel: false,
             })}>
-
             <Tab.Screen
                 name="Home"
                 component={Home}
@@ -49,7 +46,6 @@ export default function MyTabs({ navigation }) {
                 options={{
                     headerShown: false
                 }}
-
             />
             <Tab.Screen
                 name="ListChat"
@@ -57,14 +53,14 @@ export default function MyTabs({ navigation }) {
                 options={{
                     headerShown: false
                 }}
-
             />
             <Tab.Screen
-                name="ProfileUser"
+                name="Profile"
                 component={ProfileUser}
+                options= {{
+                    headerShown: false
+                }}
             />
-
-
         </ Tab.Navigator>
     )
 }

@@ -12,7 +12,6 @@ const Tab = createBottomTabNavigator();
 
 export default function MyTabsTalent({ navigation }) {
 
-
     return (
         <Tab.Navigator
             screenOptions={({ route }) => ({
@@ -21,9 +20,9 @@ export default function MyTabsTalent({ navigation }) {
 
                     if (route.name === 'Home') {
                         iconName = focused ? 'home' : 'home';
-                    } else if (route.name === 'Profile talent') {
+                    } else if (route.name === 'Profile Talent') {
                         iconName = focused ? 'user' : 'user';
-                    } else if (route.name === 'ListChat') {
+                    } else if (route.name === 'List Chat') {
                         iconName = focused ? 'wechat' : 'wechat';
                     } else if (route.name === 'Logout') {
                         iconName = focused ? 'search1' : 'search1'
@@ -40,9 +39,20 @@ export default function MyTabsTalent({ navigation }) {
                     headerShown: false
                 }}
             />
-           
-
-
+            <Tab.Screen
+                name="List Chat"
+                component={ListChat}
+                options={{
+                    headerShown: false
+                }}
+            />
+            <Tab.Screen
+                name="Profile Talent"
+                component={ProfileTalent}
+                options={{
+                    headerShown: false
+                }}
+            />
         </ Tab.Navigator>
     )
 }

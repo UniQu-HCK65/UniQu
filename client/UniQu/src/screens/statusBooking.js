@@ -18,14 +18,14 @@ export default function StatusBooking({ navigation, route }) {
         endSession: false,
         reviewed: false
     });
+
     const [buttonShow, setButtonShow] = useState(false);
+    console.log(JSON.stringify(data, null,2))
 
     const {
         loading: loadingTransaction,
         error: errorTransaction,
         data: dataTransaction } = useQuery(GET_TRANSACTION, { variables: { bookingId: bookingId } })
-
-
 
     const convertTemp = () => {
         if (statusBooking === 'requested') {
@@ -94,8 +94,6 @@ export default function StatusBooking({ navigation, route }) {
         }
     }, [paymentLink])
 
-    console.log(status)
-
     if (loading) {
         return <Text>Loading...</Text>
     }
@@ -107,6 +105,7 @@ export default function StatusBooking({ navigation, route }) {
     return (
         <>
             <View style={styles.container}>
+
                 <Image
                     source={{
                         uri:
@@ -115,6 +114,13 @@ export default function StatusBooking({ navigation, route }) {
                     style={styles.backgroundImage}
                 />
                 <View style={styles.overlay}></View>
+                <View style={{position: 'absolute'}}>
+                    <Text style={{ fontSize: 30, fontWeight: 'bold', color: 'white', marginTop: 160, marginLeft: 45 }}>Hi, {data.bookingById.userName} !</Text>
+                </View>
+
+                <View style={{position: 'absolute'}}>
+                    <Text style={{ fontSize: 15, fontWeight: 'normal', color: 'white', marginTop: 200, marginLeft: 45 }}>This is your booking status..</Text>
+                </View>
 
                 <View style={styles.card}>
                     <View style={{ flexDirection: "column", alignItems: "flex-start", maxWidth: 305, gap: 15, marginRight: 20 }}>
@@ -150,9 +156,9 @@ export default function StatusBooking({ navigation, route }) {
                             <StatusCircle active={status.endSession} />
                             <View style={{}}>
                                 <StatusText active={status.endSession} style={{ fontWeight: 'bold' }}>End Session</StatusText>
-                                <CopyWritingText active={status.endSession}>Session complete! Thank you for using our service. We hope you had a satisfying experience.</CopyWritingText>
+                                <CopyWritingText active={status.endSession}>Session complete! Thank you for using our service.</CopyWritingText>
                             </View>
-
+                            <View style={styles.connector} />
                         </View>
 
                         <View style={{ flexDirection: "row", alignItems: "start", gap: 10 }}>
@@ -165,7 +171,7 @@ export default function StatusBooking({ navigation, route }) {
                                     Reviewed
                                 </StatusText>
                                 <CopyWritingText active={status.reviewed}>
-                                    Thank you for using our service.
+                                    Please rate us.
                                 </CopyWritingText>
                             </View>
                         </View>
@@ -185,10 +191,19 @@ export default function StatusBooking({ navigation, route }) {
                     </View>
                 </View>
 
-
                 <View style={{ justifyContent: "center", alignContent: "center", flex: 1, marginBottom: 200, marginHorizontal: 40, position: 'relative' }}>
                     <View style={{ backgroundColor: "black", width: "100%", height: 150, justifyContent: "center", alignItems: "center", borderRadius: 20 }}>
-                        <Text style={{ fontSize: 15, fontWeight: "bold", color: "white", maxWidth: 250 }}>Let's Begin! Please wait while we process your request..</Text>
+                        <Image
+                                source={{uri: data.bookingById.talentImgUrl}}
+                                style={{
+                                    width: 60,
+                                    height: 60,
+                                    borderRadius: 40,
+                                }}
+                            />
+                        <Text style={{color: 'white', fontWeight: 'bold', marginTop: 10}}>{data.bookingById.talentName}</Text>
+                        <Text style={{color: 'white', fontWeight: '500', marginTop: 7}}>{data.bookingById.bookStatus}</Text>
+                        <Text style={{color: 'white', fontWeight: '500', fontSize: 10}}>{data.bookingById.bookDate} | {data.bookingById.bookSession}</Text>
                     </View>
 
                 </View>
@@ -211,9 +226,7 @@ const StatusConnector = () => (
 const StatusCircle = ({ active }) => (
     <View style={{ height: 15, width: 15, backgroundColor: active ? "black" : "lightgrey", borderRadius: 10, marginTop: 5 }} />
 );
-
 const StatusText = ({ active, children, style }) => <Text style={{ color: active ? "black" : "lightgrey", ...style }}>{children}</Text>;
-
 const CopyWritingText = ({ active, children, style }) => <Text style={{ color: active ? "grey" : "lightgrey", ...style }}>{children}</Text>;
 
 const styles = StyleSheet.create({
