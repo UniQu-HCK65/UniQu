@@ -1,73 +1,71 @@
 import React, { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { GET_BOOKING_BY_ID, UPDATE_BOOKING_STATUS } from "../queries/query";
+import { DENY_BOOKING, GET_BOOKING_BY_ID, UPDATE_BOOKING_STATUS } from "../queries/query";
 import { gql, useMutation, useQuery } from "@apollo/client";
 
 export default function ListBookingTalent({ route }) {
-    const bookingId = route.params.bookingId
+    const bookingId = route.params.bookingId;
     const { loading, error, data } = useQuery(GET_BOOKING_BY_ID, {
         variables: {
-            bookingId: bookingId
-        }
-    })
+            bookingId: bookingId,
+        },
+    });
+    const [status, setStatus] = useState("");
+    const [payment, setPayment] = useState(false);
+    const [showButton, setShowButton] = useState(true);
 
-    const [status, setStatus] = useState('');
-    const [payment, setPayment] = useState(false)
-    const [showButton, setShowButton] = useState(true)
-    //coba
-    const [updateBook, { loading: loadingUpdateBook, error: errorUpdateBook, data: dataUpdateBook }] = useMutation(UPDATE_BOOKING_STATUS)
+    const [updateBook, { loading: loadingUpdateBook, error: errorUpdateBook, data: dataUpdateBook }] = useMutation(UPDATE_BOOKING_STATUS);
+    const [denyBook, { loading: loadingDenyBook, error: errorDenyBook, data: dataDenyBook }] = useMutation(DENY_BOOKING);
 
     useEffect(() => {
-        if(!loading) {
-            setStatus(data?.bookingById?.bookStatus)
+        if (!loading) {
+            setStatus(data?.bookingById?.bookStatus);
         }
-    }, [loading, data])
+    }, [loading, data]);
 
-    const handleOnAccept = async () => {
-        const response = await updateBook({
-            variables: {
-                bookingId: bookingId
-            },
-            onCompleted: (data) => {
-                console.log(data, 'data di on completed ini kalo success yaaa')
-                setStatus(data.updateBookingStatus?.bookStatus);
-            },
-            onError: (error) => {
-                console.log('Mutation error:', error);
-            }
-        });
+    const handleMutation = async (mutationFunction) => {
+        try {
+            const response = await mutationFunction({
+                variables: { bookingId: bookingId },
+                onCompleted: (data) => {
+                    // console.log(data);
+                    setStatus(data?.updateBookingStatus?.bookStatus);
+                },
+                onError: (error) => {
+                    console.log("Mutation error:", error);
+                },
+            });
+        } catch (error) {
+            console.log("Error:", error);
+        }
+    };
+    const convertToDate = (timestamp) => {
+        const date = new Date(parseInt(timestamp));
+        return date.toLocaleDateString();
+      };
+
+    const handleOnAccept = () => {
+        handleMutation(updateBook);
     };
 
     const handleOnCancel = () => {
-        setStatus('Cancel')
-    }
-
-    const handleOnPayment = () => {
-        if (payment) {
-            setStatus('In Process')
-        }
-    }
-
-    useEffect(() => {
-        handleOnPayment()
-    }, [])
+        handleMutation(denyBook);
+    };
 
     const handleOnStartSession = () => {
-        if (payment) {
-            setStatus('On Progress')
-        }
-    }
+        handleMutation(updateBook);
+    };
 
     const handleOnEndSession = () => {
-        setStatus('End Session')
+        handleMutation(updateBook);
         setShowButton(false);
-    }
+    };
 
+    console.log(data?.bookingId?.bookStatus, '<<< status booking')
 
 
     return (
         <View style={styles.container}>
-
             <View style={styles.overlayContainer}>
                 <Image
                     source={{
@@ -78,27 +76,16 @@ export default function ListBookingTalent({ route }) {
                 <View style={styles.overlay}></View>
                 <Text style={styles.welcomingName}>Hi, {data?.bookingById.talentName}!</Text>
                 <Text style={styles.welcoming}>How are you?</Text>
-
             </View>
-
-
 
             <View style={styles.cardContainer}>
 
                 <View style={styles.card}>
-                    <Image
-                        source={
-                            require('../../assets/bookingAnimation.png')
-                        }
-                        style={styles.bookingAnimation}
-                    />
 
                     <Text style={styles.title}>
                         Please Confirm Your Request:
                     </Text>
-
                     <View style={styles.cardUser}>
-
                         <View style={styles.infoUser}>
                             <Image
                                 source={{
@@ -109,22 +96,22 @@ export default function ListBookingTalent({ route }) {
                             <View>
                                 <View style={styles.userDetail}>
                                     <Text style={styles.name}>{data?.bookingById?.userName}</Text>
-                                    <Text style={styles.status}>{data?.bookingById?.bookStatus}</Text>
+                                   
                                 </View>
-
-                                <Text style={styles.status}>@maldinigay</Text>
+                                <Text style={styles.status}>{data?.bookingById?.bookStatus}</Text>
+                                <Text style={styles.status}>{convertToDate(data?.bookingById.bookDate)}</Text>
+                                <Text style={styles.status}>{data?.bookingById.bookSession}</Text>
+                                <Text style={styles.status}>{data?.bookingById.bookLocation}</Text>
                             </View>
                         </View>
                     </View>
 
                     <View style={styles.buttonContainer}>
-
                         {showButton && status === 'requested' && !payment && (
                             <TouchableOpacity onPress={handleOnCancel} style={styles.buttonCancel}>
                                 <Text style={styles.buttonText}>Cancel</Text>
                             </TouchableOpacity>
                         )}
-
 
                         {showButton && status === 'requested' && (
                             <TouchableOpacity onPress={handleOnAccept} style={[
@@ -139,34 +126,22 @@ export default function ListBookingTalent({ route }) {
 
                         {showButton && status === 'booked' && (
                             <TouchableOpacity style={styles.waitingPayment}>
-                                <Text style={styles.buttonText}>Waiting for payament..</Text>
+                                <Text style={styles.buttonText}>Waiting for payment..</Text>
                             </TouchableOpacity>
                         )}
 
-                        {showButton && payment && status === 'In Process' && (
+                        {showButton && status === 'in progress' && (
                             <TouchableOpacity onPress={handleOnStartSession} style={styles.buttonConfirm}>
-                                <Text style={styles.buttonText}>Start Session</Text>
+                                <Text style={styles.buttonText}>Started</Text>
                             </TouchableOpacity>
                         )}
 
-                        {showButton && status === 'On Progress' && (
-                            <TouchableOpacity style={styles.onProgress}>
-                                <Text style={styles.buttonText}>Progress</Text>
-                            </TouchableOpacity>
-                        )}
-
-                        {showButton && payment && (
+                        {showButton && status === 'started' && (
                             <TouchableOpacity onPress={handleOnEndSession} style={styles.endSession}>
                                 <Text style={styles.buttonText}>End Session</Text>
                             </TouchableOpacity>
                         )}
-
-
-
-
                     </View>
-
-
                 </View>
             </View>
         </View>
@@ -239,7 +214,7 @@ const styles = StyleSheet.create({
     },
     cardUser: {
         width: 300,
-        height: 70,
+        height: 100,
         borderRadius: 15,
         backgroundColor: "white",
         marginBottom: 20,
@@ -252,27 +227,30 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 5,
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         padding: 20
     },
     infoUser: {
         flexDirection: 'row',
-        gap: 10,
+        gap: 20,
+        justifyContent: 'flex-start',
+        alignItems: 'center',
     },
     avatar: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
+        width: 60,
+        height: 60,
+        borderRadius: 30,
     },
     userDetail: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
+        justifyContent: 'flex-start',
+        alignItems: 'flex-start',
         gap: 50
     },
     status: {
         color: "grey",
-        fontSize: 11
+        fontSize: 11, 
+        marginTop: 3
     },
     name: {
         fontWeight: 'bold',

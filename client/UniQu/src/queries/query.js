@@ -361,3 +361,25 @@ export const GET_TRANSACTION = gql`
     }
   }
 `;
+
+export const DENY_BOOKING = gql`
+  mutation DenyBooking($bookingId: ID) {
+  denyBooking(bookingId: $bookingId) {
+    _id
+    TalentId
+    UserId
+    talentName
+    talentNick
+    userName
+    userNick
+    talentImgUrl
+    userImgUrl
+    bookDate
+    bookSession
+    bookLocation
+    bookStatus
+    updatedAt
+    createdAt
+  }
+}
+`

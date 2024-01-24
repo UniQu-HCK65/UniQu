@@ -67,17 +67,14 @@ export default function Booking({ route, navigation }) {
         <View style={styles.container}>
             <Text style={{fontWeight: 'bold', fontSize: 20, marginLeft: 30, marginTop: 70}}>Select Schedule </Text>
             <View style={{ marginLeft: 90, position: 'absolute', marginTop: 130 }}>
-                <Image
-                    source={require('../../assets/bookingAnimation.png')}
-                    style={styles.bookingAnimation}
-                />
+                
             </View>
             <Calendar
                 onDayPress={(day) => handleDateSelect(day)}
                 markedDates={{
                     [selectedDate]: { selected: true, disableTouchEvent: true, selectedDotColor: 'orange' },
                 }}
-                style={{ margin: 20 }}
+                style={{ margin: 20, marginTop: 30 }}
             />
             <View style={{ justifyContent: 'center', alignItems: 'center', marginHorizontal: 30 }}>
                 <View style={{ height: 3, width: '100%', borderWidth: 1, backgroundColor: 'grey', }}></View>
@@ -86,7 +83,7 @@ export default function Booking({ route, navigation }) {
             {errorMessage ? (
                 <Text style={{ color: 'red', marginLeft: 35, fontSize: 10, marginTop: 10 }}>*{errorMessage}</Text>
             ) : null}
-            <View style={{ marginLeft: 40, marginBottom: 10, marginTop: 20 }}>
+            <View style={{ marginLeft: 40, marginBottom: 10, marginTop: 40 }}>
                 <Text style={{ fontSize: 15, fontWeight: '400' }}>Select session : </Text>
             </View>
             <View style={{marginHorizontal: 30, backgroundColor: 'white'}}>
@@ -119,7 +116,7 @@ export default function Booking({ route, navigation }) {
 
 
 
-            <View style={{ flexDirection: 'row', gap: 10, marginHorizontal: 20, justifyContent: 'center', marginTop: 20 }}>
+            <View style={{ flexDirection: 'row', gap: 10, marginHorizontal: 20, justifyContent: 'center', marginTop: 40 }}>
                 <TouchableOpacity onPress={handleBooking} style={styles.submitButton}>
                     <Text style={{ color: 'white' }}>Submit</Text>
                 </TouchableOpacity>

@@ -13,6 +13,7 @@ import { WHO_AM_I_TALENT } from "../queries/query";
 import LogoutButton from "../components/logoutButton";
 import React, { useEffect } from "react";
 import { useFocusEffect } from "@react-navigation/native";
+import Ionicons from 'react-native-vector-icons/EvilIcons';
 
 // updated
 
@@ -51,33 +52,18 @@ export default function HomeforTalent({ navigation }) {
     refetchQueries: [WHO_AM_I_TALENT],
   });
 
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     const fetchData = async () => {
-  //       try {
-  //         await refetch();
-  //       } catch (error) {
-  //         console.log(error, "error refetch");
-  //       }
-  //     };
-  //     fetchData();
-  //   }, [])
-  // );
-
-  
   useFocusEffect(
     React.useCallback(() => {
-        const fetchData = async () => {
-            try {
-                await refetch();
-            } catch (error) {
-                console.log(error, "error refetch");
-            }
-        };
-        fetchData();
+      const fetchData = async () => {
+        try {
+          await refetch();
+        } catch (error) {
+          console.log(error, "error refetch");
+        }
+      };
+      fetchData();
     }, [])
-);
-  console.log(JSON.stringify(data, null, 2), "homesct");
+  );
   if (loading) return <Text>Mengambil data...</Text>;
   if (error) return <Text>Error: {error.message}</Text>;
 
@@ -96,14 +82,16 @@ export default function HomeforTalent({ navigation }) {
     }
   });
 
-  //   console.log(newData,">>new");
+  console.log(JSON.stringify(data, null, 2))
+
+  const handleRefresh = async () => {
+    await refetch();
+  }
 
   const renderListBooking = ({ item }) => {
-    console.log(JSON.stringify(item, null, 2), "item cmst");
 
     return (
       <View style={styles.containerHeader}>
-        <LogoutButton />
         <TouchableOpacity
           onPress={() =>
             navigation.navigate("Konfirmasi Booking", { bookingId: item._id })
@@ -201,7 +189,14 @@ export default function HomeforTalent({ navigation }) {
         <View>
           <View>
             <View style={styles.listStyle}>
-              <Text style={styles.textBookings}> Bookings </Text>
+              <View style={{ flexDirection: "row", justifyContent: 'space-between', alignItems: 'center' }}>
+                <Text style={{ color: 'black', fontSize: 25, fontWeight: 'bold' }}>Hi, {data?.whoAmITalent.name} !</Text>
+                <TouchableOpacity onPress={handleRefresh} style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Ionicons name="refresh" size={35} color="black" style={{ marginRight: 20 }} />
+                </TouchableOpacity>
+              </View>
+              <Text style={{ color: 'black', fontSize: 18, fontWeight: '400', marginTop: 5 }}>Your bookings list </Text>
+              <View style={{ height: 1, backgroundColor: 'grey', marginTop: 10, marginRight: 20, marginTop: 20 }}></View>
             </View>
           </View>
 
