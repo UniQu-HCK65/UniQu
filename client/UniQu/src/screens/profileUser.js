@@ -13,9 +13,10 @@ import { useQuery } from "@apollo/client";
 import LogoutButton from "../components/logoutButton";
 import { useFocusEffect } from "@react-navigation/native";
 
-
 export default function ProfileUser({ navigation }) {
-  const { loading, error, data, refetch } = useQuery(WHO_AM_I_USER, {refetcQueries: [WHO_AM_I_USER]});
+  const { loading, error, data, refetch } = useQuery(WHO_AM_I_USER, {
+    refetcQueries: [WHO_AM_I_USER],
+  });
 
   useFocusEffect(
     React.useCallback(() => {
@@ -39,7 +40,7 @@ export default function ProfileUser({ navigation }) {
   }
 
   const { whoAmI } = data;
-  console.log(whoAmI.userBookings.length, '<<< oiiii')
+  // console.log(whoAmI.userBookings.length, "<<< oiiii");
   const paymentId = whoAmI.userTransactions[0]?.paymentId;
 
   // console.log(paymentId, ">> hai");
@@ -130,9 +131,16 @@ export default function ProfileUser({ navigation }) {
 
             <View style={styles.cardTagsStyle}>
               {whoAmI.userBookings.map((booking, index) => (
-                
-                <TouchableOpacity onPress={() => navigation.navigate("Status Booking", {bookingId: booking._id})} style={styles.historyStyle} key={index}>
-                  <View style={styles.historyContainer}>
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate("Status Booking", {
+                      bookingId: booking._id,
+                    })
+                  }
+                  style={styles.historyStyle}
+                  key={index}
+                >
+                  {/* <View style={styles.historyContainer}>
                     <View>
                       <Text style={styles.historyLabel}>No. Payment</Text>
                     </View>
@@ -142,7 +150,7 @@ export default function ProfileUser({ navigation }) {
                         : {paymentId ? paymentId : "-"}
                       </Text>
                     </View>
-                  </View>
+                  </View> */}
 
                   <View style={styles.historyContainer}>
                     <View>
@@ -164,10 +172,10 @@ export default function ProfileUser({ navigation }) {
 
                   <View style={styles.historyContainer}>
                     <View>
-                      <Text style={styles.historyLabel}>Seesion</Text>
+                      <Text style={styles.historyLabel}>Session</Text>
                     </View>
-                    <View style={{ marginLeft: 42}}>
-                      <Text>: Session {booking.bookSession}</Text>
+                    <View style={{ marginLeft: 42 }}>
+                      <Text>: {booking.bookSession}</Text>
                     </View>
                   </View>
 
@@ -194,7 +202,7 @@ export default function ProfileUser({ navigation }) {
           </View>
         </View>
       </View>
-      <LogoutButton/>
+      <LogoutButton />
     </ScrollView>
   );
 }
@@ -269,7 +277,7 @@ const styles = StyleSheet.create({
     shadowRadius: 1,
   },
   usernameStyle: {
-    fontSize: 18,
+    fontSize: 15,
     color: "#4e4e4e",
     marginTop: 3,
     marginLeft: 25,
@@ -283,7 +291,8 @@ const styles = StyleSheet.create({
     marginLeft: 25,
     marginTop: 10,
     backgroundColor: "#4e4e4e",
-    width: 120,
+    width: 110,
+    // width: 120,
     height: 40,
     borderRadius: 20,
     alignItems: "center",
@@ -292,7 +301,6 @@ const styles = StyleSheet.create({
   cardTagsStyle: {
     flexWrap: "wrap",
     flexDirection: "row",
-    
   },
   locationStyle: {
     marginLeft: 25,
@@ -319,12 +327,13 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.2,
     shadowRadius: 4,
-    marginHorizontal: 30
-    
+    marginHorizontal: 30,
   },
   historyContainer: {
     flexDirection: "row",
     alignItems: "center",
     margin: 1,
+    // backgroundColor: "white",
+    marginLeft: 15
   },
 });
