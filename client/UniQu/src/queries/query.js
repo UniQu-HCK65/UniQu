@@ -308,3 +308,15 @@ export const GET_BOOKING_BY_ID = gql`
   }
 }
 `
+
+export const ADD_REVIEWS = gql`
+mutation AddReview($newReview: NewReview) {
+  addReview(newReview: $newReview) {
+    BookingId
+    message
+    reviewerName
+    rating
+    updatedAt
+    createdAt
+  }
+}`

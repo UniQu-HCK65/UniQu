@@ -21,6 +21,7 @@ import StatusBooking from "../screens/statusBooking";
 import ListBookingTalent from "../screens/listBookingDetail";
 import EditStatusBooking from "../screens/editStatusBooking";
 import ProfileTalent from "../screens/profileTalent";
+import EditProfileTalent from "../screens/editProfileTalent";
 
 const Stack = createNativeStackNavigator();
 
@@ -28,9 +29,9 @@ const Stack = createNativeStackNavigator();
 
 export default function StackNavigator() {
   const { isLoggedIn } = useContext(LoginContext);
-  const role = isLoggedIn.role
-  const token = isLoggedIn.accessToken
-  console.log(role, token)
+  const role = isLoggedIn.role;
+  const token = isLoggedIn.accessToken;
+  console.log(role, token);
 
   return (
     // <Stack.Navigator
@@ -161,8 +162,8 @@ export default function StackNavigator() {
     //     </>
     //   )}
     // </Stack.Navigator>
-    <Stack.Navigator screenOptions={{ gestureDirection: 'vertical' }}>
-      {(!token || !role) ? (
+    <Stack.Navigator screenOptions={{ gestureDirection: "vertical" }}>
+      {!token || !role ? (
         <>
           <Stack.Screen
             name="LandingPage"
@@ -182,7 +183,7 @@ export default function StackNavigator() {
             options={{ headerShown: false }}
           />
         </>
-      ) : (role === 'user') ? (
+      ) : role === "user" ? (
         <>
           <Stack.Screen
             name="Home"
@@ -214,17 +215,11 @@ export default function StackNavigator() {
             options={{ headerShown: false }}
           />
 
-          <Stack.Screen
-            name="Edit Profile"
-            component={EditProfileUser}
-          />
+          <Stack.Screen name="Edit Profile" component={EditProfileUser} />
 
-          <Stack.Screen
-            name="Profile"
-            component={ProfileUser}
-          />
+          <Stack.Screen name="Profile" component={ProfileUser} />
         </>
-      ) : (role === 'talent') ? (
+      ) : role === "talent" ? (
         <>
           <Stack.Screen
             name="List Booking"
@@ -244,10 +239,14 @@ export default function StackNavigator() {
             options={{ headerShown: false }}
           />
 
-          <Stack.Screen
+          {/* <Stack.Screen
             name="Profile"
             component={ProfileTalent}
-          />
+          /> */}
+
+          <Stack.Screen name="Edit Profile" component={EditProfileTalent} />
+          <Stack.Screen name="Profile" component={ProfileTalent} />
+
         </>
       ) : null}
     </Stack.Navigator>
