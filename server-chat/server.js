@@ -12,25 +12,22 @@ const multer = require("multer");
 const path = require("path");
 
 const fs = require("fs");
-const cloudinary = require('cloudinary').v2;
+const cloudinary = require("cloudinary").v2;
 // iamge upload success
-const PORT = 4000;
+const PORT = process.env.PORT || 4000;
 
 const clientOrigins = "*"; //CARI ALL
 // const clientOrigins = "exp://192.168.27.141:8081";
 const mongoUri = process.env.CHAT_DB_URI;
 
-
-//SOCLET IO SERVER
+//SOCKET IO SERVER
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: true,
+    origin: "*",
   },
 });
-
-
 
 //MULTER
 const storage = multer.diskStorage({
@@ -44,11 +41,10 @@ const storage = multer.diskStorage({
 
 const upload = multer({ dest: "uploads/" }); // Destination folder for temporary storage
 
-
 cloudinary.config({
-  cloud_name: "daaiivsej",
-  api_key: "785748544789591",
-  api_secret: "0jHkGGwxgSe3S0aCvVyAUeZG1as",
+  cloud_name: process.env.cloudinary_cloud_name,
+  api_key: process.env.cloudinary_api_key,
+  api_secret: process.env.cloudinary_api_secret,
 });
 
 let db;
@@ -82,9 +78,6 @@ const startServer = async () => {
       }
     });
 
-
-
-
     app.get("/get-messages", async (req, res) => {
       const { room } = req.query;
       const messageCollection = db.collection("messages");
@@ -106,7 +99,6 @@ const startServer = async () => {
     process.exit(1);
   }
 };
-
 
 io.on("connect", (socket) => {
   console.log(`${socket.id} just connected`);

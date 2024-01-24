@@ -498,7 +498,7 @@ const resolvers = {
             },
           }
         );
-        console.log(insertedReview, "AAAA");
+        // console.log(insertedReview, "AAAA");
 
         if (insertedReview.acknowledged === false) {
           throw {
