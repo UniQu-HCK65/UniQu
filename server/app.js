@@ -6,8 +6,6 @@ const { verifyToken } = require("./helpers/jwt");
 const { ApolloServer } = require("@apollo/server");
 const { startStandaloneServer } = require("@apollo/server/standalone");
 
-// const cors = require("cors");
-// const express = require("express");
 const bodyParser = require("body-parser");
 //WEEEEE
 
@@ -46,6 +44,9 @@ const {
 
 const client = require("./config/configMongo");
 const { ObjectId } = require("mongodb");
+const { GraphQLError } = require("graphql");
+const midtransClient = require("midtrans-client");
+const axios = require("axios");
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -173,27 +174,166 @@ const startServer = async () => {
         currency: 'IDR'
         }
         */
-        //COOOOOOOOOOOOOOOOOOOOOOMEEEEEEE BREEEAAAKK ME DOWWWWWWWWNNNNNNN!!!!!!!!
-        const findTransaction = await db.collection("Transactions").findOne({
-          _id: new ObjectId(req.body.order_id),
+
+        const transaction = await db.collection("Transactions");
+        const bookings = await db.collection("Bookings");
+
+        const findTransaction = await transaction.findOne({
+          orderId: req.body.order_id,
         });
 
-        if (findTransaction.transactionStatus !== "unpaid")
-          res.status(200).json("Webhook received successfully");
+        const orderId = req.body.order_id;
+
+        // console.log(findTransaction, "AAAAA");
+
+        if (!findTransaction) {
+          throw {
+            message: "Transaction not found",
+            code: "NOT_FOUND",
+            status: 404,
+          };
+        }
+
+        if (
+          req.body.status_code !== "200" &&
+          (req.body.transaction_status !== "settlement" ||
+            req.body.transaction_status !== "capture")
+        ) {
+          throw {
+            message:
+              "Transaction has failed please visit the transaction page again",
+            code: "BAD_REQUEST",
+            status: 400,
+          };
+        }
+        const findActiveTransaction = await transaction.findOne({
+          BookingId: new ObjectId(findTransaction.BookingId),
+          transactionStatus: "unpaid",
+        });
+
+        if (!findActiveTransaction) {
+          throw {
+            message:
+              "No active transaction found, please check your booking id or place a new booking",
+            code: "BAD_REQUEST",
+            status: 400,
+          };
+        }
+
+        const midtransStatusUrl = `https://api.sandbox.midtrans.com/v2/${orderId}/status`;
+        const midtransOptions = {
+          method: "GET",
+          headers: {
+            accept: "application/json",
+            Authorization: `Basic ${Buffer.from(
+              `${process.env.MIDTRANS_SERVER_KEY}:`
+            ).toString("base64")}`,
+          },
+        };
+
+        const midtransResponse = await axios.get(
+          midtransStatusUrl,
+          midtransOptions
+        );
+        const midtransData = midtransResponse.data;
+
+        // console.log(midtransData, "BBBBBB");
+
+        if (midtransData.status_code === "404") {
+          throw {
+            message:
+              "You have an unstarted transaction, please visit this link: " +
+              findActiveTransaction.paymentLink,
+            code: "NOT_FOUND",
+            status: 404,
+          };
+        } else if (
+          midtransData.status_code === "201" &&
+          midtransData.transaction_status === "pending"
+        ) {
+          throw {
+            message:
+              "You have an unfinished transaction, please visit this link: " +
+              findActiveTransaction.paymentLink,
+            code: "UNAUTHORIZED",
+            status: 401,
+          };
+        } else if (midtransData.transaction_status === "expire") {
+          const espireTransaction = await transaction.updateOne(
+            {
+              _id: new ObjectId(findActiveTransaction._id),
+            },
+            {
+              $set: {
+                transactionStatus: "expired",
+                updatedAt: new Date(),
+              },
+            }
+          );
+
+          const expireBooking = await bookings.updateOne(
+            {
+              _id: new ObjectId(findActiveTransaction.BookingId),
+            },
+            {
+              $set: {
+                bookStatus: "expired",
+                updatedAt: new Date(),
+              },
+            }
+          );
+
+          throw {
+            message:
+              "Your transaction has expired, please place an order again",
+            code: "UNAUTHORIZED",
+            status: 401,
+          };
+        } else if (
+          midtransData.status_code === "200" &&
+          (midtransData.transaction_status === "settlement" ||
+            midtransData.transaction_status === "capture")
+        ) {
+          await transaction.updateOne(
+            {
+              _id: new ObjectId(findActiveTransaction._id),
+            },
+            {
+              $set: {
+                transactionStatus: "paid",
+                updatedAt: new Date(),
+              },
+            }
+          );
+        }
+
+        const findUpdatedTransaction = await transaction.findOne({
+          _id: new ObjectId(findActiveTransaction._id),
+        });
+
+        if (findUpdatedTransaction.transactionStatus === "paid") {
+          await bookings.updateOne(
+            {
+              _id: new ObjectId(findActiveTransaction.BookingId),
+            },
+            {
+              $set: {
+                bookStatus: "in progress",
+                updatedAt: new Date(),
+              },
+            }
+          );
+        }
+
+        res.status(200).json("Transaction has been updated successfully");
       } catch (error) {
         console.error("Error handling Midtrans Webhook:", error);
         res.status(500).send("Internal Server Error");
-        throw new GraphQLError(error.message || "Internal Server Error", {
-          extensions: {
-            code: error.code || "INTERNAL_SERVER_ERROR",
-            http: { status: error.status || 500 },
-          },
-        });
       }
     });
 
     httpServer.listen({ port: process.env.PORT || 5555 }, () => {
-      console.log(`🚀 Server ready at http://localhost:5555/`);
+      console.log(`🚀 Server ready at http://localhost:5555/graphql`);
     });
   } catch (error) {
     console.log(error);
