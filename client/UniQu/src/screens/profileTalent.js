@@ -9,6 +9,7 @@ import {
 import { Feather } from "@expo/vector-icons";
 import { useQuery } from "@apollo/client";
 import { WHO_AM_I_TALENT } from "../queries/query";
+import LogoutButton from "../components/logoutButton";
 
 export default function ProfileTalent({ navigation }) {
   const { loading, error, data } = useQuery(WHO_AM_I_TALENT); //move ke listbookingdetail
@@ -49,9 +50,10 @@ export default function ProfileTalent({ navigation }) {
 
           <View>
             <View>
-              <View style={styles.cardOption}>
-                <View>
-                  <Text style={styles.fontOption}>{talentData.name}</Text>
+              <View style={{}}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'space-between' }}>
+                  <Text style={styles.fontOption}>{talentData.name} </Text>
+                  
                 </View>
               </View>
             </View>
@@ -86,11 +88,13 @@ export default function ProfileTalent({ navigation }) {
             <View>
               <View style={styles.cardOption}>
                 <View>
+                  <LogoutButton/>
                   <Text style={styles.tagsStyle}>Booking History</Text>
+
                 </View>
               </View>
 
-{/* move ke listbookingdetail */}
+              {/* move ke listbookingdetail */}
               {talentData.talentBookings.map((booking) => (
                 <View key={booking._id} style={styles.cardTagsStyle}>
                   <View style={styles.historyStyle}>
