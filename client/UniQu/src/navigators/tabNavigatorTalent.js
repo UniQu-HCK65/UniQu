@@ -4,17 +4,14 @@ import ProfileUser from '../screens/profileUser';
 import Ionicons from 'react-native-vector-icons/AntDesign';
 import ListChat from '../screens/list-chat';
 import Search from '../screens/search';
-import { useContext } from 'react';
-import { LoginContext } from '../context/LoginContext';
+import HomeforTalent from '../screens/homeCMST';
+import ProfileTalent from '../screens/profileTalent';
+import LogoutButton from '../components/logoutButton';
 
 const Tab = createBottomTabNavigator();
 
-export default function MyTabs({ navigation }) {
-    const { isLoggedIn } = useContext(LoginContext);
+export default function MyTabsTalent({ navigation }) {
 
-    const role = isLoggedIn.role
-    const token = isLoggedIn.accessToken
-    
 
     return (
         <Tab.Navigator
@@ -24,11 +21,11 @@ export default function MyTabs({ navigation }) {
 
                     if (route.name === 'Home') {
                         iconName = focused ? 'home' : 'home';
-                    } else if (route.name === 'ProfileUser') {
+                    } else if (route.name === 'Profile talent') {
                         iconName = focused ? 'user' : 'user';
                     } else if (route.name === 'ListChat') {
                         iconName = focused ? 'wechat' : 'wechat';
-                    } else if (route.name === 'Search') {
+                    } else if (route.name === 'Logout') {
                         iconName = focused ? 'search1' : 'search1'
                     }
                     return <Ionicons name={iconName} size={23} color={focused ? 'black' : color} />;
@@ -38,31 +35,12 @@ export default function MyTabs({ navigation }) {
 
             <Tab.Screen
                 name="Home"
-                component={Home}
+                component={HomeforTalent}
                 options={{
                     headerShown: false
                 }}
             />
-            <Tab.Screen
-                name="Search"
-                component={Search}
-                options={{
-                    headerShown: false
-                }}
-
-            />
-            <Tab.Screen
-                name="ListChat"
-                component={ListChat}
-                options={{
-                    headerShown: false
-                }}
-
-            />
-            <Tab.Screen
-                name="ProfileUser"
-                component={ProfileUser}
-            />
+           
 
 
         </ Tab.Navigator>

@@ -41,7 +41,7 @@ const getStatusColor = (status) => {
 
 export default function HomeforTalent({ navigation }) {
   const { loading, error, data } = useQuery(WHO_AM_I_TALENT);
-  console.log(data, "homesct");
+  console.log(JSON.stringify(data, null, 2), "homesct");
   if (loading) return <Text>Mengambil data...</Text>;
   if (error) return <Text>Error: {error.message}</Text>;
 
@@ -64,10 +64,11 @@ export default function HomeforTalent({ navigation }) {
 
   const renderListBooking = ({ item }) => {
     // console.log(item, "itemmmm renderer");
+    console.log(JSON.stringify(item, null, 2))
 
     return (
       <View style={styles.containerHeader}>
-        <TouchableOpacity onPress={() => navigation.navigate('Konfirmasi Booking')} style={styles.cardContainer}>
+        <TouchableOpacity onPress={() => navigation.navigate('Konfirmasi Booking', { bookingId: item._id })} style={styles.cardContainer}>
           <View style={{ flexDirection: "row" }}>
             <View style={styles.image}>
               <Image
