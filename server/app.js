@@ -155,26 +155,6 @@ const startServer = async () => {
       try {
         console.log("MASUK");
         console.log("Received Midtrans Webhook:", req.body);
-        /*
-        Received Midtrans Webhook: {
-        va_numbers: [ { va_number: '04273148101', bank: 'bca' } ],
-        transaction_time: '2024-01-23 20:23:00',
-        transaction_status: 'settlement',
-        transaction_id: '405bab46-d157-4f8b-96ed-b4afab05b613',
-        status_message: 'midtrans payment notification',
-        status_code: '200',
-        signature_key: 'cd71d063a313a26d434ffe60d90fd8678b1c4a6653bf79b962d32fddcc043121a995a0abeccb9f0c63a5ad00c3759fe7b7bcea5f0addf681b272a4a8e3b1fc73',
-        settlement_time: '2024-01-23 20:23:06',
-        payment_type: 'bank_transfer',
-        payment_amounts: [],
-        order_id: 'TRX-BKNG-0.554764376927015',
-        merchant_id: 'G810204273',
-        gross_amount: '500000.00',
-        fraud_status: 'accept',
-        expiry_time: '2024-01-23 20:24:00',
-        currency: 'IDR'
-        }
-        */
 
         const transaction = await db.collection("Transactions");
         const bookings = await db.collection("Bookings");
@@ -333,9 +313,12 @@ const startServer = async () => {
       }
     });
 
-    httpServer.listen({ port: process.env.PORT || 5555 }, () => {
-      console.log(`🚀 Server ready at http://localhost:5555/graphql`);
-    });
+    httpServer.listen(
+      { port: process.env.PORT || 5555, host: "0.0.0.0" },
+      () => {
+        console.log(`🚀 Server ready at http://localhost:5555/graphql`);
+      }
+    );
   } catch (error) {
     console.log(error);
   }

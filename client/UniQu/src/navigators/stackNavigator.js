@@ -44,13 +44,11 @@ export default function StackNavigator() {
             component={LandingPage}
             options={{ headerShown: false }}
           />
-
           <Stack.Screen
             name="Login"
             component={Login}
             options={{ headerShown: false }}
           />
-
           <Stack.Screen
             name="Register"
             component={Register}

@@ -35,9 +35,28 @@ const typeDefs = `#graphql
     bookLocation: String
   }
 
+  type BookingWithReview {
+    _id: ID
+    TalentId: ID
+    UserId: ID
+    talentName: String
+    talentNick: String
+    userName: String
+    userNick: String
+    talentImgUrl: String
+    userImgUrl:String
+    bookDate: String
+    bookSession: String
+    bookLocation: String
+    bookStatus: String
+    updatedAt: String
+    createdAt: String
+    review: Review
+  }
+
   type Query {
     bookings: [Booking]
-    bookingById(bookingId:ID): Booking
+    bookingById(bookingId:ID): BookingWithReview
   }
 
   type Mutation {
@@ -77,7 +96,21 @@ const resolvers = {
           _id: new ObjectId(bookingId),
         });
 
-        return getBooking;
+        const getTalent = await db.collection("Talents").findOne({
+          _id: new ObjectId(getBooking.TalentId),
+        });
+
+        const bookIdFromReview = new ObjectId(bookingId);
+        // console.log(getTalent);
+
+        // console.log(bookIdFromReview, "bookingId");
+
+        const getReview = getTalent.reviews.filter((review) => {
+          // console.log(review, "review");
+          return review.BookingId.equals(bookIdFromReview);
+        });
+
+        return { ...getBooking, review: getReview[0] };
       } catch (error) {
         console.log(error, "GET_BOOKING_BY_ID"); // errorHandler next up
         throw new GraphQLError(error.message || "Internal Server Error", {
@@ -312,8 +345,8 @@ const resolvers = {
 
           const twoDigitRandom = Math.floor(Math.random() * 90) + 10;
 
-          const orderId = `TRX-BKNG-${Math.random().toString().slice(2, 6)}`; //TSTING PURPOSES
-          // const orderId = `TRX-BKNG-${bookingId}-${auth.username}-${twoDigitRandom}`;
+          // const orderId = `TRX-BKNG-${Math.random().toString().slice(2, 6)}`; //TSTING PURPOSES
+          const orderId = `TRX-BKNG-${bookingId}-${auth.username}-${twoDigitRandom}`;
 
           const trxAmount = 500_000;
 
@@ -328,9 +361,7 @@ const resolvers = {
                 price: 500000,
                 quantity: 1,
 
-
                 name: "Booking Session with " + findTalent.name,
-
               },
             ],
             customer_details: {
@@ -341,8 +372,8 @@ const resolvers = {
 
           // console.log(midtransTransaction, "AAAAAAA");
 
-          const expiryDate = new Date(new Date().getTime() + 2 * 60 * 1000); //NANTI GANTI OI, ini 2 mnt
-          //  const expiryDate = new Date(new Date().getTime() + 60 * 60 * 1000);
+          // const expiryDate = new Date(new Date().getTime() + 2 * 60 * 1000); //NANTI GANTI OI, ini 2 mnt
+          const expiryDate = new Date(new Date().getTime() + 30 * 60 * 1000);
 
           const createTransaction = await transaction.insertOne({
             TalentId: new ObjectId(talentId),
@@ -673,7 +704,7 @@ const resolvers = {
 
         const checkTalent = findBookingTalentId.equals(talentId);
 
-        console.log(checkTalent, "checkTalent");
+        // console.log(checkTalent, "checkTalent");
         if (!checkTalent) {
           throw {
             message: "Forbidden, you are not the talent",
