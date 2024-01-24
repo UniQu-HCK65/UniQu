@@ -14,7 +14,9 @@ const typeDefs = `#graphql
     TalentId: ID
     UserId: ID
     talentName: String
+    talentNick: String
     userName: String
+    userNick: String
     talentImgUrl: String
     userImgUrl:String
     bookDate: String
@@ -128,6 +130,18 @@ const resolvers = {
           };
         }
 
+        const currentDate = new Date();
+
+        const requestedDate = new Date(newBooking.bookDate);
+
+        if (requestedDate < currentDate) {
+          throw {
+            message: "Date cannot be in the past",
+            code: "BAD_REQUEST",
+            status: 400,
+          };
+        }
+
         const bookings = await db.collection(COLLECTION_NAME);
 
         const findExistingBooking = await bookings
@@ -146,10 +160,12 @@ const resolvers = {
           (booking) =>
             booking.bookStatus !== "ended" &&
             booking.bookStatus !== "denied" &&
-            booking.bookStatus !== "cancelled"
+            booking.bookStatus !== "cancelled" &&
+            booking.bookStatus !== "Reviewed" &&
+            booking.bookStatus !== "expired"
         );
 
-        console.log(ongoingBooking, "AAAAAAA");
+        // console.log(ongoingBooking, "AAAAAAA");
 
         if (ongoingBooking) {
           throw {
@@ -175,7 +191,9 @@ const resolvers = {
           TalentId: new ObjectId(newBooking.TalentId),
           UserId: new ObjectId(userId),
           talentName: findTalent.name,
+          talentNick: findTalent.username,
           userName: findUser.name,
+          userNick: findUser.username,
           talentImgUrl: findTalent.imgUrl,
           userImgUrl: findUser.imgUrl,
           bookDate: new Date(newBooking.bookDate),
@@ -294,7 +312,7 @@ const resolvers = {
 
           const twoDigitRandom = Math.floor(Math.random() * 90) + 10;
 
-          const orderId = `TRX-BKNG-${Math.random().toString()}`; //TSTING PURPOSES
+          const orderId = `TRX-BKNG-${Math.random().toString().slice(2, 6)}`; //TSTING PURPOSES
           // const orderId = `TRX-BKNG-${bookingId}-${auth.username}-${twoDigitRandom}`;
 
           const trxAmount = 500_000;
@@ -309,11 +327,10 @@ const resolvers = {
                 id: bookingId,
                 price: 500000,
                 quantity: 1,
-                name:
-                  findUser.name +
-                  "'s" +
-                  "Booking Session with " +
-                  findTalent.name,
+
+
+                name: "Booking Session with " + findTalent.name,
+
               },
             ],
             customer_details: {
@@ -365,7 +382,6 @@ const resolvers = {
           );
         } else if (findBooking.bookStatus === "booked") {
           //UPDATE FROM BOOKED TO IN PROGRESS
-
           const transaction = await db.collection("Transactions");
 
           const findActiveTransaction = await transaction.findOne({
@@ -385,8 +401,6 @@ const resolvers = {
           const orderId = findActiveTransaction.orderId;
 
           const midtransStatusUrl = `https://api.sandbox.midtrans.com/v2/${orderId}/status`;
-          // console.log(midtransStatusUrl, "midtransStatusUrl");
-
           const midtransOptions = {
             method: "GET",
             headers: {
@@ -439,7 +453,7 @@ const resolvers = {
 
             const expireBooking = await bookings.updateOne(
               {
-                _id: new ObjectId(findActiveTransaction._id),
+                _id: new ObjectId(findActiveTransaction.BookingId),
               },
               {
                 $set: {

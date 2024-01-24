@@ -10,20 +10,20 @@ import { Feather } from "@expo/vector-icons";
 import { useQuery } from "@apollo/client";
 import { WHO_AM_I_TALENT } from "../queries/query";
 
-export default function ProfileTalent() {
+export default function ProfileTalent({ navigation }) {
   const { loading, error, data } = useQuery(WHO_AM_I_TALENT);
 
   if (loading) return <Text>Loading...</Text>;
   if (error) return <Text>Error: {error.message}</Text>;
 
   const talentData = data.whoAmITalent;
-  console.log(talentData, "profile talent");
+  // console.log(talentData, "profile talent");
 
   const convertToDate = (timestamp) => {
     const date = new Date(parseInt(timestamp));
     return date.toLocaleDateString();
   };
-//malam guys
+  //malam guys
   return (
     <ScrollView>
       <View style={styles.container}>
@@ -37,11 +37,13 @@ export default function ProfileTalent() {
                 style={styles.photoImage}
               />
 
-              {/* <View style={styles.buttonEdit}>
-              <TouchableOpacity>
-                <Feather name="edit-2" size={25} color="black" />
-              </TouchableOpacity>
-            </View> */}
+              <View style={styles.buttonEdit}>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("Edit Profile")}
+                >
+                  <Feather name="edit-2" size={25} color="black" />
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
 
@@ -72,7 +74,7 @@ export default function ProfileTalent() {
                       ...styles.usernameStyle,
                       fontStyle: "italic",
                       marginTop: 20,
-                      width: 360
+                      width: 360,
                     }}
                   >
                     {talentData.aboutme}

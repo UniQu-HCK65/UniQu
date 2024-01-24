@@ -291,20 +291,62 @@ export const BOOKING_TALENT = gql`
 
 export const GET_BOOKING_BY_ID = gql`
   query BookingById($bookingId: ID) {
-  bookingById(bookingId: $bookingId) {
-    _id
-    TalentId
-    UserId
-    talentName
-    userName
-    talentImgUrl
-    userImgUrl
-    bookDate
-    bookSession
-    bookLocation
-    bookStatus
+    bookingById(bookingId: $bookingId) {
+      _id
+      TalentId
+      UserId
+      talentName
+      userName
+      talentImgUrl
+      userImgUrl
+      bookDate
+      bookSession
+      bookLocation
+      bookStatus
+      updatedAt
+      createdAt
+    }
+  }
+`;
+
+export const ADD_REVIEWS = gql`
+mutation AddReview($newReview: NewReview) {
+  addReview(newReview: $newReview) {
+    BookingId
+    message
+    reviewerName
+    rating
     updatedAt
     createdAt
+  }`;
+
+export const UPDATE_BOOKING_STATUS = gql`
+  mutation UpdateBookingStatus($bookingId: ID) {
+    updateBookingStatus(bookingId: $bookingId) {
+      _id
+      TalentId
+      UserId
+      talentName
+      userName
+      talentImgUrl
+      userImgUrl
+      bookDate
+      bookSession
+      bookLocation
+      bookStatus
+      updatedAt
+      createdAt
+    }
   }
-}
-`
+`;
+
+export const GET_TRANSACTION = gql`
+  query GetTransactionLink($bookingId: ID) {
+    getTransactionLink(bookingId: $bookingId) {
+      paymentId
+      orderId
+      paymentLink
+      BookingId
+    }
+  }
+`;

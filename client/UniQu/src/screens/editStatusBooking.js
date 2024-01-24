@@ -1,33 +1,61 @@
 import React, { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { GET_BOOKING_BY_ID, UPDATE_BOOKING_STATUS } from "../queries/query";
+import { gql, useMutation, useQuery } from "@apollo/client";
 
-export default function ListBookingTalent() {
-    const [status, setStatus] = useState('Requested');
+export default function ListBookingTalent({ route }) {
+    const bookingId = route.params.bookingId
+    const { loading, error, data } = useQuery(GET_BOOKING_BY_ID, {
+        variables: {
+            bookingId: bookingId
+        }
+    })
+
+    const [status, setStatus] = useState('');
     const [payment, setPayment] = useState(false)
     const [time, setTime] = useState(false)
     const [showButton, setShowButton] = useState(true)
+    //coba
+    const [updateBook, { loading: loadingUpdateBook, error: errorUpdateBook, data: dataUpdateBook }] = useMutation(UPDATE_BOOKING_STATUS)
 
+    useEffect(() => {
+        if(!loading) {
+            setStatus(data?.bookingById?.bookStatus)
+        }
+    }, [loading, data])
 
-    const handleOnAccept = () => {
-        setStatus('Booked')
-    }
+    const handleOnAccept = async () => {
+        const response = await updateBook({
+            variables: {
+                bookingId: bookingId
+            },
+            onCompleted: (data) => {
+                console.log(data, 'data di on completed ini kalo success yaaa')
+                setStatus(data.updateBookingStatus?.bookStatus);
+            },
+            onError: (error) => {
+                console.log('Mutation error:', error);
+            }
+        });
+        console.log(JSON.stringify(response, null, 2));
+    };
 
     const handleOnCancel = () => {
         setStatus('Cancel')
     }
 
     const handleOnPayment = () => {
-        if(payment && !time){
+        if (payment && !time) {
             setStatus('In Process')
-        } 
+        }
     }
-   
+
     useEffect(() => {
         handleOnPayment()
     }, [])
 
     const handleOnStartSession = () => {
-        if((!time && payment) || (time && !payment)) {
+        if ((!time && payment) || (time && !payment)) {
             setStatus('On Progress')
         }
     }
@@ -38,9 +66,9 @@ export default function ListBookingTalent() {
     }
 
     const handleTimeUp = () => {
-       if(time && payment ){
-           setStatus('On Progress')
-       }
+        if (time && payment) {
+            setStatus('On Progress')
+        }
     }
 
     useEffect(() => {
@@ -59,7 +87,7 @@ export default function ListBookingTalent() {
                     style={styles.topImage}
                 />
                 <View style={styles.overlay}></View>
-                <Text style={styles.welcomingName}>Hi, Maldini!</Text>
+                <Text style={styles.welcomingName}>Hi, {data?.bookingById.talentName}!</Text>
                 <Text style={styles.welcoming}>How are you?</Text>
 
             </View>
@@ -85,14 +113,14 @@ export default function ListBookingTalent() {
                         <View style={styles.infoUser}>
                             <Image
                                 source={{
-                                    uri: "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=3322&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                    uri: data?.bookingById?.talentImgUrl
                                 }}
                                 style={styles.avatar}
                             />
                             <View>
                                 <View style={styles.userDetail}>
-                                    <Text style={styles.name}>Maldini Junior</Text>
-                                    <Text style={styles.status}>{status}</Text>
+                                    <Text style={styles.name}>{data?.bookingById?.userName}</Text>
+                                    <Text style={styles.status}>{data?.bookingById?.bookStatus}</Text>
                                 </View>
 
                                 <Text style={styles.status}>@maldinigay</Text>
@@ -102,25 +130,25 @@ export default function ListBookingTalent() {
 
                     <View style={styles.buttonContainer}>
 
-                        {showButton && status === 'Requested' && !time && !payment && (
+                        {showButton && status === 'requested' && !time && !payment && (
                             <TouchableOpacity onPress={handleOnCancel} style={styles.buttonCancel}>
                                 <Text style={styles.buttonText}>Cancel</Text>
                             </TouchableOpacity>
                         )}
 
 
-                        {showButton && status === 'Requested' && (
+                        {showButton && status === 'requested' && (
                             <TouchableOpacity onPress={handleOnAccept} style={[
                                 styles.buttonConfirm,
-                                { backgroundColor: status === 'Booked' ? '#4CAF50' : '#2b471f' },
+                                { backgroundColor: status === 'booked' ? '#4CAF50' : '#2b471f' },
                             ]}
-                                disabled={status === 'Booked'}
+                                disabled={status === 'booked'}
                             >
-                                <Text style={styles.buttonText}>{status === 'Booked' ? 'Start Session' : 'Accept'}</Text>
+                                <Text style={styles.buttonText}>{status === 'booked' ? 'Start Session' : 'Accept'}</Text>
                             </TouchableOpacity>
                         )}
 
-                        {showButton && status === 'Booked' && (
+                        {showButton && status === 'booked' && (
                             <TouchableOpacity style={styles.waitingPayment}>
                                 <Text style={styles.buttonText}>Waiting for payament..</Text>
                             </TouchableOpacity>
@@ -132,19 +160,19 @@ export default function ListBookingTalent() {
                             </TouchableOpacity>
                         )}
 
-                        {showButton && status === 'On Progress' && !time&& (
+                        {showButton && status === 'On Progress' && !time && (
                             <TouchableOpacity style={styles.onProgress}>
                                 <Text style={styles.buttonText}>Progress</Text>
                             </TouchableOpacity>
                         )}
 
-                        {showButton && time && payment &&(
+                        {showButton && time && payment && (
                             <TouchableOpacity onPress={handleOnEndSession} style={styles.endSession}>
                                 <Text style={styles.buttonText}>End Session</Text>
                             </TouchableOpacity>
                         )}
 
-                     
+
 
 
                     </View>
@@ -301,7 +329,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center'
     },
-    onProgress : {
+    onProgress: {
         width: 140,
         height: 40,
         backgroundColor: 'grey',
@@ -309,7 +337,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center'
     },
-    endSession : {
+    endSession: {
         width: 140,
         height: 40,
         backgroundColor: '#632b27',

@@ -64,10 +64,17 @@ const typeDefs = `#graphql
     talentsForMe:[Talent]
   }
 
+  type UserActiveBooking {
+    _id: ID
+    username: String
+    userBookings:[Booking]
+  }
+
   type Query {
     users: [User]
     talentsForMe: TalentForMe
     whoAmI: ProfileUser
+    getUserActiveBooking: UserActiveBooking
     getUserById(userId: ID): ProfileUser
   }
 
@@ -172,6 +179,108 @@ const resolvers = {
         return user[0];
       } catch (error) {
         console.log(error, "GET_USER_PROFILE"); // errorHandler next up
+        throw new GraphQLError(error.message || "Internal Server Error", {
+          extensions: {
+            code: error.code || "INTERNAL_SERVER_ERROR",
+            http: { status: error.status || 500 },
+          },
+        });
+      }
+    },
+
+    getUserActiveBooking: async (parent, args, contextValue, info) => {
+      try {
+        const { db, authentication } = contextValue;
+        const auth = await authentication();
+
+        const role = auth.role;
+
+        if (role !== "user") {
+          throw {
+            message: "Forbidden, you are not a user",
+            code: "FORBIDDEN",
+            status: 403,
+          };
+        }
+
+        const userId = auth._id;
+
+        if (!userId)
+          throw {
+            message: "User not found",
+            code: "NOT_FOUND",
+            status: 404,
+          };
+
+        const users = await db.collection(COLLECTION_NAME);
+
+        const userWithBookings = await users
+          .aggregate([
+            {
+              $match: {
+                _id: new ObjectId(auth._id),
+              },
+            },
+            {
+              $lookup: {
+                from: "Bookings",
+                localField: "_id",
+                foreignField: "UserId",
+                as: "userBookings",
+              },
+            },
+            {
+              $unwind: {
+                path: "$userBookings",
+                preserveNullAndEmptyArrays: true,
+              },
+            },
+            {
+              $match: {
+                $or: [
+                  { "userBookings.bookStatus": "requested" },
+                  { "userBookings.bookStatus": "booked" },
+                  { "userBookings.bookStatus": "started" },
+                  { "userBookings.bookStatus": "in progress" },
+                ],
+              },
+            },
+            {
+              $group: {
+                _id: {
+                  _id: "$_id",
+                  name: "$name",
+                  username: "$username",
+                  email: "$email",
+                  role: "$role",
+                  gender: "$gender",
+                  imgUrl: "$imgUrl",
+                  tags: "$tags",
+                  userLocations: "$userLocations",
+                  createdAt: "$createdAt",
+                  updatedAt: "$updatedAt",
+                },
+                userBookings: { $push: "$userBookings" },
+              },
+            },
+          ])
+          .toArray();
+        // console.log(userWithBookings);
+
+        if (userWithBookings.length < 1)
+          throw {
+            message: "No active booking found....., yet",
+            code: "NOT_FOUND",
+            status: 404,
+          };
+
+        return {
+          _id: new ObjectId(userWithBookings[0]._id._id),
+          username: userWithBookings[0]._id.username,
+          userBookings: userWithBookings[0].userBookings,
+        };
+      } catch (error) {
+        console.log(error, "GET_USER_ACTIVE_BOOKING"); // errorHandler next up
         throw new GraphQLError(error.message || "Internal Server Error", {
           extensions: {
             code: error.code || "INTERNAL_SERVER_ERROR",
@@ -469,7 +578,6 @@ const resolvers = {
           };
 
           const access_token = signToken(payload);
-          //NGENGASU
 
           return { access_token, role: payload.role };
         } else if (findTalent) {

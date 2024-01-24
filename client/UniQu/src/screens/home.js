@@ -14,10 +14,12 @@ import { gql, useQuery } from "@apollo/client";
 import {
   FOR_YOU_TALENT_PAGE,
   GET_ALL_TALENT,
+  GET_BOOKING_BY_ID,
   GET_USER,
   SEARCH_TALENT,
 } from "../queries/query";
 import Ionicons from "react-native-vector-icons/Feather";
+import RatingModal from "../components/modalRating";
 
 const tags = [
   "Sneakers",
@@ -63,6 +65,7 @@ export default function Home({ navigation }) {
   const [selectedDataType, setSelectedDataType] = useState("all");
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [bookingId, setBookingId] = useState(null);
 
   const {
     loading: searchLoading,
@@ -80,14 +83,14 @@ export default function Home({ navigation }) {
   });
 
   // update search
-  
+
   const handleSearch = async () => {
-    console.log(search, "<< bfr search");
+    // console.log(search, "<< bfr search");
     // await refetchSearch();
     if (searchData && searchData.searchTalent) {
       setAllTalents(searchData.searchTalent);
     }
-    console.log(searchData, "<< aft search");
+    // console.log(searchData, "<< aft search");
 
     // setAllTalents(searchData.searchTalent);
   };
@@ -226,7 +229,9 @@ export default function Home({ navigation }) {
               </View>
 
               <View style={styles.ratingContainer}>
-                <Text style={styles.ratingText}>{item.rating/item.reviews?.length}</Text>
+                <Text style={styles.ratingText}>
+                  {item.rating / item.reviews?.length}
+                </Text>
                 <Text style={styles.reviewsText}>
                   ({totalReviewers.size} reviews)
                 </Text>
