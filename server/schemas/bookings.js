@@ -312,8 +312,8 @@ const resolvers = {
 
           const twoDigitRandom = Math.floor(Math.random() * 90) + 10;
 
-          const orderId = `TRX-BKNG-${Math.random().toString().slice(2, 6)}`; //TSTING PURPOSES
-          // const orderId = `TRX-BKNG-${bookingId}-${auth.username}-${twoDigitRandom}`;
+          // const orderId = `TRX-BKNG-${Math.random().toString().slice(2, 6)}`; //TSTING PURPOSES
+          const orderId = `TRX-BKNG-${bookingId}-${auth.username}-${twoDigitRandom}`;
 
           const trxAmount = 500_000;
 
@@ -341,8 +341,8 @@ const resolvers = {
 
           // console.log(midtransTransaction, "AAAAAAA");
 
-          const expiryDate = new Date(new Date().getTime() + 2 * 60 * 1000); //NANTI GANTI OI, ini 2 mnt
-          //  const expiryDate = new Date(new Date().getTime() + 60 * 60 * 1000);
+          // const expiryDate = new Date(new Date().getTime() + 2 * 60 * 1000); //NANTI GANTI OI, ini 2 mnt
+           const expiryDate = new Date(new Date().getTime() + 30 * 60 * 1000);
 
           const createTransaction = await transaction.insertOne({
             TalentId: new ObjectId(talentId),
