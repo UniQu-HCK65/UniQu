@@ -134,6 +134,14 @@ const resolvers = {
 
         const requestedDate = new Date(newBooking.bookDate);
 
+        if (requestedDate < currentDate) {
+          throw {
+            message: "Date cannot be in the past",
+            code: "BAD_REQUEST",
+            status: 400,
+          };
+        }
+
         const bookings = await db.collection(COLLECTION_NAME);
 
         const findExistingBooking = await bookings
@@ -319,11 +327,7 @@ const resolvers = {
                 id: bookingId,
                 price: 500000,
                 quantity: 1,
-                name:
-                  findUser.name +
-                  "'s" +
-                  "Booking Session with " +
-                  findTalent.name,
+                name: "Booking Session with " + findTalent.name,
               },
             ],
             customer_details: {

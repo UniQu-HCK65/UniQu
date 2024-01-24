@@ -67,7 +67,7 @@ const typeDefs = `#graphql
   type UserActiveBooking {
     _id: ID
     username: String
-    talentsForMe:[Booking]
+    userBookings:[Booking]
   }
 
   type Query {
@@ -230,29 +230,55 @@ const resolvers = {
               },
             },
             {
+              $unwind: {
+                path: "$userBookings",
+                preserveNullAndEmptyArrays: true,
+              },
+            },
+            {
               $match: {
                 $or: [
-                  { "userBookings.bookStatus": "ended" },
-                  { "userBookings.bookStatus": "Reviewed" },
-                  { "userBookings.bookStatus": "cancelled" },
-                  { "userBookings.bookStatus": "expired" },
+                  { "userBookings.bookStatus": "requested" },
+                  { "userBookings.bookStatus": "booked" },
+                  { "userBookings.bookStatus": "started" },
+                  { "userBookings.bookStatus": "in progress" },
                 ],
+              },
+            },
+            {
+              $group: {
+                _id: {
+                  _id: "$_id",
+                  name: "$name",
+                  username: "$username",
+                  email: "$email",
+                  role: "$role",
+                  gender: "$gender",
+                  imgUrl: "$imgUrl",
+                  tags: "$tags",
+                  userLocations: "$userLocations",
+                  createdAt: "$createdAt",
+                  updatedAt: "$updatedAt",
+                },
+                userBookings: { $push: "$userBookings" },
               },
             },
           ])
           .toArray();
         console.log(userWithBookings);
 
-        // if (user.length < 1)
-        //   throw {
-        //     message: "User not found",
-        //     code: "NOT_FOUND",
-        //     status: 404,
-        //   };
+        if (userWithBookings.length < 1)
+          throw {
+            message: "No active booking found....., yet",
+            code: "NOT_FOUND",
+            status: 404,
+          };
 
-        // console.log(user,"AGGREGATE CUY");
-
-        // return user[0];
+        return {
+          _id: new ObjectId(userWithBookings[0]._id._id),
+          username: userWithBookings[0]._id.username,
+          userBookings: userWithBookings[0].userBookings,
+        };
       } catch (error) {
         console.log(error, "GET_USER_ACTIVE_BOOKING"); // errorHandler next up
         throw new GraphQLError(error.message || "Internal Server Error", {
@@ -552,7 +578,6 @@ const resolvers = {
           };
 
           const access_token = signToken(payload);
-          //NGENGASU
 
           return { access_token, role: payload.role };
         } else if (findTalent) {
