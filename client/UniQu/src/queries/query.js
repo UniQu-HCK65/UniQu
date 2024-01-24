@@ -148,10 +148,12 @@ export const WHO_AM_I_TALENT = gql`
       email
       password
       aboutme
+      role
       gender
       imgUrl
       tags
       reviews {
+        BookingId
         message
         reviewerName
         rating
@@ -166,7 +168,11 @@ export const WHO_AM_I_TALENT = gql`
         TalentId
         UserId
         talentName
+        talentNick
         userName
+        userNick
+        talentImgUrl
+        userImgUrl
         bookDate
         bookSession
         bookLocation
@@ -181,7 +187,10 @@ export const WHO_AM_I_TALENT = gql`
         talentName
         userName
         paymentId
+        orderId
+        paymentLink
         BookingId
+        expiryDate
         transactionStatus
         paidByAdmin
         updatedAt
@@ -310,16 +319,17 @@ export const GET_BOOKING_BY_ID = gql`
 `;
 
 export const ADD_REVIEWS = gql`
-mutation AddReview($newReview: NewReview) {
-  addReview(newReview: $newReview) {
-    BookingId
-    message
-    reviewerName
-    rating
-    updatedAt
-    createdAt
+  mutation AddReview($newReview: NewReview) {
+    addReview(newReview: $newReview) {
+      BookingId
+      message
+      reviewerName
+      rating
+      updatedAt
+      createdAt
+    }
   }
-}`;
+`;
 
 export const UPDATE_BOOKING_STATUS = gql`
   mutation UpdateBookingStatus($bookingId: ID) {
@@ -351,5 +361,3 @@ export const GET_TRANSACTION = gql`
     }
   }
 `;
-
-

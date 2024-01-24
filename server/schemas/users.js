@@ -35,7 +35,6 @@ const typeDefs = `#graphql
 
   input EditUser {
     name: String
-    password: String
     imgUrl: String
     tags: [String]
     userLocations: [String]
@@ -648,7 +647,6 @@ const resolvers = {
           {
             $set: {
               ...editUser,
-              password: hashPw(editUser.password),
               updatedAt: new Date(),
             },
           }

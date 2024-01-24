@@ -13,7 +13,6 @@ export default function ListBookingTalent({ route }) {
 
     const [status, setStatus] = useState('');
     const [payment, setPayment] = useState(false)
-    const [time, setTime] = useState(false)
     const [showButton, setShowButton] = useState(true)
     //coba
     const [updateBook, { loading: loadingUpdateBook, error: errorUpdateBook, data: dataUpdateBook }] = useMutation(UPDATE_BOOKING_STATUS)
@@ -37,7 +36,6 @@ export default function ListBookingTalent({ route }) {
                 console.log('Mutation error:', error);
             }
         });
-        console.log(JSON.stringify(response, null, 2));
     };
 
     const handleOnCancel = () => {
@@ -45,7 +43,7 @@ export default function ListBookingTalent({ route }) {
     }
 
     const handleOnPayment = () => {
-        if (payment && !time) {
+        if (payment) {
             setStatus('In Process')
         }
     }
@@ -55,7 +53,7 @@ export default function ListBookingTalent({ route }) {
     }, [])
 
     const handleOnStartSession = () => {
-        if ((!time && payment) || (time && !payment)) {
+        if (payment) {
             setStatus('On Progress')
         }
     }
@@ -65,15 +63,6 @@ export default function ListBookingTalent({ route }) {
         setShowButton(false);
     }
 
-    const handleTimeUp = () => {
-        if (time && payment) {
-            setStatus('On Progress')
-        }
-    }
-
-    useEffect(() => {
-        handleTimeUp()
-    }, [])
 
 
     return (
@@ -130,7 +119,7 @@ export default function ListBookingTalent({ route }) {
 
                     <View style={styles.buttonContainer}>
 
-                        {showButton && status === 'requested' && !time && !payment && (
+                        {showButton && status === 'requested' && !payment && (
                             <TouchableOpacity onPress={handleOnCancel} style={styles.buttonCancel}>
                                 <Text style={styles.buttonText}>Cancel</Text>
                             </TouchableOpacity>
@@ -154,19 +143,19 @@ export default function ListBookingTalent({ route }) {
                             </TouchableOpacity>
                         )}
 
-                        {showButton && payment && status === 'In Process' && !time && (
+                        {showButton && payment && status === 'In Process' && (
                             <TouchableOpacity onPress={handleOnStartSession} style={styles.buttonConfirm}>
                                 <Text style={styles.buttonText}>Start Session</Text>
                             </TouchableOpacity>
                         )}
 
-                        {showButton && status === 'On Progress' && !time && (
+                        {showButton && status === 'On Progress' && (
                             <TouchableOpacity style={styles.onProgress}>
                                 <Text style={styles.buttonText}>Progress</Text>
                             </TouchableOpacity>
                         )}
 
-                        {showButton && time && payment && (
+                        {showButton && payment && (
                             <TouchableOpacity onPress={handleOnEndSession} style={styles.endSession}>
                                 <Text style={styles.buttonText}>End Session</Text>
                             </TouchableOpacity>

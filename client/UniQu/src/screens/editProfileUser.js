@@ -1,9 +1,9 @@
-import { useMutation } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import React, { useEffect, useState } from "react";
 import { Button, StyleSheet, Text, TextInput, View } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import { SelectList } from "react-native-dropdown-select-list";
-import { EditUser } from "../queries/query";
+import { EditUser, WHO_AM_I_USER } from "../queries/query";
 import { useNavigation } from "@react-navigation/native";
 
 const tags = [
@@ -36,35 +36,35 @@ const location = [
 
 export default function EditProfileUser() {
   const navigation = useNavigation();
-
+  const { loading, error, data } = useQuery(WHO_AM_I_USER);
   const [editProfileMutation] = useMutation(EditUser);
+  const [tagsValue, setTagsValue] = useState([]);
 
-  const [input, setInput] = useState({
+  const [formData, setFormData] = useState({
     name: "",
-    tags: [],
-    password: "",
-    userLocations: "",
     imgUrl: "",
+    password: "",
+    tags: [],
+    userLocations: "",
   });
 
-  console.log(input, "input edit");
   //ME WANT SLEEP MORE
+// delete pass
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState(formData.tags);
 
-  const [open, setOpen] = useState(false);11
-  const [value, setValue] = useState();
   const [items, setItems] = useState([]);
   const [selectedLoc, setSelectedLoc] = useState("");
 
   const onInputHandler = () => {
     const updatedProfile = {
-      name: input.name,
-      password: input.password,
-      tags: value,
+      name: formData.name,
+      password: formData.password,
+      tags: tagsValue,
       userLocations: selectedLoc,
-      imgUrl: input.imgUrl,
+      imgUrl: formData.imgUrl,
     };
-    console.log("successfully changed", updatedProfile);
-    // console.log(onInputHandler, ">>> ikiii");
+    console.log(updatedProfile, "halah capek");
 
     editProfileMutation({
       variables: {
@@ -72,33 +72,62 @@ export default function EditProfileUser() {
       },
     })
       .then((response) => {
-        console.log("successfully changed", response);
-        setInput({
-          ...input,
-          name: response.data.editProfile.name,
-          tags: response.data.editProfile.tags,
-          userLocations: response.data.editProfile.userLocations,
-          imgUrl: response.data.editProfile.imgUrl,
-        });
+        console.log("Response from mutation:", response);
 
-        navigation.navigate("Profile");
+        if (response && response.data && response.data.editProfile) {
+          console.log("Successfully updated user:", response.data.editProfile);
+
+          const editedUser = response.data.editProfile;
+          setFormData({
+            ...formData,
+            name: editedUser.name,
+            imgUrl: editedUser.imgUrl,
+            password: editedUser.password,
+            tags: editedUser.tags,
+            userLocations: editedUser.userLocations,
+          });
+          navigation.navigate("Profile");
+        } else {
+          console.error("Failed to update user. Response:", response);
+        }
       })
       .catch((error) => {
-        console.error("Error during update data", error);
+        console.error("Error during mutation:", error);
       });
   };
 
   useEffect(() => {
-    setInput({
-      name: "",
-      tags: [],
-      password: "",
-      userLocations: "",
-      imgUrl: "",
-    });
+    if (!loading && data && data.whoAmI) {
+      const { name, imgUrl, password, tags, userLocations } = data.whoAmI;
+      setFormData({
+        name,
+        imgUrl,
+        password,
+        tags,
+        userLocations,
+      });
 
-    setItems(tags.map((tag) => ({ label: tag, value: tag })));
-  }, []);
+      // Pindahkan baris ini ke sini
+      setTagsValue(tags);
+    }
+  }, [loading, data]);
+
+  const handleInputChange = (name, value) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  // const handleUpdateProfile = async () => {
+  //   try {
+  //     await updateProfile({
+  //       variables: { input: formData },
+  //     });
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   return (
     <View style={styles.container}>
@@ -109,8 +138,8 @@ export default function EditProfileUser() {
         <View style={styles.textInput}>
           <TextInput
             style={{ fontSize: 20, marginTop: 5 }}
-            value={input.imgUrl}
-            onChangeText={(text) => setInput({ ...input, imgUrl: text })}
+            value={formData.imgUrl}
+            onChangeText={(text) => handleInputChange("imgUrl", text)}
           />
         </View>
       </View>
@@ -122,8 +151,8 @@ export default function EditProfileUser() {
         <View style={styles.textInput}>
           <TextInput
             style={{ fontSize: 20, marginTop: 5 }}
-            value={input.name}
-            onChangeText={(text) => setInput({ ...input, name: text })}
+            value={formData.name || ""}
+            onChangeText={(text) => handleInputChange("name", text)}
           />
         </View>
       </View>
@@ -135,11 +164,10 @@ export default function EditProfileUser() {
         <View style={styles.textInput}>
           <TextInput
             style={{ fontSize: 20, marginTop: 5 }}
-            value={input.password}
-            onChangeText={(text) =>
-              setInput((prevInput) => ({ ...prevInput, password: text }))
-            }
+            value={formData.password}
+            onChangeText={(text) => handleInputChange("password", text)}
             secureTextEntry={true}
+            keyboardType="default"
           />
         </View>
       </View>
@@ -158,7 +186,7 @@ export default function EditProfileUser() {
             max={18}
             open={open}
             value={value}
-            items={items}
+            items={tags.map((tag) => ({ label: tag, value: tag }))}
             setOpen={setOpen}
             setValue={setValue}
             theme="LIGHT"
@@ -189,7 +217,7 @@ export default function EditProfileUser() {
             setSelected={(val) => setSelectedLoc(val)}
             data={location}
             save="value"
-            defaultValue={input.userLocations}
+            defaultValue={formData.userLocations}
           />
         </View>
       </View>
