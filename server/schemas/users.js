@@ -64,10 +64,17 @@ const typeDefs = `#graphql
     talentsForMe:[Talent]
   }
 
+  type UserActiveBooking {
+    _id: ID
+    username: String
+    talentsForMe:[Booking]
+  }
+
   type Query {
     users: [User]
     talentsForMe: TalentForMe
     whoAmI: ProfileUser
+    getUserActiveBooking: UserActiveBooking
     getUserById(userId: ID): ProfileUser
   }
 
@@ -172,6 +179,82 @@ const resolvers = {
         return user[0];
       } catch (error) {
         console.log(error, "GET_USER_PROFILE"); // errorHandler next up
+        throw new GraphQLError(error.message || "Internal Server Error", {
+          extensions: {
+            code: error.code || "INTERNAL_SERVER_ERROR",
+            http: { status: error.status || 500 },
+          },
+        });
+      }
+    },
+
+    getUserActiveBooking: async (parent, args, contextValue, info) => {
+      try {
+        const { db, authentication } = contextValue;
+        const auth = await authentication();
+
+        const role = auth.role;
+
+        if (role !== "user") {
+          throw {
+            message: "Forbidden, you are not a user",
+            code: "FORBIDDEN",
+            status: 403,
+          };
+        }
+
+        const userId = auth._id;
+
+        if (!userId)
+          throw {
+            message: "User not found",
+            code: "NOT_FOUND",
+            status: 404,
+          };
+
+        const users = await db.collection(COLLECTION_NAME);
+
+        const userWithBookings = await users
+          .aggregate([
+            {
+              $match: {
+                _id: new ObjectId(auth._id),
+              },
+            },
+            {
+              $lookup: {
+                from: "Bookings",
+                localField: "_id",
+                foreignField: "UserId",
+                as: "userBookings",
+              },
+            },
+            {
+              $match: {
+                $or: [
+                  { "userBookings.bookStatus": "ended" },
+                  { "userBookings.bookStatus": "Reviewed" },
+                  { "userBookings.bookStatus": "cancelled" },
+                  { "userBookings.bookStatus": "expired" },
+                ],
+              },
+            },
+          ])
+          .toArray();
+        console.log(userWithBookings);
+
+        // if (user.length < 1)
+        //   throw {
+        //     message: "User not found",
+        //     code: "NOT_FOUND",
+        //     status: 404,
+        //   };
+
+        // console.log(user,"AGGREGATE CUY");
+
+        // return user[0];
+      } catch (error) {
+        console.log(error, "GET_USER_ACTIVE_BOOKING"); // errorHandler next up
         throw new GraphQLError(error.message || "Internal Server Error", {
           extensions: {
             code: error.code || "INTERNAL_SERVER_ERROR",
