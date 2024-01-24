@@ -308,3 +308,23 @@ export const GET_BOOKING_BY_ID = gql`
   }
 }
 `
+
+export const UPDATE_BOOKING_STATUS = gql`
+  mutation UpdateBookingStatus($bookingId: ID) {
+  updateBookingStatus(bookingId: $bookingId) {
+    _id
+    TalentId
+    UserId
+    talentName
+    userName
+    talentImgUrl
+    userImgUrl
+    bookDate
+    bookSession
+    bookLocation
+    bookStatus
+    updatedAt
+    createdAt
+  }
+}
+`

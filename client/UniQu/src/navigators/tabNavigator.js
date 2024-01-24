@@ -4,7 +4,8 @@ import ProfileUser from '../screens/profileUser';
 import Ionicons from 'react-native-vector-icons/AntDesign';
 import ListChat from '../screens/list-chat';
 import Search from '../screens/search';
-import HomeforTalent from '../screens/homeCMST';
+import { useContext } from 'react';
+import { LoginContext } from '../context/LoginContext';
 
 const Tab = createBottomTabNavigator();
 
@@ -13,6 +14,7 @@ export default function MyTabs({ navigation }) {
 
     const role = isLoggedIn.role
     const token = isLoggedIn.accessToken
+    
 
     return (
         <Tab.Navigator
@@ -34,10 +36,32 @@ export default function MyTabs({ navigation }) {
                 tabBarShowLabel: false,
             })}>
 
-            <Stack.Screen
+            <Tab.Screen
                 name="Home"
-                component={HomeforTalent}
-                options={{ headerShown: false }}
+                component={Home}
+                options={{
+                    headerShown: false
+                }}
+            />
+            <Tab.Screen
+                name="Search"
+                component={Search}
+                options={{
+                    headerShown: false
+                }}
+
+            />
+            <Tab.Screen
+                name="ListChat"
+                component={ListChat}
+                options={{
+                    headerShown: false
+                }}
+
+            />
+            <Tab.Screen
+                name="ProfileUser"
+                component={ProfileUser}
             />
 
 

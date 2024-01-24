@@ -40,26 +40,7 @@ export default function MyTabsTalent({ navigation }) {
                     headerShown: false
                 }}
             />
-            <Tab.Screen
-                name="Logout"
-                component={LogoutButton}
-                options={{
-                    headerShown: false
-                }}
-
-            />
-            <Tab.Screen
-                name="ListChat"
-                component={ListChat}
-                options={{
-                    headerShown: false
-                }}
-
-            />
-            <Tab.Screen
-                name="Profile talent"
-                component={ProfileTalent}
-            />
+           
 
 
         </ Tab.Navigator>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { GET_BOOKING_BY_ID } from "../queries/query";
-import { useQuery } from "@apollo/client";
+import { GET_BOOKING_BY_ID, UPDATE_BOOKING_STATUS } from "../queries/query";
+import { useMutation, useQuery } from "@apollo/client";
 
 export default function ListBookingTalent({route}) {
     const bookingId = route.params.bookingId
@@ -11,23 +11,33 @@ export default function ListBookingTalent({route}) {
         }
     })
 
-    console.log(JSON.stringify(data, null, 2))
-    // console.log(data.bookingById, "<<< status")dat
-    // console.log(data?.bookingById?.bookStatus)
-
-    
-    
-
-    const [status, setStatus] = useState(data?.bookingById?.bookStatus);
-    const [payment, setPayment] = useState(true)
-    const [time, setTime] = useState(true)
+    const [status, setStatus] = useState('requested');
+    const [payment, setPayment] = useState(false)
+    const [time, setTime] = useState(false)
     const [showButton, setShowButton] = useState(true)
+//coba lagi
+    const [updateBook, {
+        loading : loadingUpdateBook, 
+        error : errorUpdateBook, 
+        data : dataUpdateBook}] = useMutation(UPDATE_BOOKING_STATUS)
 
-    // console.log(status)
 
-
-    const handleOnAccept = () => {
-        setStatus('Booked')
+    const handleOnAccept = async () => {
+        const response = await updateBook({
+            variables: {
+                bookingId: bookingId
+            },
+            refetchQueries: {
+                UPDATE_BOOKING_STATUS
+            },
+            onCompleted: (data) => {
+                console.log('masuk')
+                setStatus(data?.updateBookingStatus?.bookStatus)
+            },
+            onError: (error) => {
+                console.log(error)
+            }
+        })
     }
 
     const handleOnCancel = () => {
@@ -120,25 +130,25 @@ export default function ListBookingTalent({route}) {
 
                     <View style={styles.buttonContainer}>
 
-                        {showButton && status === 'Requested' && !time && !payment && (
+                        {showButton && status === 'requested' && !time && !payment && (
                             <TouchableOpacity onPress={handleOnCancel} style={styles.buttonCancel}>
                                 <Text style={styles.buttonText}>Cancel</Text>
                             </TouchableOpacity>
                         )}
 
 
-                        {showButton && status === 'Requested' && (
+                        {showButton && status === 'requested' && (
                             <TouchableOpacity onPress={handleOnAccept} style={[
                                 styles.buttonConfirm,
-                                { backgroundColor: status === 'Booked' ? '#4CAF50' : '#2b471f' },
+                                { backgroundColor: status === 'booked' ? '#4CAF50' : '#2b471f' },
                             ]}
-                                disabled={status === 'Booked'}
+                                disabled={status === 'booked'}
                             >
-                                <Text style={styles.buttonText}>{status === 'Booked' ? 'Start Session' : 'Accept'}</Text>
+                                <Text style={styles.buttonText}>{status === 'booked' ? 'Start Session' : 'Accept'}</Text>
                             </TouchableOpacity>
                         )}
 
-                        {showButton && status === 'Booked' && (
+                        {showButton && status === 'booked' && (
                             <TouchableOpacity style={styles.waitingPayment}>
                                 <Text style={styles.buttonText}>Waiting for payament..</Text>
                             </TouchableOpacity>
