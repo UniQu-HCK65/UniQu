@@ -265,7 +265,7 @@ const resolvers = {
             },
           ])
           .toArray();
-        console.log(userWithBookings);
+        // console.log(userWithBookings);
 
         if (userWithBookings.length < 1)
           throw {

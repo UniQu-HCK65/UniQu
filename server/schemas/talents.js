@@ -193,7 +193,7 @@ const resolvers = {
             },
           ])
           .toArray();
-        console.log(talentWithBookings);
+        // console.log(talentWithBookings);
 
         if (talentWithBookings.length < 1)
           throw {
