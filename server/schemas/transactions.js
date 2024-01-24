@@ -292,8 +292,8 @@ const resolvers = {
 
         // console.log(midtransTransaction, "AAAAAAA");
 
-        const expiryDate = new Date(new Date().getTime() + 2 * 60 * 1000) //NANTI GANTI
-        // const expiryDate = new Date(new Date().getTime() + 60 * 60 * 1000)
+        // const expiryDate = new Date(new Date().getTime() + 2 * 60 * 1000) //NANTI GANTI
+        const expiryDate = new Date(new Date().getTime() + 30 * 60 * 1000)
 
         const createTransaction = await transaction.insertOne({
           TalentId: new ObjectId(talentId),
