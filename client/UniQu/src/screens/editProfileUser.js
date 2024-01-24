@@ -50,7 +50,7 @@ export default function EditProfileUser() {
   console.log(input, "input edit");
   //ME WANT SLEEP MORE
 
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false);11
   const [value, setValue] = useState();
   const [items, setItems] = useState([]);
   const [selectedLoc, setSelectedLoc] = useState("");
