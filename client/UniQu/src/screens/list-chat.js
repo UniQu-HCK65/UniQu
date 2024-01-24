@@ -1,29 +1,43 @@
 import React, { useContext, useEffect } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useQuery } from "@apollo/client";
-import { WHO_AM_I_USER } from "../queries/query";
+import { WHO_AM_I_TALENT, WHO_AM_I_USER } from "../queries/query";
+import { LoginContext } from "../context/LoginContext";
 
 export default function ListChat({ navigation }) {
   // console.log(isLoggedIn, "AAAAAAAA")
-  const { loading, error, data } = useQuery(WHO_AM_I_USER);
+  const { isLoggedIn } = useContext(LoginContext);
+  const {
+    loading: loadingUser,
+    error: errorUser,
+    data: dataUser,
+  } = useQuery(WHO_AM_I_USER);
+  
+  const {
+    loading: loadingTalent,
+    error: errorTalent,
+    data: dataTalent,
+  } = useQuery(WHO_AM_I_TALENT);
 
-  const userLoggedInId = data?.whoAmI?._id;
-  const userLoggedInName = data?.whoAmI?.name;
-  console.log(userLoggedInId, loading, error, "qqqq");
-  const userTargetId = "anything you want here";
+  const userLoggedInId = dataUser?.whoAmI?._id;
+  const userLoggedInName = dataUser?.whoAmI?.name;
 
-  const getUserLoggedInId = async () => {
-    const id = await SecureStore.getItemAsync("userId");
-    return id;
-  };
+  let roomName1 = "0";
+  let roomName2 = "0";
 
   const handleToChatRoom = () => {
+    // console.log("chat room pressed");
+    if (isLoggedIn.role === "user") {
+      roomName1 = userLoggedInId;
+      roomName2 = "userTargetId";
+    } else if (isLoggedIn.role === "talent") {
+      roomName1 = "userTargetId";
+      roomName2 = userLoggedInId;
+    }
 
-    console.log("chat room pressed");
     navigation.navigate("Chat", {
-        roomName: `123`,
-        // roomName: `${userLoggedInId}-${userTargetId}`,
-        userLoggedInName: userLoggedInName,
+      roomName: `${roomName1}-${roomName2}`,
+      userLoggedInName: userLoggedInName,
     });
   };
 
