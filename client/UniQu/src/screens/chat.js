@@ -28,6 +28,7 @@ export default function Chat({ route, navigation }) {
   const roomName = route.params.roomName;
   const userLoggedInName = route.params.userLoggedInName;
   // console.log(route.params, "<<<<<<<<<<username>>>>>>>>>>");
+  //hahahahahhahaa
 
   function handleRoom(roomName) {
     setRoom(roomName);
