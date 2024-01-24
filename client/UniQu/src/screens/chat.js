@@ -14,7 +14,7 @@ import { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import { launchImageLibraryAsync } from 'expo-image-picker';
 
-const serverURL = "http://uniqu-chat-server.rprakoso.my.id"
+const serverURL = "https://uniqu-chat-server.rprakoso.my.id";
 
 const socket = io(serverURL);
 
