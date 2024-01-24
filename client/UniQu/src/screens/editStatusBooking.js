@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { GET_BOOKING_BY_ID, UPDATE_BOOKING_STATUS } from "../queries/query";
-import { useMutation, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 
-export default function ListBookingTalent({route}) {
+export default function ListBookingTalent({ route }) {
     const bookingId = route.params.bookingId
     const { loading, error, data } = useQuery(GET_BOOKING_BY_ID, {
         variables: {
@@ -11,51 +11,51 @@ export default function ListBookingTalent({route}) {
         }
     })
 
-    const [status, setStatus] = useState('requested');
+    const [status, setStatus] = useState('');
     const [payment, setPayment] = useState(false)
     const [time, setTime] = useState(false)
     const [showButton, setShowButton] = useState(true)
-//coba lagi
-    const [updateBook, {
-        loading : loadingUpdateBook, 
-        error : errorUpdateBook, 
-        data : dataUpdateBook}] = useMutation(UPDATE_BOOKING_STATUS)
+    //coba
+    const [updateBook, { loading: loadingUpdateBook, error: errorUpdateBook, data: dataUpdateBook }] = useMutation(UPDATE_BOOKING_STATUS)
 
+    useEffect(() => {
+        if(!loading) {
+            setStatus(data?.bookingById?.bookStatus)
+        }
+    }, [loading, data])
 
     const handleOnAccept = async () => {
         const response = await updateBook({
             variables: {
                 bookingId: bookingId
             },
-            refetchQueries: {
-                UPDATE_BOOKING_STATUS
-            },
             onCompleted: (data) => {
-                console.log('masuk')
-                setStatus(data?.updateBookingStatus?.bookStatus)
+                console.log(data, 'data di on completed ini kalo success yaaa')
+                setStatus(data.updateBookingStatus?.bookStatus);
             },
             onError: (error) => {
-                console.log(error)
+                console.log('Mutation error:', error);
             }
-        })
-    }
+        });
+        console.log(JSON.stringify(response, null, 2));
+    };
 
     const handleOnCancel = () => {
         setStatus('Cancel')
     }
 
     const handleOnPayment = () => {
-        if(payment && !time){
+        if (payment && !time) {
             setStatus('In Process')
-        } 
+        }
     }
-   
+
     useEffect(() => {
         handleOnPayment()
     }, [])
 
     const handleOnStartSession = () => {
-        if((!time && payment) || (time && !payment)) {
+        if ((!time && payment) || (time && !payment)) {
             setStatus('On Progress')
         }
     }
@@ -66,9 +66,9 @@ export default function ListBookingTalent({route}) {
     }
 
     const handleTimeUp = () => {
-       if(time && payment ){
-           setStatus('On Progress')
-       }
+        if (time && payment) {
+            setStatus('On Progress')
+        }
     }
 
     useEffect(() => {
@@ -160,19 +160,19 @@ export default function ListBookingTalent({route}) {
                             </TouchableOpacity>
                         )}
 
-                        {showButton && status === 'On Progress' && !time&& (
+                        {showButton && status === 'On Progress' && !time && (
                             <TouchableOpacity style={styles.onProgress}>
                                 <Text style={styles.buttonText}>Progress</Text>
                             </TouchableOpacity>
                         )}
 
-                        {showButton && time && payment &&(
+                        {showButton && time && payment && (
                             <TouchableOpacity onPress={handleOnEndSession} style={styles.endSession}>
                                 <Text style={styles.buttonText}>End Session</Text>
                             </TouchableOpacity>
                         )}
 
-                     
+
 
 
                     </View>
@@ -329,7 +329,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center'
     },
-    onProgress : {
+    onProgress: {
         width: 140,
         height: 40,
         backgroundColor: 'grey',
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center'
     },
-    endSession : {
+    endSession: {
         width: 140,
         height: 40,
         backgroundColor: '#632b27',
