@@ -368,7 +368,7 @@ const resolvers = {
         }
 
         const reviewToPush = {
-          message: newReview.content,
+          message: newReview.message,
           reviewerName: reviewerName,
           rating: newReview.rating,
           BookingId: new ObjectId(newReview.bookId),

@@ -130,6 +130,10 @@ const resolvers = {
           };
         }
 
+        const currentDate = new Date();
+
+        const requestedDate = new Date(newBooking.bookDate);
+
         const bookings = await db.collection(COLLECTION_NAME);
 
         const findExistingBooking = await bookings
