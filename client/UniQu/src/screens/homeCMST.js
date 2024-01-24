@@ -1,5 +1,6 @@
 import { gql, useQuery } from "@apollo/client";
 import {
+  ActivityIndicator,
   FlatList,
   Image,
   SafeAreaView,
@@ -10,6 +11,8 @@ import {
 } from "react-native";
 import { WHO_AM_I_TALENT } from "../queries/query";
 import LogoutButton from "../components/logoutButton";
+import React, { useEffect } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 
 // updated
 
@@ -34,13 +37,37 @@ const getStatusColor = (status) => {
       return "#74649b";
     case "ended":
       return "#5a84a5";
+    case "Reviewed":
+      return "#0298";
+    case "expired":
+      return "#cb3444";
     default:
       return "##000000";
   }
 };
 
 export default function HomeforTalent({ navigation }) {
-  const { loading, error, data } = useQuery(WHO_AM_I_TALENT);
+  const { loading, error, data, refetch } = useQuery(WHO_AM_I_TALENT, {
+    refetchQueries: [WHO_AM_I_TALENT],
+  });
+
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     const fetchData = async () => {
+  //       try {
+  //         await refetch();
+  //       } catch (error) {
+  //         console.log(error, "error refetch");
+  //       }
+  //     };
+  //     fetchData();
+  //   }, [])
+  // );
+
+  useEffect(() => {
+    refetch();
+  }, []);
+
   console.log(JSON.stringify(data, null, 2), "homesct");
   if (loading) return <Text>Mengambil data...</Text>;
   if (error) return <Text>Error: {error.message}</Text>;
@@ -63,17 +90,22 @@ export default function HomeforTalent({ navigation }) {
   //   console.log(newData,">>new");
 
   const renderListBooking = ({ item }) => {
-    // console.log(item, "itemmmm renderer");
-    console.log(JSON.stringify(item, null, 2))
+    console.log(JSON.stringify(item, null, 2), "item cmst");
 
     return (
       <View style={styles.containerHeader}>
-        <TouchableOpacity onPress={() => navigation.navigate('Konfirmasi Booking', { bookingId: item._id })} style={styles.cardContainer}>
+        <LogoutButton />
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate("Konfirmasi Booking", { bookingId: item._id })
+          }
+          style={styles.cardContainer}
+        >
           <View style={{ flexDirection: "row" }}>
             <View style={styles.image}>
               <Image
                 source={{
-                  uri: data?.whoAmITalent.imgUrl || "",
+                  uri: item.userImgUrl,
                 }}
                 style={styles.profileImage}
               />
@@ -83,9 +115,8 @@ export default function HomeforTalent({ navigation }) {
               <View style={styles.profileDetails}>
                 <View style={styles.detailName}>
                   <Text style={styles.nameText}>{item.userName}</Text>
-                  <Text style={styles.descriptionText}>
-                    {item.bookLocation}
-                  </Text>
+
+                  <Text style={styles.descriptionText}>@{item.userNick}</Text>
                 </View>
               </View>
             </View>
@@ -103,15 +134,6 @@ export default function HomeforTalent({ navigation }) {
           </View>
 
           <View style={styles.detailsbook}>
-            <View style={{ flexDirection: "row" }}>
-              <Text style={{ fontSize: 17 }}> Session {item.bookSession} </Text>
-              <Text style={{ fontSize: 17, marginLeft: 177 }}>
-                {convertToDate(item.bookDate)}{" "}
-              </Text>
-            </View>
-          </View>
-
-          <View>
             <View style={{ flexDirection: "row", marginTop: 4 }}>
               <View>
                 <Text
@@ -121,30 +143,41 @@ export default function HomeforTalent({ navigation }) {
                     fontSize: 17,
                   }}
                 >
-                  Status Payment
+                  Book Date
                 </Text>
               </View>
               <View>
-                <Text style={styles.fillSubJudul2}>
-                  :{" "}
-                  {item?.transaction?.transactionStatus
-                    ? item?.transaction?.transactionStatus
-                    : " - "}
+                <Text style={{ ...styles.fillSubJudul2, marginLeft: 41 }}>
+                  : {convertToDate(item.bookDate)}{" "}
+                </Text>
+              </View>
+            </View>
+
+            <View style={{ flexDirection: "row", marginTop: 4 }}>
+              <View>
+                <Text
+                  style={{
+                    ...styles.subJudul,
+                    marginLeft: 3,
+                    fontSize: 17,
+                  }}
+                >
+                  Book Session
+                </Text>
+              </View>
+              <View>
+                <Text style={{ ...styles.fillSubJudul2, marginLeft: 20 }}>
+                  : {item.bookSession}{" "}
                 </Text>
               </View>
             </View>
 
             <View style={styles.detailsbooktransaction}>
               <View>
-                <Text style={styles.subJudul}>No. Payment</Text>
+                <Text style={styles.subJudul}>Location</Text>
               </View>
               <View>
-                <Text style={styles.fillSubJudul}>
-                  :{" "}
-                  {item?.transaction?.paymentId
-                    ? item?.transaction?.paymentId
-                    : " - "}
-                </Text>
+                <Text style={styles.fillSubJudul}>: {item.bookLocation}</Text>
               </View>
             </View>
           </View>
@@ -154,7 +187,7 @@ export default function HomeforTalent({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View>
         <View>
           <View>
@@ -162,18 +195,21 @@ export default function HomeforTalent({ navigation }) {
               <Text style={styles.textBookings}> Bookings </Text>
             </View>
           </View>
-          <LogoutButton />
 
           <View style={styles.containerHeader}>
-            <FlatList
-              data={newData}
-              renderItem={renderListBooking}
-              keyExtractor={(item) => item._id}
-            />
+            {loading ? (
+              <ActivityIndicator size="large" color="#5a84a5" />
+            ) : (
+              <FlatList
+                data={data.whoAmITalent.talentBookings}
+                keyExtractor={(item) => item._id}
+                renderItem={renderListBooking}
+              />
+            )}
           </View>
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -186,7 +222,7 @@ const styles = StyleSheet.create({
     // backgroundColor: "yellow",
     // margin: 25,
     marginLeft: 20,
-    marginTop: 25,
+    marginTop: "15%",
     marginBottom: 20,
   },
   textBookings: {
@@ -196,7 +232,7 @@ const styles = StyleSheet.create({
   cardContainer: {
     backgroundColor: "#fff",
     // backgroundColor: "red",
-    borderLeftWidth: "5",
+    borderLeftWidth: 5,
     padding: 20,
     borderRadius: 28,
     marginBottom: 13,
@@ -204,7 +240,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 5,
-    borderLeftColor: "#E6A4B4",
+    borderLeftColor: "grey",
   },
   profileImage: {
     width: 60,
@@ -239,7 +275,7 @@ const styles = StyleSheet.create({
   },
   descriptionText: {
     marginRight: 10,
-    fontSize: 15,
+    fontSize: 13,
     width: 180,
     color: "#666",
     marginBottom: 10,
@@ -265,7 +301,7 @@ const styles = StyleSheet.create({
   },
   detailsbook: {
     // backgroundColor: "lightgrey",
-    marginTop: 20,
+    marginTop: 13,
   },
   detailsbooktransaction: {
     flexDirection: "row",
@@ -281,12 +317,12 @@ const styles = StyleSheet.create({
   fillSubJudul: {
     fontSize: 17,
     marginTop: 1,
-    marginLeft: 23,
+    marginLeft: 53,
     // backgroundColor: "red"
   },
   fillSubJudul2: {
     fontSize: 17,
-    marginLeft: 3,
+    // marginLeft: 30,
     // backgroundColor: "yellow"
   },
 });
