@@ -103,10 +103,10 @@ const resolvers = {
         const bookIdFromReview = new ObjectId(bookingId);
         // console.log(getTalent);
 
-        console.log(bookIdFromReview, "bookingId");
+        // console.log(bookIdFromReview, "bookingId");
 
         const getReview = getTalent.reviews.filter((review) => {
-          console.log(review, "review");
+          // console.log(review, "review");
           return review.BookingId.equals(bookIdFromReview);
         });
 
