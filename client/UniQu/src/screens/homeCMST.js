@@ -64,10 +64,19 @@ export default function HomeforTalent({ navigation }) {
   //   }, [])
   // );
 
-  useEffect(() => {
-    refetch();
-  }, []);
-
+  
+  useFocusEffect(
+    React.useCallback(() => {
+        const fetchData = async () => {
+            try {
+                await refetch();
+            } catch (error) {
+                console.log(error, "error refetch");
+            }
+        };
+        fetchData();
+    }, [])
+);
   console.log(JSON.stringify(data, null, 2), "homesct");
   if (loading) return <Text>Mengambil data...</Text>;
   if (error) return <Text>Error: {error.message}</Text>;

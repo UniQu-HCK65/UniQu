@@ -14,7 +14,7 @@ import { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import { launchImageLibraryAsync } from 'expo-image-picker';
 
-const serverURL = "http://192.168.27.141:4000";
+const serverURL = "http://uniqu-chat-server.rprakoso.my.id"
 
 const socket = io(serverURL);
 
@@ -143,6 +143,7 @@ useEffect(() => {
     try {
       const response = await fetch(`${serverURL}/get-messages?room=${room}`);
       const data = await response.json();
+      console.log(data,"aaaaaaa")
       setChats(data.messages);
     } catch (error) {
       console.error("Error fetching messages:", error);

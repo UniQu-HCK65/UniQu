@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Image, StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import { GET_BOOKING_BY_ID, GET_TRANSACTION } from "../queries/query";
 import RatingModal from "../components/modalRating";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function StatusBooking({ navigation, route }) {
     const { bookingId } = route.params
@@ -19,65 +20,108 @@ export default function StatusBooking({ navigation, route }) {
         reviewed: false
     });
 
+    console.log(statusBooking, '<<<< status booking')
+
+
     const [buttonShow, setButtonShow] = useState(false);
-    console.log(JSON.stringify(data, null,2))
 
     const {
         loading: loadingTransaction,
         error: errorTransaction,
-        data: dataTransaction } = useQuery(GET_TRANSACTION, { variables: { bookingId: bookingId } })
+        data: dataTransaction,
+        refetch: refetchTransaction
+    } = useQuery(GET_TRANSACTION, { variables: { bookingId: bookingId } })
 
     const convertTemp = () => {
         if (statusBooking === 'requested') {
             setStatus({
                 requested: true,
                 booked: false,
+                inprogress: false,
                 startSession: false,
                 endSession: false,
                 reviewed: false
             });
+            setButtonShow(false)
         } else if (statusBooking === 'booked') {
             setStatus({
                 requested: true,
                 booked: true,
+                inprogress: false,
                 startSession: false,
                 endSession: false,
                 reviewed: false
             });
+
+            setButtonShow(true)
+        } else if (statusBooking === 'in progress') {
+            setStatus({
+                requested: true,
+                booked: true,
+                inprogress: true,
+                startSession: false,
+                endSession: false,
+                reviewed: false
+            });
+            setButtonShow(false)
         } else if (statusBooking === 'startSession') {
             setStatus({
                 requested: true,
                 booked: true,
+                inprogress: true,
                 startSession: true,
                 endSession: false,
                 reviewed: false
             });
+            setButtonShow(false)
         } else if (statusBooking === 'ended') {
             setStatus({
                 requested: true,
                 booked: true,
+                inprogress: true,
                 startSession: true,
                 endSession: true,
                 reviewed: false
             });
+            setButtonShow(false)
         } else if (status === 'reviewed') {
             setStatus({
                 requested: true,
                 booked: true,
+                inprogress: true,
                 startSession: true,
                 endSession: true,
                 reviewed: true
             });
+            setButtonShow(false)
         }
     };
+
 
     const showRatingModal = () => {
         setRatingModalVisible(true);
     };
 
+    useFocusEffect(
+        React.useCallback(() => {
+            const fetchData = async () => {
+                try {
+                    await refetch();
+                    await refetchTransaction()
+                } catch (error) {
+                    console.log(error, "error refetch");
+                }
+            };
+            fetchData();
+        }, [])
+    );
+
+    useEffect(() => {
+        refetch()
+    }, [])
+
     useEffect(() => {
         convertTemp();
-        console.log(statusBooking, ">>status bok");
         if (statusBooking === "ended") {
             console.log("pop up modal! Booking has ended!");
             showRatingModal();
@@ -88,11 +132,11 @@ export default function StatusBooking({ navigation, route }) {
 
     const paymentLink = dataTransaction?.getTransactionLink?.paymentLink
 
-    useEffect(() => {
-        if (paymentLink && status.requested === true && status.booked === true && status.startSession === false && status.endSession === false) {
-            setButtonShow(true)
-        }
-    }, [paymentLink])
+    // useEffect(() => {
+    //     if (paymentLink && status.requested === true && status.booked === true && status.startSession === false && status.endSession === false) {
+    //         setButtonShow(true)
+    //     }
+    // }, [paymentLink])
 
     if (loading) {
         return <Text>Loading...</Text>
@@ -114,11 +158,11 @@ export default function StatusBooking({ navigation, route }) {
                     style={styles.backgroundImage}
                 />
                 <View style={styles.overlay}></View>
-                <View style={{position: 'absolute'}}>
-                    <Text style={{ fontSize: 30, fontWeight: 'bold', color: 'white', marginTop: 160, marginLeft: 45 }}>Hi, {data.bookingById.userName} !</Text>
+                <View style={{ position: 'absolute' }}>
+                    <Text style={{ fontSize: 30, fontWeight: 'bold', color: 'white', marginTop: 160, marginLeft: 45 }}>Hi, {data?.bookingById?.userName} !</Text>
                 </View>
 
-                <View style={{position: 'absolute'}}>
+                <View style={{ position: 'absolute' }}>
                     <Text style={{ fontSize: 15, fontWeight: 'normal', color: 'white', marginTop: 200, marginLeft: 45 }}>This is your booking status..</Text>
                 </View>
 
@@ -144,9 +188,19 @@ export default function StatusBooking({ navigation, route }) {
                         </View>
 
                         <View style={{ flexDirection: "row", alignItems: "start", gap: 10 }}>
+                            <StatusCircle active={status.booked} />
+                            <View style={{}}>
+                                <StatusText active={status.booked} style={{ fontWeight: 'bold' }}>In Progress</StatusText>
+                                <CopyWritingText active={status.booked}>Payment has been accepted. See u later!</CopyWritingText>
+
+                            </View>
+                            <View style={styles.connector} />
+                        </View>
+
+                        <View style={{ flexDirection: "row", alignItems: "start", gap: 10 }}>
                             <StatusCircle active={status.startSession} />
                             <View style={{}}>
-                                <StatusText active={status.startSession} style={{ fontWeight: 'bold' }}>Start Session</StatusText>
+                                <StatusText active={status.startSession} style={{ fontWeight: 'bold' }}>Started</StatusText>
                                 <CopyWritingText active={status.startSession}>Your session has started. We will provide confirmation shortly</CopyWritingText>
                             </View>
                             <View style={styles.connector} />
@@ -155,7 +209,7 @@ export default function StatusBooking({ navigation, route }) {
                         <View style={{ flexDirection: "row", alignItems: "start", gap: 10 }}>
                             <StatusCircle active={status.endSession} />
                             <View style={{}}>
-                                <StatusText active={status.endSession} style={{ fontWeight: 'bold' }}>End Session</StatusText>
+                                <StatusText active={status.endSession} style={{ fontWeight: 'bold' }}>End</StatusText>
                                 <CopyWritingText active={status.endSession}>Session complete! Thank you for using our service.</CopyWritingText>
                             </View>
                             <View style={styles.connector} />
@@ -191,19 +245,19 @@ export default function StatusBooking({ navigation, route }) {
                     </View>
                 </View>
 
-                <View style={{ justifyContent: "center", alignContent: "center", flex: 1, marginBottom: 200, marginHorizontal: 40, position: 'relative' }}>
+                <View style={{ justifyContent: "center", alignContent: "center", flex: 1, marginBottom: 250, marginHorizontal: 40, position: 'relative' }}>
                     <View style={{ backgroundColor: "black", width: "100%", height: 150, justifyContent: "center", alignItems: "center", borderRadius: 20 }}>
                         <Image
-                                source={{uri: data.bookingById.talentImgUrl}}
-                                style={{
-                                    width: 60,
-                                    height: 60,
-                                    borderRadius: 40,
-                                }}
-                            />
-                        <Text style={{color: 'white', fontWeight: 'bold', marginTop: 10}}>{data.bookingById.talentName}</Text>
-                        <Text style={{color: 'white', fontWeight: '500', marginTop: 7}}>{data.bookingById.bookStatus}</Text>
-                        <Text style={{color: 'white', fontWeight: '500', fontSize: 10}}>{data.bookingById.bookDate} | {data.bookingById.bookSession}</Text>
+                            source={{ uri: data.bookingById.talentImgUrl }}
+                            style={{
+                                width: 60,
+                                height: 60,
+                                borderRadius: 40,
+                            }}
+                        />
+                        <Text style={{ color: 'white', fontWeight: 'bold', marginTop: 10 }}>{data?.bookingById?.talentName}</Text>
+                        <Text style={{ color: 'white', fontWeight: '500', marginTop: 7 }}>{data?.bookingById?.bookStatus}</Text>
+                        <Text style={{ color: 'white', fontWeight: '500', fontSize: 10 }}>{data?.bookingById?.bookDate} | {data?.bookingById?.bookSession}</Text>
                     </View>
 
                 </View>

@@ -117,6 +117,12 @@ export default function StackNavigator() {
             options={{ headerShown: false }}
           />
 
+          <Stack.Screen
+            name="Chat"
+            component={Chat}
+            options={{ headerShown: false }}
+          />
+
           <Stack.Screen name="Profile" component={ProfileTalent} />
         </>
       ) : null}
