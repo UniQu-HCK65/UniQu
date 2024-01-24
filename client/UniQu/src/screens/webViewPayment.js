@@ -2,16 +2,18 @@ import React, { Component } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { WebView } from "react-native-webview";
 
-const MyWebComponent = () => {
+const MyWebComponent = ({url}) => {
+  console.log(url)
   return (
-    <WebView source={{ uri: "https://reactnative.dev/" }} style={{ flex: 1 }} />
+    <WebView source={{ uri: `${url}` }} style={{ flex: 1 }} />
   );
 };
 
 export default function WebViewPayment({ navigation, route }) {
+  const url = route.params.url
   return (
     <View style={{ flex: 1 }}>
-      <MyWebComponent />
+      <MyWebComponent url={url} />
     </View>
   );
 }

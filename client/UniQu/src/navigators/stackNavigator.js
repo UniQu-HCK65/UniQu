@@ -22,6 +22,7 @@ import ListBookingTalent from "../screens/listBookingDetail";
 import EditStatusBooking from "../screens/editStatusBooking";
 import ProfileTalent from "../screens/profileTalent";
 import MyTabsTalent from "./tabNavigatorTalent";
+import WebViewPayment from "../screens/webViewPayment";
 
 const Stack = createNativeStackNavigator();
 
@@ -57,6 +58,7 @@ export default function StackNavigator() {
         </>
       ) : (role === 'user') ? (
         <>
+
           <Stack.Screen
             name="Home"
             component={MyTabs}
@@ -95,6 +97,12 @@ export default function StackNavigator() {
           <Stack.Screen
             name="Profile"
             component={ProfileUser}
+          />
+
+          <Stack.Screen
+            name="webView"
+            component={WebViewPayment}
+            options={{ headerShown: false }}
           />
         </>
       ) : (role === 'talent') ? (

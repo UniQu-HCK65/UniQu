@@ -328,3 +328,13 @@ export const UPDATE_BOOKING_STATUS = gql`
   }
 }
 `
+
+export const GET_TRANSACTION = gql`
+query GetTransactionLink($bookingId: ID) {
+  getTransactionLink(bookingId: $bookingId) {
+    paymentId
+    orderId
+    paymentLink
+    BookingId
+  }
+}`
