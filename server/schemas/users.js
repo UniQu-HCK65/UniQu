@@ -45,11 +45,11 @@ const typeDefs = `#graphql
     name: String
     username: String
     email: String
-    password: String,
-    role: String,
+    password: String
+    role: String
     imgUrl: String
-    gender: String,
-    tags: [String],
+    gender: String
+    tags: [String]
     userLocations: [String]
     userBookings: [Booking]
     userTransactions: [Transaction]
@@ -69,12 +69,28 @@ const typeDefs = `#graphql
     userBookings:[Booking]
   }
 
+  type userChatlist {
+    _id: ID
+    username: String
+    name: String
+    imgUrl: String
+    chatList: [ChatList]
+  }
+
+  type ChatList {
+    TalentId: ID
+    talentName: String
+    talentNick: String
+    talentImgUrl: String
+    }
+
   type Query {
     users: [User]
     talentsForMe: TalentForMe
     whoAmI: ProfileUser
     getUserActiveBooking: UserActiveBooking
     getUserById(userId: ID): ProfileUser
+    getUserChatlist: userChatlist
   }
 
   type Auth {
@@ -176,6 +192,96 @@ const resolvers = {
         // console.log(user,"AGGREGATE CUY");
 
         return user[0];
+      } catch (error) {
+        console.log(error, "GET_USER_PROFILE"); // errorHandler next up
+        throw new GraphQLError(error.message || "Internal Server Error", {
+          extensions: {
+            code: error.code || "INTERNAL_SERVER_ERROR",
+            http: { status: error.status || 500 },
+          },
+        });
+      }
+    },
+
+    getUserChatlist: async (parent, args, contextValue, info) => {
+      try {
+        const { db, authentication } = contextValue;
+        const auth = await authentication();
+
+        const role = auth.role;
+
+        if (role !== "user") {
+          throw {
+            message: "Forbidden, you are not a user",
+            code: "FORBIDDEN",
+            status: 403,
+          };
+        }
+
+        const userId = auth._id;
+
+        if (!userId)
+          throw {
+            message: "User not found",
+            code: "NOT_FOUND",
+            status: 404,
+          };
+
+        const users = await db.collection(COLLECTION_NAME);
+
+        const user = await users
+          .aggregate([
+            {
+              $match: {
+                _id: new ObjectId(auth._id),
+              },
+            },
+            {
+              $lookup: {
+                from: "Bookings",
+                localField: "_id",
+                foreignField: "UserId",
+                as: "userBookings",
+              },
+            },
+          ])
+          .toArray();
+
+        const userChatlist = user[0].userBookings;
+
+        // Create a set to store unique TalentIds
+        const uniqueTalentIdsSet = new Set();
+
+        // Filter out duplicates based on TalentId
+        const filterDuplicatesChatlist = userChatlist.filter((booking) => {
+          const { TalentId } = booking;
+
+          // Convert TalentId to a string for comparison
+          const talentIdString = TalentId.toString();
+
+          // Check if TalentId is not in the set
+          if (!uniqueTalentIdsSet.has(talentIdString)) {
+            // If not, add it to the set and include it in the result
+            uniqueTalentIdsSet.add(talentIdString);
+            return true;
+          }
+
+          // If TalentId is in the set, it's a duplicate, so exclude it
+          return false;
+        });
+
+        // console.log(user, "USER");
+        // console.log(filterDuplicatesChatlist);
+
+        const userWithUniqueChatlist = {
+          _id: user[0]._id,
+          username: user[0].username,
+          name: user[0].name,
+          imgUrl: user[0].imgUrl,
+          chatList: filterDuplicatesChatlist,
+        };
+
+        return userWithUniqueChatlist;
       } catch (error) {
         console.log(error, "GET_USER_PROFILE"); // errorHandler next up
         throw new GraphQLError(error.message || "Internal Server Error", {

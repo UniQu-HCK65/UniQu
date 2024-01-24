@@ -196,9 +196,10 @@ const startServer = async () => {
         }
 
         if (
-          req.body.status_code !== "200" &&
+          (req.body.status_code !== "200" || req.body.status_code !== "200") &&
           (req.body.transaction_status !== "settlement" ||
-            req.body.transaction_status !== "capture")
+            req.body.transaction_status !== "capture" ||
+            req.body.transaction_status !== "pending")
         ) {
           throw {
             message:

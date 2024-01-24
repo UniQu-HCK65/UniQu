@@ -73,12 +73,30 @@ const typeDefs = `#graphql
   talentActiveBooking: [Booking]
   }
 
+  type talentChatList {
+    _id: ID
+    username: String
+    name: String
+    imgUrl: String
+    chatList: [ChatListTalent]
+  }
+
+  type ChatListTalent {
+    UserId: ID
+    userName: String
+    userNick: String
+    userImgUrl: String
+    }
+
+
   type Query {
     talents: [Talent]
     searchTalent(searchParam:SearchTalent): [Talent]
     getTalentsById(talentId:String): ProfileTalent
     whoAmITalent: ProfileTalent
     getTalentActiveBooking: TalentActiveBooking
+    getTalentChatlist: talentChatList
+
   }
 
   type Mutation {
@@ -107,6 +125,96 @@ const resolvers = {
         return talents;
       } catch (error) {
         console.log(error, "GET_TALENTS"); // errorHandler next up
+        throw new GraphQLError(error.message || "Internal Server Error", {
+          extensions: {
+            code: error.code || "INTERNAL_SERVER_ERROR",
+            http: { status: error.status || 500 },
+          },
+        });
+      }
+    },
+
+    getTalentChatlist: async (parent, args, contextValue, info) => {
+      try {
+        const { db, authentication } = contextValue;
+        const auth = await authentication();
+
+        const role = auth.role;
+
+        if (role !== "talent") {
+          throw {
+            message: "Forbidden, you are not a talent",
+            code: "FORBIDDEN",
+            status: 403,
+          };
+        }
+
+        const talentId = auth._id;
+
+        if (!talentId)
+          throw {
+            message: "User not found",
+            code: "NOT_FOUND",
+            status: 404,
+          };
+
+        const talents = await db.collection(COLLECTION_NAME);
+
+        const talent = await talents
+          .aggregate([
+            {
+              $match: {
+                _id: new ObjectId(auth._id),
+              },
+            },
+            {
+              $lookup: {
+                from: "Bookings",
+                localField: "_id",
+                foreignField: "TalentId",
+                as: "talentBookings",
+              },
+            },
+          ])
+          .toArray();
+
+        const talentChatList = talent[0].talentBookings;
+
+        // Create a set to store unique TalentIds
+        const uniqueTalentIdsSet = new Set();
+
+        // Filter out duplicates based on TalentId
+        const filterDuplicatesChatlist = talentChatList.filter((booking) => {
+          const { UserId } = booking;
+
+          // Convert TalentId to a string for comparison
+          const userIdToString = UserId.toString();
+
+          // Check if TalentId is not in the set
+          if (!uniqueTalentIdsSet.has(userIdToString)) {
+            // If not, add it to the set and include it in the result
+            uniqueTalentIdsSet.add(userIdToString);
+            return true;
+          }
+
+          // If TalentId is in the set, it's a duplicate, so exclude it
+          return false;
+        });
+
+        // console.log(user, "USER");
+        // console.log(filterDuplicatesChatlist);
+
+        const talentWithUniqueChatlist = {
+          _id: talent[0]._id,
+          username: talent[0].username,
+          name: talent[0].name,
+          imgUrl: talent[0].imgUrl,
+          chatList: filterDuplicatesChatlist,
+        };
+
+        return talentWithUniqueChatlist;
+      } catch (error) {
+        console.log(error, "GET_USER_PROFILE"); // errorHandler next up
         throw new GraphQLError(error.message || "Internal Server Error", {
           extensions: {
             code: error.code || "INTERNAL_SERVER_ERROR",
