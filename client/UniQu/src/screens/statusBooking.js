@@ -1,9 +1,9 @@
 import { useQuery } from "@apollo/client";
 import React, { useEffect, useState } from "react";
-import { Image, StyleSheet, View, Text } from "react-native";
-import { GET_BOOKING_BY_ID } from "../queries/query";
+import { Image, StyleSheet, View, Text, TouchableOpacity } from "react-native";
+import { GET_BOOKING_BY_ID, GET_TRANSACTION } from "../queries/query";
 
-export default function StatusBooking({ route }) {
+export default function StatusBooking({ navigation, route }) {
     const { bookingId } = route.params
     const { loading, error, data, refetch } = useQuery(GET_BOOKING_BY_ID, { variables: { bookingId: bookingId } })
 
@@ -13,61 +13,61 @@ export default function StatusBooking({ route }) {
         booked: false,
         startSession: false,
         endSession: false,
-      });
-    
-      const convertTemp = () => {
+    });
+    const [buttonShow, setButtonShow] = useState(false);
+
+    const {
+        loading: loadingTransaction,
+        error: errorTransaction,
+        data: dataTransaction } = useQuery(GET_TRANSACTION, { variables: { bookingId: bookingId } })
+
+
+
+    const convertTemp = () => {
         if (statusBooking === 'requested') {
-          setStatus({
-            requested: true,
-            booked: false,
-            startSession: false,
-            endSession: false,
-          });
+            setStatus({
+                requested: true,
+                booked: false,
+                startSession: false,
+                endSession: false,
+            });
         } else if (statusBooking === 'booked') {
-          setStatus({
-            requested: true,
-            booked: true,
-            startSession: false,
-            endSession: false,
-          });
+            setStatus({
+                requested: true,
+                booked: true,
+                startSession: false,
+                endSession: false,
+            });
         } else if (statusBooking === 'startSession') {
-          setStatus({
-            requested: true,
-            booked: true,
-            startSession: true,
-            endSession: false,
-          });
+            setStatus({
+                requested: true,
+                booked: true,
+                startSession: true,
+                endSession: false,
+            });
         } else if (statusBooking === 'ended') {
-          setStatus({
-            requested: true,
-            booked: true,
-            startSession: true,
-            endSession: true,
-          });
+            setStatus({
+                requested: true,
+                booked: true,
+                startSession: true,
+                endSession: true,
+            });
         }
-      };
-    
-      useEffect(() => {
+    };
+
+    useEffect(() => {
         convertTemp();
-      }, [statusBooking])
+    }, [statusBooking])
 
-    // const convertStatusBooking = (statusBooking) => {
-    //     return {
-    //         requested: statusBooking === 'requested' ? true : false,
-    //         booked: statusBooking === 'booked' ? true : false,
-    //         startSession: statusBooking === 'startSession' ? true : false,
-    //         endSession: statusBooking === 'ended' ? true : false,
-    //     };
-    // };
+    const paymentLink = dataTransaction?.getTransactionLink?.paymentLink
 
-    // const initialStatus = convertStatusBooking(statusBooking);
+    useEffect(() => {
+        if (paymentLink && status.requested === true && status.booked === true && status.startSession === false && status.endSession === false) {
+            setButtonShow(true)
+        }
+    }, [paymentLink])
 
-    // const [status, setStatus] = useState(initialStatus);
-
-    // useEffect(() => {
-    //     const updatedStatus = convertStatusBooking(statusBooking);
-    //     setStatus(updatedStatus);
-    // }, [statusBooking]);
+    console.log(status)
 
     if (loading) {
         return <Text>Loading...</Text>
@@ -77,65 +77,75 @@ export default function StatusBooking({ route }) {
         return <Text>Error fetching data</Text>
     }
 
-   
-
-
     return (
-        <View style={styles.container}>
-            <Image
-                source={{
-                    uri:
-                        "https://images.unsplash.com/photo-1519554318711-aaf73ece6ff9?q=80&w=3270&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                }}
-                style={styles.backgroundImage}
-            />
-            <View style={styles.overlay}></View>
-            <View style={styles.card}>
-                <View style={{ flexDirection: "column", alignItems: "flex-start", maxWidth: 305, gap: 15, marginRight: 20 }}>
-                    <View style={{ flexDirection: "row", alignItems: "start", gap: 10 }}>
-                        <StatusCircle active={status.requested} />
-                        <View style={{}}>
-                            <StatusText active={status.requested} style={{ fontWeight: 'bold' }}>Requested</StatusText>
-                            <CopyWritingText active={status.requested}>Your request is being processed. We will provide confirmation shortly</CopyWritingText>
-                        </View>
-                        <View style={styles.connector} />
-                    </View>
+        <>
+            <View style={styles.container}>
+                <Image
+                    source={{
+                        uri:
+                            "https://images.unsplash.com/photo-1519554318711-aaf73ece6ff9?q=80&w=3270&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                    }}
+                    style={styles.backgroundImage}
+                />
+                <View style={styles.overlay}></View>
 
-                    <View style={{ flexDirection: "row", alignItems: "start", gap: 10 }}>
-                        <StatusCircle active={status.booked} />
-                        <View style={{}}>
-                            <StatusText active={status.booked} style={{ fontWeight: 'bold' }}>Booked</StatusText>
-                            <CopyWritingText active={status.booked}>Your session has been booked. We will provide confirmation shortly</CopyWritingText>
-                        </View>
-                        <View style={styles.connector} />
-                    </View>
-
-                    <View style={{ flexDirection: "row", alignItems: "start", gap: 10 }}>
-                        <StatusCircle active={status.startSession} />
-                        <View style={{}}>
-                            <StatusText active={status.startSession} style={{ fontWeight: 'bold' }}>Start Session</StatusText>
-                            <CopyWritingText active={status.startSession}>Your session has started. We will provide confirmation shortly</CopyWritingText>
-                        </View>
-                        <View style={styles.connector} />
-                    </View>
-
-                    <View style={{ flexDirection: "row", alignItems: "start", gap: 10 }}>
-                        <StatusCircle active={status.endSession} />
-                        <View style={{}}>
-                            <StatusText active={status.endSession} style={{ fontWeight: 'bold' }}>End Session</StatusText>
-                            <CopyWritingText active={status.endSession}>Session complete! Thank you for using our service. We hope you had a satisfying experience.</CopyWritingText>
+                <View style={styles.card}>
+                    <View style={{ flexDirection: "column", alignItems: "flex-start", maxWidth: 305, gap: 15, marginRight: 20 }}>
+                        <View style={{ flexDirection: "row", alignItems: "start", gap: 10 }}>
+                            <StatusCircle active={status.requested} />
+                            <View style={{}}>
+                                <StatusText active={status.requested} style={{ fontWeight: 'bold' }}>Requested</StatusText>
+                                <CopyWritingText active={status.requested}>Your request is being processed. We will provide confirmation shortly</CopyWritingText>
+                            </View>
+                            <View style={styles.connector} />
                         </View>
 
+                        <View style={{ flexDirection: "row", alignItems: "start", gap: 10 }}>
+                            <StatusCircle active={status.booked} />
+                            <View style={{}}>
+                                <StatusText active={status.booked} style={{ fontWeight: 'bold' }}>Booked</StatusText>
+                                <CopyWritingText active={status.booked}>Your session has been booked. We will provide confirmation shortly. Pay Now</CopyWritingText>
+
+                            </View>
+                            <View style={styles.connector} />
+                        </View>
+
+                        <View style={{ flexDirection: "row", alignItems: "start", gap: 10 }}>
+                            <StatusCircle active={status.startSession} />
+                            <View style={{}}>
+                                <StatusText active={status.startSession} style={{ fontWeight: 'bold' }}>Start Session</StatusText>
+                                <CopyWritingText active={status.startSession}>Your session has started. We will provide confirmation shortly</CopyWritingText>
+                            </View>
+                            <View style={styles.connector} />
+                        </View>
+
+                        <View style={{ flexDirection: "row", alignItems: "start", gap: 10 }}>
+                            <StatusCircle active={status.endSession} />
+                            <View style={{}}>
+                                <StatusText active={status.endSession} style={{ fontWeight: 'bold' }}>End Session</StatusText>
+                                <CopyWritingText active={status.endSession}>Session complete! Thank you for using our service. We hope you had a satisfying experience.</CopyWritingText>
+                            </View>
+
+                        </View>
                     </View>
                 </View>
 
-            </View>
-            <View style={{ justifyContent: "center", alignContent: "center", flex: 1, marginBottom: 200, marginHorizontal: 40 }}>
-                <View style={{ backgroundColor: "black", width: "100%", height: 150, justifyContent: "center", alignItems: "center", borderRadius: 20 }}>
-                    <Text style={{ fontSize: 15, fontWeight: "bold", color: "white", maxWidth: 250 }}>Let's Begin! Please wait while we process your request..</Text>
+
+                <View style={{ justifyContent: "center", alignContent: "center", flex: 1, marginBottom: 200, marginHorizontal: 40, position: 'relative' }}>
+                    <View style={{ backgroundColor: "black", width: "100%", height: 150, justifyContent: "center", alignItems: "center", borderRadius: 20 }}>
+                        <Text style={{ fontSize: 15, fontWeight: "bold", color: "white", maxWidth: 250 }}>Let's Begin! Please wait while we process your request..</Text>
+                    </View>
+
                 </View>
-            </View>
-        </View >
+            </View >
+            {buttonShow && (
+                    <View style={{ justifyContent: 'center', alignItems: 'center', position: 'absolute', marginTop: 750, marginLeft: 122, flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                        <TouchableOpacity onPress={() => navigation.navigate('webView', { url: paymentLink })} style={{ height: 35, width: 150, backgroundColor: '#1c5c2d', justifyContent: 'center', alignItems: 'center', borderRadius: 20 }}>
+                            <Text style={{ color: "white", fontWeight: "bold", fontSize: 15 }}>Pay now!</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
+        </>
     );
 }
 
