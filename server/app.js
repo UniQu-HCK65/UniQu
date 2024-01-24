@@ -2,6 +2,7 @@ if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
 const { verifyToken } = require("./helpers/jwt");
+const { CronJob } = require("cron");
 
 const { ApolloServer } = require("@apollo/server");
 const { startStandaloneServer } = require("@apollo/server/standalone");
@@ -342,79 +343,93 @@ const startServer = async () => {
 
 startServer();
 
-// (async () => {
-//   try {
-//     const db = client.db(process.env.DB_NAME);
+const job1 = new CronJob(
+  // "20 * * * * *", // cronTime Testing
+  "0 0 22 * * *", // cronTime
+  async function () {
+    const db = client.db(process.env.DB_NAME);
 
-//     const { url } = await startStandaloneServer(server, {
-//       listen: { port: process.env.PORT || 5555 },
-//       context: async ({ req, res }) => {
-//         try {
-//           return {
-//             authentication: async () => {
-//               let token = req.headers.authorization;
-//               // console.log(token);
-//               if (!token)
-//                 throw {
-//                   message: "Invalid Token",
-//                   code: "UNAUTHORIZED",
-//                   status: 401,
-//                 };
+    const bookings = await db.collection("Bookings");
 
-//               const splittedToken = token.split(" ");
+    const currentDate = new Date();
 
-//               if (splittedToken[0] !== "Bearer")
-//                 throw {
-//                   message: "Invalid Tokena",
-//                   code: "UNAUTHORIZED",
-//                   status: 401,
-//                 };
+    let findActiveBookings = await bookings
+      .find({
+        $or: [
+          { bookStatus: "requested" },
+          { bookStatus: "in progress" },
+          { bookStatus: "started" },
+        ],
+      })
+      .toArray();
 
-//               token = splittedToken[1];
+    if (findActiveBookings.length > 0) {
+      let endBookings = findActiveBookings
+        .filter((booking) => new Date(booking.bookDate) < currentDate)
+        .map((booking) => {
+          return bookings.updateOne(
+            {
+              _id: new ObjectId(booking._id),
+            },
+            {
+              $set: {
+                bookStatus: "ended",
+                updatedAt: new Date(),
+              },
+            }
+          );
+        });
+      console.log(endBookings, "AAAAA");
+    }
 
-//               const payload = verifyToken(token);
+    console.log(
+      "job1, will invalidate every booking at 22.00 if it passed 1 day after the bookedDate"
+    );
+  },
+  null,
+  true,
+  "Asia/Jakarta"
+);
 
-//               const users = await db.collection("Users");
+const job2 = new CronJob(
+  "0 15 * * * *", // cronTime
+  async function () {
+    const db = client.db(process.env.DB_NAME);
 
-//               const talents = await db.collection("Talents");
+    const transactions = await db.collection("Transactions");
 
-//               const findTalent = await talents.findOne({
-//                 _id: new ObjectId(payload._id),
-//               });
+    const currentDate = new Date();
 
-//               const findUser = await users.findOne({
-//                 _id: new ObjectId(payload._id),
-//               });
+    let findActiveTransactions = await transactions
+      .find({ transactionStatus: "unpaid" })
+      .toArray();
 
-//               // console.log(findUser);
-//               if (!findUser && !findTalent)
-//                 throw {
-//                   message: "Invalid Token",
-//                   code: "UNAUTHORIZED",
-//                   status: 401,
-//                 };
+    if (findActiveTransactions.length === 0) {
+      return console.log(
+        "no transactions needed to be invalidated, nothing to do here"
+      );
+    }
+    let endTransactions = findActiveTransactions
+      .filter((transaction) => new Date(transaction.expiryDate) < currentDate)
+      .map((transaction) => {
+        return transactions.updateOne(
+          {
+            _id: new ObjectId(transaction._id),
+          },
+          {
+            $set: {
+              transactionStatus: "expired",
+              updatedAt: new Date(),
+            },
+          }
+        );
+      });
+    console.log(endTransactions, "BBBBB");
 
-//               return {
-//                 _id: payload._id,
-//                 username: payload.username,
-//                 role: payload.role,
-//               };
-//             },
-//             db,
-//           };
-//         } catch (error) {
-//           console.log(error, "CONTEXT_APP"); // errorHandler next up
-//           throw new GraphQLError(error.message || "Internal Server Error", {
-//             extensions: {
-//               code: error.code || "INTERNAL_SERVER_ERROR",
-//               http: { status: error.status || 500 },
-//             },
-//           });
-//         }
-//       },
-//     });
-//     console.log(`🚀 Server ready at: ${url}`);
-//   } catch (error) {
-//     console.error(error);
-//   }
-// })();
+    console.log("job2, will invalidate every transaction that's expired");
+  },
+  null,
+  true,
+  "Asia/Jakarta"
+);
+//THROW MYSELF OFF
