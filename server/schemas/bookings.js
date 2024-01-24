@@ -106,7 +106,7 @@ const resolvers = {
         console.log(bookIdFromReview, "bookingId");
 
         const getReview = getTalent.reviews.filter((review) => {
-          console.log(review, "review");
+          // console.log(review, "review");
           return review.BookingId.equals(bookIdFromReview);
         });
 
