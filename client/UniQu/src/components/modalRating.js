@@ -28,6 +28,7 @@ const RatingModal = (props) => {
     console.log("Comment>>", text);
     setMessage(text);
   };
+  //ll
 
   const handleSubmit = async () => {
     console.log("Rating:", rating);
