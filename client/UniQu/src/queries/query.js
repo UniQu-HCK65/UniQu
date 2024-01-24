@@ -361,3 +361,37 @@ export const GET_TRANSACTION = gql`
     }
   }
 `;
+
+export const GET_TALENT_CHATLIST = gql`
+  query GetTalentChatlist {
+    getTalentChatlist {
+      _id
+      username
+      name
+      imgUrl
+      chatList {
+        UserId
+        userName
+        userNick
+        userImgUrl
+      }
+    }
+  }
+`;
+
+export const GET_USER_CHATLIST = gql`
+  query Query {
+    getUserChatlist {
+      _id
+      username
+      name
+      imgUrl
+      chatList {
+        TalentId
+        talentName
+        talentNick
+        talentImgUrl
+      }
+    }
+  }
+`;
