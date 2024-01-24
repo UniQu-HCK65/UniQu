@@ -2,10 +2,14 @@ import React, { Component } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { WebView } from "react-native-webview";
 
-const MyWebComponent = ({url}) => {
+const MyWebComponent = ({ url }) => {
   console.log(url)
   return (
-    <WebView source={{ uri: `${url}` }} style={{ flex: 1 }} />
+    <WebView
+      ref={(ref) => (this.webview = ref)}
+      source={{ uri: `${url}` }} style={{ flex: 1 }}
+      onNavigationStateChange={this.handleWebViewNavigationStateChange}
+    />
   );
 };
 

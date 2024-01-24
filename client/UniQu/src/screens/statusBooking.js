@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Image, StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import { GET_BOOKING_BY_ID, GET_TRANSACTION } from "../queries/query";
 
-export default function StatusBooking({navigation, route }) {
+export default function StatusBooking({ navigation, route }) {
     const { bookingId } = route.params
     const { loading, error, data, refetch } = useQuery(GET_BOOKING_BY_ID, { variables: { bookingId: bookingId } })
 
@@ -14,10 +14,14 @@ export default function StatusBooking({navigation, route }) {
         startSession: false,
         endSession: false,
     });
+    const [buttonShow, setButtonShow] = useState(false);
 
-    const { loading: loadingTransaction, error: errorTransaction, data: dataTransaction } = useQuery(GET_TRANSACTION, { variables: { bookingId: bookingId } })
+    const {
+        loading: loadingTransaction,
+        error: errorTransaction,
+        data: dataTransaction } = useQuery(GET_TRANSACTION, { variables: { bookingId: bookingId } })
 
-    const paymentLink = dataTransaction?.getTransactionLink?.paymentLink
+
 
     const convertTemp = () => {
         if (statusBooking === 'requested') {
@@ -55,6 +59,16 @@ export default function StatusBooking({navigation, route }) {
         convertTemp();
     }, [statusBooking])
 
+    const paymentLink = dataTransaction?.getTransactionLink?.paymentLink
+
+    useEffect(() => {
+        if (paymentLink && status.requested === true && status.booked === true && status.startSession === false && status.endSession === false) {
+            setButtonShow(true)
+        }
+    }, [paymentLink])
+
+    console.log(status)
+
     if (loading) {
         return <Text>Loading...</Text>
     }
@@ -63,75 +77,75 @@ export default function StatusBooking({navigation, route }) {
         return <Text>Error fetching data</Text>
     }
 
-
-
-
     return (
+        <>
+            <View style={styles.container}>
+                <Image
+                    source={{
+                        uri:
+                            "https://images.unsplash.com/photo-1519554318711-aaf73ece6ff9?q=80&w=3270&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                    }}
+                    style={styles.backgroundImage}
+                />
+                <View style={styles.overlay}></View>
 
-        <View style={styles.container}>
-            <Image
-                source={{
-                    uri:
-                        "https://images.unsplash.com/photo-1519554318711-aaf73ece6ff9?q=80&w=3270&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                }}
-                style={styles.backgroundImage}
-            />
-            <View style={styles.overlay}></View>
-            
-            <View style={styles.card}>
-                <View style={{ flexDirection: "column", alignItems: "flex-start", maxWidth: 305, gap: 15, marginRight: 20 }}>
-                    <View style={{ flexDirection: "row", alignItems: "start", gap: 10 }}>
-                        <StatusCircle active={status.requested} />
-                        <View style={{}}>
-                            <StatusText active={status.requested} style={{ fontWeight: 'bold' }}>Requested</StatusText>
-                            <CopyWritingText active={status.requested}>Your request is being processed. We will provide confirmation shortly</CopyWritingText>
-                        </View>
-                        <View style={styles.connector} />
-                    </View>
-                    <TouchableOpacity onPress={() => navigation.navigate('home')} style={{}}>
-                                <Text style={{color: 'black', fontWeight: 'bold', fontSize: 20}}>Payment</Text>
-                            </TouchableOpacity>
-
-                    <View style={{ flexDirection: "row", alignItems: "start", gap: 10 }}>
-                        <StatusCircle active={status.booked} />
-                        <View style={{}}>
-                            <StatusText active={status.booked} style={{ fontWeight: 'bold' }}>Booked</StatusText>
-                            <CopyWritingText active={status.booked}>Your session has been booked. We will provide confirmation shortly</CopyWritingText>
-                           
-                        </View>
-                        <View style={styles.connector} />
-                    </View>
-
-                    <View style={{ flexDirection: "row", alignItems: "start", gap: 10 }}>
-                        <StatusCircle active={status.startSession} />
-                        <View style={{}}>
-                            <StatusText active={status.startSession} style={{ fontWeight: 'bold' }}>Start Session</StatusText>
-                            <CopyWritingText active={status.startSession}>Your session has started. We will provide confirmation shortly</CopyWritingText>
-                        </View>
-                        <View style={styles.connector} />
-                    </View>
-
-                    <View style={{ flexDirection: "row", alignItems: "start", gap: 10 }}>
-                        <StatusCircle active={status.endSession} />
-                        <View style={{}}>
-                            <StatusText active={status.endSession} style={{ fontWeight: 'bold' }}>End Session</StatusText>
-                            <CopyWritingText active={status.endSession}>Session complete! Thank you for using our service. We hope you had a satisfying experience.</CopyWritingText>
+                <View style={styles.card}>
+                    <View style={{ flexDirection: "column", alignItems: "flex-start", maxWidth: 305, gap: 15, marginRight: 20 }}>
+                        <View style={{ flexDirection: "row", alignItems: "start", gap: 10 }}>
+                            <StatusCircle active={status.requested} />
+                            <View style={{}}>
+                                <StatusText active={status.requested} style={{ fontWeight: 'bold' }}>Requested</StatusText>
+                                <CopyWritingText active={status.requested}>Your request is being processed. We will provide confirmation shortly</CopyWritingText>
+                            </View>
+                            <View style={styles.connector} />
                         </View>
 
+                        <View style={{ flexDirection: "row", alignItems: "start", gap: 10 }}>
+                            <StatusCircle active={status.booked} />
+                            <View style={{}}>
+                                <StatusText active={status.booked} style={{ fontWeight: 'bold' }}>Booked</StatusText>
+                                <CopyWritingText active={status.booked}>Your session has been booked. We will provide confirmation shortly. Pay Now</CopyWritingText>
+
+                            </View>
+                            <View style={styles.connector} />
+                        </View>
+
+                        <View style={{ flexDirection: "row", alignItems: "start", gap: 10 }}>
+                            <StatusCircle active={status.startSession} />
+                            <View style={{}}>
+                                <StatusText active={status.startSession} style={{ fontWeight: 'bold' }}>Start Session</StatusText>
+                                <CopyWritingText active={status.startSession}>Your session has started. We will provide confirmation shortly</CopyWritingText>
+                            </View>
+                            <View style={styles.connector} />
+                        </View>
+
+                        <View style={{ flexDirection: "row", alignItems: "start", gap: 10 }}>
+                            <StatusCircle active={status.endSession} />
+                            <View style={{}}>
+                                <StatusText active={status.endSession} style={{ fontWeight: 'bold' }}>End Session</StatusText>
+                                <CopyWritingText active={status.endSession}>Session complete! Thank you for using our service. We hope you had a satisfying experience.</CopyWritingText>
+                            </View>
+
+                        </View>
                     </View>
                 </View>
 
-            </View>
-            <View style={{ justifyContent: "center", alignContent: "center", flex: 1, marginBottom: 200, marginHorizontal: 40 }}>
-                <View style={{ backgroundColor: "black", width: "100%", height: 150, justifyContent: "center", alignItems: "center", borderRadius: 20 }}>
-                    <Text style={{ fontSize: 15, fontWeight: "bold", color: "white", maxWidth: 250 }}>Let's Begin! Please wait while we process your request..</Text>
-                </View>
-            </View>
 
-            <TouchableOpacity onPress={() => navigation.navigate('webView', {url : paymentLink})} style={{ top: 20, left: 20 }}>
-                <Text style={{ color: "black", fontWeight: "bold", fontSize: 30 }}>Cancel</Text>
-            </TouchableOpacity>
-        </View >
+                <View style={{ justifyContent: "center", alignContent: "center", flex: 1, marginBottom: 200, marginHorizontal: 40, position: 'relative' }}>
+                    <View style={{ backgroundColor: "black", width: "100%", height: 150, justifyContent: "center", alignItems: "center", borderRadius: 20 }}>
+                        <Text style={{ fontSize: 15, fontWeight: "bold", color: "white", maxWidth: 250 }}>Let's Begin! Please wait while we process your request..</Text>
+                    </View>
+
+                </View>
+            </View >
+            {buttonShow && (
+                    <View style={{ justifyContent: 'center', alignItems: 'center', position: 'absolute', marginTop: 750, marginLeft: 122, flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                        <TouchableOpacity onPress={() => navigation.navigate('webView', { url: paymentLink })} style={{ height: 35, width: 150, backgroundColor: '#1c5c2d', justifyContent: 'center', alignItems: 'center', borderRadius: 20 }}>
+                            <Text style={{ color: "white", fontWeight: "bold", fontSize: 15 }}>Pay now!</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
+        </>
     );
 }
 
