@@ -11,7 +11,7 @@ import { useQuery } from "@apollo/client";
 import { WHO_AM_I_TALENT } from "../queries/query";
 
 export default function ProfileTalent({ navigation }) {
-  const { loading, error, data } = useQuery(WHO_AM_I_TALENT);
+  const { loading, error, data } = useQuery(WHO_AM_I_TALENT); //move ke listbookingdetail
 
   if (loading) return <Text>Loading...</Text>;
   if (error) return <Text>Error: {error.message}</Text>;
@@ -90,6 +90,7 @@ export default function ProfileTalent({ navigation }) {
                 </View>
               </View>
 
+{/* move ke listbookingdetail */}
               {talentData.talentBookings.map((booking) => (
                 <View key={booking._id} style={styles.cardTagsStyle}>
                   <View style={styles.historyStyle}>

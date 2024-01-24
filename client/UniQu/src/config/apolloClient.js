@@ -4,7 +4,7 @@ import { setContext } from "@apollo/client/link/context";
 
 const httpLink = createHttpLink({
   // uri:  'http://localhost:5555'
-  uri: "https://93a0-139-228-111-126.ngrok-free.app/graphql",
+  uri: "https://3ced-139-228-111-126.ngrok-free.app/graphql",
 });
 
 async function getValueFor(key) {
