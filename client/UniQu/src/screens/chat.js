@@ -28,6 +28,7 @@ export default function Chat({ route, navigation }) {
   const roomName = route.params.roomName;
   const userLoggedInName = route.params.userLoggedInName;
   // console.log(route.params, "<<<<<<<<<<username>>>>>>>>>>");
+  //hahahahahhahaa
 
   function handleRoom(roomName) {
     setRoom(roomName);
@@ -143,6 +144,7 @@ useEffect(() => {
     try {
       const response = await fetch(`${serverURL}/get-messages?room=${room}`);
       const data = await response.json();
+      console.log(data,"aaaaaaa")
       setChats(data.messages);
     } catch (error) {
       console.error("Error fetching messages:", error);

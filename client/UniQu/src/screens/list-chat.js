@@ -43,7 +43,7 @@ export default function ListChat({ navigation }) {
           />
           <View style={styles.textContainer}>
             <Text style={styles.name}>Maldini Junior</Text>
-            <Text style={styles.message}>Love u wahyu</Text>
+            <Text style={styles.message}>Love u wahysssu</Text>
           </View>
           <Text style={styles.time}>12.00 AM</Text>
         </View>
