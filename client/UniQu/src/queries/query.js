@@ -318,7 +318,8 @@ mutation AddReview($newReview: NewReview) {
     rating
     updatedAt
     createdAt
-  }`;
+  }
+}`;
 
 export const UPDATE_BOOKING_STATUS = gql`
   mutation UpdateBookingStatus($bookingId: ID) {
@@ -350,3 +351,5 @@ export const GET_TRANSACTION = gql`
     }
   }
 `;
+
+
