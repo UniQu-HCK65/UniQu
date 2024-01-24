@@ -64,7 +64,7 @@ export default function EditProfileUser() {
       userLocations: selectedLoc,
       imgUrl: formData.imgUrl,
     };
-    console.log(updatedProfile, "anjgg");
+    console.log(updatedProfile, "halah capek");
 
     editProfileMutation({
       variables: {
