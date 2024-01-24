@@ -21,6 +21,7 @@ import StatusBooking from "../screens/statusBooking";
 import ListBookingTalent from "../screens/listBookingDetail";
 import EditStatusBooking from "../screens/editStatusBooking";
 import ProfileTalent from "../screens/profileTalent";
+import EditProfileTalent from "../screens/editProfileTalent";
 import MyTabsTalent from "./tabNavigatorTalent";
 import WebViewPayment from "../screens/webViewPayment";
 
@@ -30,13 +31,13 @@ const Stack = createNativeStackNavigator();
 
 export default function StackNavigator() {
   const { isLoggedIn } = useContext(LoginContext);
-  const role = isLoggedIn.role
-  const token = isLoggedIn.accessToken
-  console.log(role, token)
+  const role = isLoggedIn.role;
+  const token = isLoggedIn.accessToken;
+  console.log(role, token);
 
   return (
-    <Stack.Navigator screenOptions={{ gestureDirection: 'vertical' }}>
-      {(!token || !role) ? (
+    <Stack.Navigator screenOptions={{ gestureDirection: "vertical" }}>
+      {!token || !role ? (
         <>
           <Stack.Screen
             name="LandingPage"
@@ -56,9 +57,8 @@ export default function StackNavigator() {
             options={{ headerShown: false }}
           />
         </>
-      ) : (role === 'user') ? (
+      ) : role === "user" ? (
         <>
-
           <Stack.Screen
             name="Home"
             component={MyTabs}
@@ -89,15 +89,9 @@ export default function StackNavigator() {
             options={{ headerShown: false }}
           />
 
-          <Stack.Screen
-            name="Edit Profile"
-            component={EditProfileUser}
-          />
+          <Stack.Screen name="Edit Profile" component={EditProfileUser} />
 
-          <Stack.Screen
-            name="Profile"
-            component={ProfileUser}
-          />
+          <Stack.Screen name="Profile" component={ProfileUser} />
 
           <Stack.Screen
             name="webView"
@@ -105,7 +99,7 @@ export default function StackNavigator() {
             options={{ headerShown: false }}
           />
         </>
-      ) : (role === 'talent') ? (
+      ) : role === "talent" ? (
         <>
           <Stack.Screen
             name="Home"
@@ -125,10 +119,7 @@ export default function StackNavigator() {
             options={{ headerShown: false }}
           />
 
-          <Stack.Screen
-            name="Profile"
-            component={ProfileTalent}
-          />
+          <Stack.Screen name="Profile" component={ProfileTalent} />
         </>
       ) : null}
     </Stack.Navigator>
