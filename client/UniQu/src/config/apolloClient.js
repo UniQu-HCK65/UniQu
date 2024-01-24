@@ -4,7 +4,7 @@ import { setContext } from "@apollo/client/link/context";
 
 const httpLink = createHttpLink({
 
-  uri:  'http://localhost:5555'
+  uri:  'http://localhost:5555/graphql'
   // uri: "https://3f86-139-228-111-126.ngrok-free.app",
 });
 

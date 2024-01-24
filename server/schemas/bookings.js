@@ -14,7 +14,9 @@ const typeDefs = `#graphql
     TalentId: ID
     UserId: ID
     talentName: String
+    talentNick: String
     userName: String
+    userNick: String
     talentImgUrl: String
     userImgUrl:String
     bookDate: String
@@ -147,10 +149,11 @@ const resolvers = {
             booking.bookStatus !== "ended" &&
             booking.bookStatus !== "denied" &&
             booking.bookStatus !== "cancelled" &&
+            booking.bookStatus !== "Reviewed" &&
             booking.bookStatus !== "expired"
         );
 
-        console.log(ongoingBooking, "AAAAAAA");
+        // console.log(ongoingBooking, "AAAAAAA");
 
         if (ongoingBooking) {
           throw {
@@ -176,7 +179,9 @@ const resolvers = {
           TalentId: new ObjectId(newBooking.TalentId),
           UserId: new ObjectId(userId),
           talentName: findTalent.name,
+          talentNick: findTalent.username,
           userName: findUser.name,
+          userNick: findUser.username,
           talentImgUrl: findTalent.imgUrl,
           userImgUrl: findUser.imgUrl,
           bookDate: new Date(newBooking.bookDate),
@@ -295,7 +300,7 @@ const resolvers = {
 
           const twoDigitRandom = Math.floor(Math.random() * 90) + 10;
 
-          const orderId = `TRX-BKNG-${Math.random().toString()}`; //TSTING PURPOSES
+          const orderId = `TRX-BKNG-${Math.random().toString().slice(2, 6)}`; //TSTING PURPOSES
           // const orderId = `TRX-BKNG-${bookingId}-${auth.username}-${twoDigitRandom}`;
 
           const trxAmount = 500_000;
@@ -311,8 +316,6 @@ const resolvers = {
                 price: 500000,
                 quantity: 1,
                 name:
-                  findUser.name +
-                  "'s" +
                   "Booking Session with " +
                   findTalent.name,
               },
@@ -385,8 +388,6 @@ const resolvers = {
           const orderId = findActiveTransaction.orderId;
 
           const midtransStatusUrl = `https://api.sandbox.midtrans.com/v2/${orderId}/status`;
-          // console.log(midtransStatusUrl, "midtransStatusUrl");
-
           const midtransOptions = {
             method: "GET",
             headers: {
