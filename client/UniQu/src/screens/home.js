@@ -236,8 +236,12 @@ export default function Home({ navigation }) {
               </View>
 
               <View style={styles.descriptionText}>
-                <Text>{item.aboutme}</Text>
-              </View>
+              <Text>
+                {item.aboutme.length > 10
+                  ? `${item.aboutme.substring(0, 100)}...`
+                  : item.aboutme}
+              </Text>
+            </View>
 
               <View style={styles.ratingContainer}>
                 <Text style={styles.ratingText}>

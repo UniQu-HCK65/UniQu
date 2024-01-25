@@ -31,7 +31,7 @@ export default function Chat({ route, navigation }) {
   const [imageUri, setImageUri] = useState(null);
   const [chats, setChats] = useState([]);
   const roomName = route.params.roomName;
-
+  console.log(route.params, "<< route params")
   // console.log(
   //   route.params,
   //   "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"

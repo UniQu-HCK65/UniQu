@@ -10,13 +10,18 @@ import {
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { GET_TALENTS_BY_ID, GET_USER_CHATLIST } from "../queries/query";
-import { useQuery } from "@apollo/client";
+import { useQuery, useLazyQuery } from "@apollo/client";
 
 export default function TalentDetails({ navigation, route }) {
   const { talentId } = route.params;
   const { loading, error, data } = useQuery(GET_TALENTS_BY_ID, {
     variables: { talentId },
   });
+  const {
+    loading: loadingUser,
+    error: errorUser,
+    data: dataUserChatlist,
+  } = useQuery(GET_USER_CHATLIST);
 
   if (loading) return <ActivityIndicator size="large" color="#5a84a5" />;
   if (error) return <Text>Error: {error.message}</Text>;
@@ -29,27 +34,24 @@ export default function TalentDetails({ navigation, route }) {
   }
 
 
-  const {
-    loading: loadingUser,
-    error: errorUser,
-    data: dataUserChatlist,
-  } = useQuery(GET_USER_CHATLIST);
-
   let roomName1 = "0";
   let roomName2 = "0"
 
-  const handleToChatRoom = (talentId) => {
-    roomName1 = dataUserChatlist?.getUserChatlist?._id
-    roomName2 = talentId
-
-    navigation.navigate('Chat', {
-      roomName: `${roomName1}-${roomName2}`,
-      userLoggedInName: dataUserChatlist?.getUserChatlist?.name,
-      userLoggedInImgUrl: dataUserChatlist?.getUserChatlist?.imgUrl,
-    })
-
+  function handleToChatRoom(chatData){
+    console.log(roomName1, roomName2, "<<< roomsssss di dalam")
+    console.log(error, "<<")
+    
+    
+    navigation.navigate('Chat', chatData)
   }
-
+  roomName1 = dataUserChatlist?.getUserChatlist?._id
+  roomName2 = talentId
+  let chatData = {
+    roomName: `${roomName1}-${roomName2}`,
+    userLoggedInName: dataUserChatlist?.getUserChatlist?.name,
+    userLoggedInImgUrl: dataUserChatlist?.getUserChatlist?.imgUrl,
+  }
+  console.log(dataUserChatlist, "<<< dataUserChatlist di luar")
 
 
   // console.log(talent, "menungsoooo");
@@ -138,7 +140,7 @@ export default function TalentDetails({ navigation, route }) {
               marginRight: 50,
             }}
           >
-            <TouchableOpacity onPress={() => handleToChatRoom(talentId)} style={styles.chatButton}>
+            <TouchableOpacity onPress={() => handleToChatRoom(chatData)} style={styles.chatButton}>
               <Ionicons
                 name="chatbubbles-outline"
                 color="white"
