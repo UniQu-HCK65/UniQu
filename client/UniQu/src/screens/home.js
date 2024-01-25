@@ -43,20 +43,33 @@ const tags = [
 ];
 
 const ALL_TALENT = gql`
-  query Talents {
-    talents {
-      _id
-      name
-      username
-      email
-      password
-      aboutme
-      gender
-      tags
-      talentLocations
-      balance
+ query Talents {
+  talents {
+    _id
+    name
+    username
+    email
+    password
+    aboutme
+    role
+    gender
+    imgUrl
+    tags
+    reviews {
+      BookingId
+      message
+      reviewerName
+      rating
+      updatedAt
+      createdAt
     }
+    rating
+    talentLocations
+    balance
+    updatedAt
+    createdAt
   }
+}
 `;
 
 export default function Home({ navigation }) {
@@ -188,7 +201,7 @@ export default function Home({ navigation }) {
   // console.log(talentsForYou)
 
   const renderTalentForYou = ({ item }) => {
-    // console.log(item, "item");
+    // console.log(JSON.stringify(item, null, 2), "item");
     if (forYouError || allTalentError) {
       return <Text>Error: {error.message}</Text>;
     }
@@ -197,8 +210,6 @@ export default function Home({ navigation }) {
     if (item.reviews && Array.isArray(item.reviews)) {
       item.reviews.forEach((review) => totalReviewers.add(review.reviewerName));
     }
-
-    // console.log(totalReviewers, "total");
 
     return (
       <TouchableOpacity
@@ -230,7 +241,7 @@ export default function Home({ navigation }) {
 
               <View style={styles.ratingContainer}>
                 <Text style={styles.ratingText}>
-                  {item.rating / item.reviews?.length}
+                  {(item.rating / item.reviews?.length).toFixed(1)}
                 </Text>
                 <Text style={styles.reviewsText}>
                   ({totalReviewers.size} reviews)
@@ -316,10 +327,10 @@ export default function Home({ navigation }) {
             !dataRender
               ? forYouData.talentsForMe.talentsForMe
               : dataRender.filter(
-                  (talent) =>
-                    talent.name.toLowerCase().includes(search.toLowerCase()) ||
-                    talent.username.toLowerCase().includes(search.toLowerCase())
-                )
+                (talent) =>
+                  talent.name.toLowerCase().includes(search.toLowerCase()) ||
+                  talent.username.toLowerCase().includes(search.toLowerCase())
+              )
           }
           keyExtractor={(item) => item._id}
           renderItem={renderTalentForYou}

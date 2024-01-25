@@ -12,7 +12,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import { GET_TALENTS_BY_ID } from "../queries/query";
 import { useQuery } from "@apollo/client";
 
-export default function TalentDetails({navigation, route }) {
+export default function TalentDetails({ navigation, route }) {
   const { talentId } = route.params;
   const { loading, error, data } = useQuery(GET_TALENTS_BY_ID, {
     variables: { talentId },
@@ -22,6 +22,13 @@ export default function TalentDetails({navigation, route }) {
   if (error) return <Text>Error: {error.message}</Text>;
 
   const talent = data.getTalentsById;
+
+  const totalReviewers = new Set();
+  if (talent.reviews && Array.isArray(talent.reviews)) {
+    talent.reviews.forEach((review) => totalReviewers.add(review.reviewerName));
+  }
+
+
 
   // console.log(talent, "menungsoooo");
 
@@ -48,9 +55,9 @@ export default function TalentDetails({navigation, route }) {
 
           <View style={styles.textHeaders}>
             <Text style={styles.name}>{talent.name}</Text>
-            <Ionicons name="star" size={13} color={"#85803a"} style={{ left: 5 }}></Ionicons>
+            <Ionicons name="star" size={13} color={"#85803a"} style={{ left: 19 }}></Ionicons>
             <Text style={styles.rating}>
-              {talent.rating} ({talent.reviews.length} reviews)
+              {(talent.rating / talent.reviews?.length).toFixed(1)} ({totalReviewers.size}) reviews
             </Text>
           </View>
 
@@ -67,7 +74,7 @@ export default function TalentDetails({navigation, route }) {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            style={{ flexDirection: "row", maxWidth: 350 }}
+            style={{ flexDirection: "row", maxWidth: 390 }}
           >
             {talent.tags.map((tag, index) => (
               <View style={styles.tagsCard} key={index}>
@@ -75,85 +82,32 @@ export default function TalentDetails({navigation, route }) {
               </View>
             ))}
           </ScrollView>
+          {/* <View style={{}}>
+            <Text style={{marginLeft: 25, fontSize: 20}}>Review</Text>
+          </View> */}
 
-          {/* <ScrollView
+          <ScrollView
             vertical
             showsVerticalScrollIndicator={false}
-            style={{
-              // justifyContent: "center",
-              // alignItems: "center",
-              marginHorizontal: 25,
-            }}
+            style={{ maxWidth: '100%', maxHeight: 300, marginBottom: 50 }}
+            contentContainerStyle={{ minHeight: 100, justifyContent: 'center', alignItems: 'center' }}
           >
-            <View style={{ gap: 5, height: 50, marginBottom: 300 }}>
-              {/* <View style={{marginBottom: 50}}> */}
-                {/* <View
-                  style={{
-                    width: "100%",
-                    height: 50,
-                    borderColor: "black",
-                    borderWidth: 1,
-                  }}
-                ></View>
-                <View
-                  style={{
-                    width: "100%",
-                    height: 50,
-                    borderColor: "black",
-                    borderWidth: 1,
-                  }}
-                ></View>
-                <View
-                  style={{
-                    width: "100%",
-                    height: 50,
-                    borderColor: "black",
-                    borderWidth: 1,
-                  }}
-                ></View>
-                <View
-                  style={{
-                    width: "100%",
-                    height: 50,
-                    borderColor: "black",
-                    borderWidth: 1,
-                  }}
-                ></View>
-                <View
-                  style={{
-                    width: "100%",
-                    height: 50,
-                    borderColor: "black",
-                    borderWidth: 1,
-                  }}
-                ></View>
-                <View
-                  style={{
-                    width: "100%",
-                    height: 50,
-                    borderColor: "black",
-                    borderWidth: 1,
-                  }}
-                ></View>
-                <View
-                  style={{
-                    width: "100%",
-                    height: 50,
-                    borderColor: "black",
-                    borderWidth: 1,
-                  }}
-                ></View>
-                <View
-                  style={{
-                    width: "100%",
-                    height: 50,
-                    borderColor: "black",
-                    borderWidth: 1,
-                  }}
-                ></View>
-              </View> */}
-            {/* </View> */}
-          {/* </ScrollView> */}
+            <View>
+              {talent.reviews.map((review, index) => (
+                <View style={{ width: 360, height: 40, borderBottomColor: 'lightgrey', borderBottomWidth: 1, marginVertical: 5, flexDirection: 'column' }} key={index}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <Text style={{fontSize: 12, color: 'grey'}}>{review.reviewerName}</Text>
+                    
+                    <Text style={{fontSize: 12, color: 'grey'}}>{review.rating}/5 <Ionicons name="star" size={13} color={"#85803a"} style={{ left: 19 }}></Ionicons></Text>
+                  </View>
+
+                  <Text style={{fontSize: 12, color: 'grey'}}>{review.message}</Text>
+
+                </View>
+              ))}
+            </View>
+          </ScrollView>
+
 
           <View
             style={{
@@ -199,7 +153,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: "100%",
     // height: 630,
-    height: 500,
+    height: 620,
     borderRadius: 40,
     backgroundColor: "white",
     marginBottom: 10,
@@ -292,7 +246,7 @@ const styles = StyleSheet.create({
   bookingButton: {
     backgroundColor: "black",
     height: 50,
-    width: 210,
+    width: 240,
     left: 25,
     borderRadius: 20,
     bottom: 30,

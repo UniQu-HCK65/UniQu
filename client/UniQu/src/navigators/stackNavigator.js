@@ -100,7 +100,7 @@ export default function StackNavigator() {
       ) : role === "talent" ? (
         <>
           <Stack.Screen
-            name="Home"
+            name="Home Talent"
             component={MyTabsTalent}
             options={{ headerShown: false }}
           />

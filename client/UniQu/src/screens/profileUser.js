@@ -76,8 +76,9 @@ export default function ProfileUser({ navigation }) {
         <View>
           <View>
             <View style={styles.cardOption}>
-              <View>
+              <View style={{flexDirection: 'row', justifyContent: 'space-between', marginRight: 25}}>
                 <Text style={styles.fontOption}>{whoAmI.name}</Text>
+                <LogoutButton />
               </View>
             </View>
           </View>
@@ -123,13 +124,13 @@ export default function ProfileUser({ navigation }) {
           </View>
 
           <View>
-            <View style={styles.cardOption}>
+            <View style={{}}>
               <View>
                 <Text style={styles.tagsStyle}>Booking History</Text>
               </View>
             </View>
 
-            <View style={styles.cardTagsStyle}>
+            <View style={{}}>
               {whoAmI.userBookings.map((booking, index) => (
                 <TouchableOpacity
                   onPress={() =>
@@ -202,7 +203,6 @@ export default function ProfileUser({ navigation }) {
           </View>
         </View>
       </View>
-      <LogoutButton />
     </ScrollView>
   );
 }
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
   usernameStyle: {
     fontSize: 15,
     color: "#4e4e4e",
-    marginTop: 3,
+    marginTop: -25,
     marginLeft: 25,
   },
   tagsStyle: {
@@ -314,8 +314,9 @@ const styles = StyleSheet.create({
   },
   historyStyle: {
     marginTop: 10,
-    backgroundColor: "#f4f4f4",
-    width: 330,
+    borderBottomColor: "grey",
+    borderBottomWidth: 1,
+    // width: 330,
     height: 120,
     justifyContent: "center",
     borderRadius: 8,
@@ -334,6 +335,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     margin: 1,
     // backgroundColor: "white",
-    marginLeft: 15
+    marginLeft: 15,
   },
 });
