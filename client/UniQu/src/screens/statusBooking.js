@@ -19,9 +19,10 @@ export default function StatusBooking({ navigation, route }) {
         booked: false,
         started: false,
         endSession: false,
-        reviewed: false
+        Reviewed: false
     });
 
+    console.log(status)
     const [buttonShow, setButtonShow] = useState(false);
 
     const {
@@ -44,7 +45,7 @@ export default function StatusBooking({ navigation, route }) {
                 inprogress: false,
                 started: false,
                 endSession: false,
-                reviewed: false
+                Reviewed: false
             });
             setButtonShow(false)
         } else if (statusBooking === 'booked') {
@@ -54,7 +55,7 @@ export default function StatusBooking({ navigation, route }) {
                 inprogress: false,
                 started: false,
                 endSession: false,
-                reviewed: false
+                Reviewed: false
             });
             setButtonShow(true)
         } else if (statusBooking === 'in progress') {
@@ -64,7 +65,7 @@ export default function StatusBooking({ navigation, route }) {
                 inprogress: true,
                 started: false,
                 endSession: false,
-                reviewed: false
+                Reviewed: false
             });
             setButtonShow(false)
         } else if (statusBooking === 'started') {
@@ -74,7 +75,7 @@ export default function StatusBooking({ navigation, route }) {
                 inprogress: true,
                 started: true,
                 endSession: false,
-                reviewed: false
+                Reviewed: false
             });
             setButtonShow(false)
         } else if (statusBooking === 'ended') {
@@ -84,17 +85,17 @@ export default function StatusBooking({ navigation, route }) {
                 inprogress: true,
                 started: true,
                 endSession: true,
-                reviewed: false
+                Reviewed: false
             });
             setButtonShow(false)
-        } else if (status === 'reviewed') {
+        } else if (statusBooking === 'Reviewed') {
             setStatus({
                 requested: true,
                 booked: true,
                 inprogress: true,
                 started: true,
                 endSession: true,
-                reviewed: true
+                Reviewed: true
             });
             setButtonShow(false)
         }
@@ -225,15 +226,15 @@ export default function StatusBooking({ navigation, route }) {
                         </View>
 
                         <View style={{ flexDirection: "row", alignItems: "start", gap: 10 }}>
-                            <StatusCircle active={status.reviewed} />
+                            <StatusCircle active={status.Reviewed} />
                             <View style={{}}>
                                 <StatusText
-                                    active={status.reviewed}
+                                    active={status.Reviewed}
                                     style={{ fontWeight: "bold" }}
                                 >
                                     Reviewed
                                 </StatusText>
-                                <CopyWritingText active={status.reviewed}>
+                                <CopyWritingText active={status.Reviewed}>
                                     Please rate us.
                                 </CopyWritingText>
                             </View>
@@ -274,7 +275,7 @@ export default function StatusBooking({ navigation, route }) {
             </View >
             {buttonShow && (
                 <View style={{ justifyContent: 'center', alignItems: 'center', position: 'absolute', marginTop: 830, marginLeft: 140, flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                    <TouchableOpacity onPress={() => navigation.navigate('webView', { url: paymentLink })} style={{ height: 35, width: 150, backgroundColor: '#1c5c2d', justifyContent: 'center', alignItems: 'center', borderRadius: 20 }}>
+                    <TouchableOpacity onPress={() => navigation.navigate('webView', { url: paymentLink, bookingId: bookingId })} style={{ height: 35, width: 150, backgroundColor: '#1c5c2d', justifyContent: 'center', alignItems: 'center', borderRadius: 20 }}>
                         <Text style={{ color: "white", fontWeight: "bold", fontSize: 15 }}>Pay now!</Text>
                     </TouchableOpacity>
                 </View>

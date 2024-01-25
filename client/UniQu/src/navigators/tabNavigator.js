@@ -40,13 +40,13 @@ export default function MyTabs({ navigation }) {
                     headerShown: false
                 }}
             />
-            <Tab.Screen
+            {/* <Tab.Screen
                 name="Search"
                 component={Search}
                 options={{
                     headerShown: false
                 }}
-            />
+            /> */}
             <Tab.Screen
                 name="ListChat"
                 component={ListChat}

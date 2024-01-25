@@ -89,7 +89,7 @@ export default function ListBookingTalent({ route }) {
                         <View style={styles.infoUser}>
                             <Image
                                 source={{
-                                    uri: data?.bookingById?.talentImgUrl
+                                    uri: data?.bookingById?.userImgUrl
                                 }}
                                 style={styles.avatar}
                             />
