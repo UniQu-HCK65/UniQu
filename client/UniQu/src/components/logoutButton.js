@@ -10,8 +10,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 export default function LogoutButton() {
     const { setIsLoggedIn } = useContext(LoginContext)
     return (
-        <View style={{justifyContent: 'center', alignItems: 'center'}}>
-            <View style={{ width: 100, height: 30, backgroundColor: '#611a2d', borderRadius: 20, alignItems: 'center', justifyContent: 'center', marginVertical: 30 }}>
+        <View style={{justifyContent: 'center', alignItems: 'center', marginTop: 50}}>
+            <View style={{ width: 130, height: 45, backgroundColor: '#611a2d', borderRadius: 30, alignItems: 'center', justifyContent: 'center', marginVertical: 30 }}>
                 <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center' }} onPress={async () => {
                     await SecureStore.deleteItemAsync('accessToken')
                     await SecureStore.deleteItemAsync('role')

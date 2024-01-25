@@ -51,7 +51,6 @@ export default function HomeforTalent({ navigation }) {
   const { loading, error, data, refetch } = useQuery(WHO_AM_I_TALENT, {
     refetchQueries: [WHO_AM_I_TALENT],
   });
-
   useFocusEffect(
     React.useCallback(() => {
       const fetchData = async () => {
@@ -64,6 +63,8 @@ export default function HomeforTalent({ navigation }) {
       fetchData();
     }, [])
   );
+
+
   if (loading) return <Text>Mengambil data...</Text>;
   if (error) return <Text>Error: {error.message}</Text>;
 
