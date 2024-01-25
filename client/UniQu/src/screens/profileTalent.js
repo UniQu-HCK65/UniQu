@@ -12,13 +12,13 @@ import { WHO_AM_I_TALENT } from "../queries/query";
 import LogoutButton from "../components/logoutButton";
 
 export default function ProfileTalent({ navigation }) {
-  const { loading, error, data } = useQuery(WHO_AM_I_TALENT); //move ke listbookingdetail
+  const { loading, error, data } = useQuery(WHO_AM_I_TALENT);
 
   if (loading) return <Text>Loading...</Text>;
   if (error) return <Text>Error: {error.message}</Text>;
 
   const talentData = data.whoAmITalent;
-  // console.log(talentData, "profile talent");
+  console.log(talentData, "profile talent");
 
   const convertToDate = (timestamp) => {
     const date = new Date(parseInt(timestamp));
@@ -37,23 +37,14 @@ export default function ProfileTalent({ navigation }) {
                 }}
                 style={styles.photoImage}
               />
-
-              <View style={styles.buttonEdit}>
-                <TouchableOpacity
-                  onPress={() => navigation.navigate("Edit Profile")}
-                >
-                  <Feather name="edit-2" size={25} color="black" />
-                </TouchableOpacity>
-              </View>
             </View>
           </View>
 
           <View>
             <View>
-              <View style={{}}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'space-between' }}>
-                  <Text style={styles.fontOption}>{talentData.name} </Text>
-                  
+              <View style={styles.cardOption}>
+                <View>
+                  <Text style={styles.fontOption}>{talentData.name}</Text>
                 </View>
               </View>
             </View>
@@ -88,66 +79,37 @@ export default function ProfileTalent({ navigation }) {
             <View>
               <View style={styles.cardOption}>
                 <View>
-                  <LogoutButton/>
-                  <Text style={styles.tagsStyle}>Booking History</Text>
-
+                  <Text style={styles.tagsStyle}>Tags</Text>
                 </View>
               </View>
 
-              {/* move ke listbookingdetail */}
-              {talentData.talentBookings.map((booking) => (
-                <View key={booking._id} style={styles.cardTagsStyle}>
-                  <View style={styles.historyStyle}>
-                    <View style={styles.historyContainer}>
-                      <View>
-                        <Text style={styles.historyLabel}>Date</Text>
-                      </View>
-                      <View style={{ marginLeft: 62 }}>
-                        <Text>: {convertToDate(booking.bookDate)}</Text>
-                      </View>
-                    </View>
-
-                    <View style={styles.historyContainer}>
-                      <View>
-                        <Text style={styles.historyLabel}>Client</Text>
-                      </View>
-                      <View style={{ marginLeft: 54 }}>
-                        <Text>: {booking.userName}</Text>
-                      </View>
-                    </View>
-
-                    <View style={styles.historyContainer}>
-                      <View>
-                        <Text style={styles.historyLabel}>Session</Text>
-                      </View>
-                      <View style={{ marginLeft: 42 }}>
-                        <Text>: {booking.bookSession}</Text>
-                      </View>
-                    </View>
-
-                    <View style={styles.historyContainer}>
-                      <View>
-                        <Text style={styles.historyLabel}>Status</Text>
-                      </View>
-                      <View style={{ marginLeft: 51 }}>
-                        <Text>: {booking.bookStatus}</Text>
-                      </View>
-                    </View>
-
-                    <View style={styles.historyContainer}>
-                      <View>
-                        <Text style={styles.historyLabel}>Location</Text>
-                      </View>
-                      <View style={{ marginLeft: 38 }}>
-                        <Text>: {booking.bookLocation}</Text>
-                      </View>
-                    </View>
+              <View style={styles.cardTagsStyle}>
+                {talentData.tags.map((tag, index) => (
+                  <View style={styles.tagsDetailStyle} key={index}>
+                    <Text style={{ color: "white" }}>{tag}</Text>
                   </View>
+                ))}
+              </View>
+            </View>
+
+            <View>
+              <View style={styles.cardOption}>
+                <View>
+                  <Text style={styles.tagsStyle}>Location</Text>
                 </View>
-              ))}
+              </View>
+
+              <View style={styles.cardTagsStyle}>
+                {talentData.talentLocations.map((talentLocation, index) => (
+                  <View style={styles.locationStyle} key={index}>
+                    <Text style={{ color: "white" }}>{talentLocation}</Text>
+                  </View>
+                ))}
+              </View>
             </View>
           </View>
         </View>
+        <LogoutButton />
       </View>
     </ScrollView>
   );
@@ -247,6 +209,17 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     flexDirection: "row",
     // backgroundColor:"red"
+  },
+  tagsDetailStyle: {
+    marginLeft: 25,
+    marginTop: 10,
+    backgroundColor: "#4e4e4e",
+    width: 110,
+    // width: 120,
+    height: 40,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
   },
   locationStyle: {
     marginLeft: 25,

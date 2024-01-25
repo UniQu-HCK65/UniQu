@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import { GET_TALENTS_BY_ID } from "../queries/query";
+import { GET_TALENTS_BY_ID, GET_USER_CHATLIST } from "../queries/query";
 import { useQuery } from "@apollo/client";
 
 export default function TalentDetails({ navigation, route }) {
@@ -26,6 +26,28 @@ export default function TalentDetails({ navigation, route }) {
   const totalReviewers = new Set();
   if (talent.reviews && Array.isArray(talent.reviews)) {
     talent.reviews.forEach((review) => totalReviewers.add(review.reviewerName));
+  }
+
+
+  const {
+    loading: loadingUser,
+    error: errorUser,
+    data: dataUserChatlist,
+  } = useQuery(GET_USER_CHATLIST);
+
+  let roomName1 = "0";
+  let roomName2 = "0"
+
+  const handleToChatRoom = (talentId) => {
+    roomName1 = dataUserChatlist?.getUserChatlist?._id
+    roomName2 = talentId
+
+    navigation.navigate('Chat', {
+      roomName: `${roomName1}-${roomName2}`,
+      userLoggedInName: dataUserChatlist?.getUserChatlist?.name,
+      userLoggedInImgUrl: dataUserChatlist?.getUserChatlist?.imgUrl,
+    })
+
   }
 
 
@@ -116,7 +138,7 @@ export default function TalentDetails({ navigation, route }) {
               marginRight: 50,
             }}
           >
-            <TouchableOpacity onPress={() => navigation.navigate("Chat")} style={styles.chatButton}>
+            <TouchableOpacity onPress={() => handleToChatRoom(talentId)} style={styles.chatButton}>
               <Ionicons
                 name="chatbubbles-outline"
                 color="white"

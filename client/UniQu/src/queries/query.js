@@ -383,6 +383,7 @@ export const DENY_BOOKING = gql`
   }
 }
 `
+
 export const GET_TALENT_CHATLIST = gql`
   query GetTalentChatlist {
     getTalentChatlist {
