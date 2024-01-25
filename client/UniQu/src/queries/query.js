@@ -361,3 +361,59 @@ export const GET_TRANSACTION = gql`
     }
   }
 `;
+
+export const DENY_BOOKING = gql`
+  mutation DenyBooking($bookingId: ID) {
+  denyBooking(bookingId: $bookingId) {
+    _id
+    TalentId
+    UserId
+    talentName
+    talentNick
+    userName
+    userNick
+    talentImgUrl
+    userImgUrl
+    bookDate
+    bookSession
+    bookLocation
+    bookStatus
+    updatedAt
+    createdAt
+  }
+}
+`
+
+export const GET_TALENT_CHATLIST = gql`
+  query GetTalentChatlist {
+    getTalentChatlist {
+      _id
+      username
+      name
+      imgUrl
+      chatList {
+        UserId
+        userName
+        userNick
+        userImgUrl
+      }
+    }
+  }
+`;
+
+export const GET_USER_CHATLIST = gql`
+  query Query {
+    getUserChatlist {
+      _id
+      username
+      name
+      imgUrl
+      chatList {
+        TalentId
+        talentName
+        talentNick
+        talentImgUrl
+      }
+    }
+  }
+`;

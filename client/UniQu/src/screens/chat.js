@@ -6,19 +6,24 @@ import {
   TouchableOpacity,
   TextInput,
   Button,
-  ScrollView
+  ScrollView,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import RatingModal from "../components/modalRating";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
-import { launchImageLibraryAsync } from 'expo-image-picker';
+import { launchImageLibraryAsync } from "expo-image-picker";
+import { LoginContext } from "../context/LoginContext";
 
-const serverURL = "http://uniqu-chat-server.rprakoso.my.id"
+const serverURL = "https://uniqu-chat-server.rprakoso.my.id";
 
 const socket = io(serverURL);
 
 export default function Chat({ route, navigation }) {
+  const { isLoggedIn } = useContext(LoginContext);
+
+  const role = isLoggedIn.role;
+
   const [room, setRoom] = useState("");
   const scrollViewRef = useRef(null);
   const [messageInput, setMessageInput] = useState("");
@@ -26,8 +31,20 @@ export default function Chat({ route, navigation }) {
   const [imageUri, setImageUri] = useState(null);
   const [chats, setChats] = useState([]);
   const roomName = route.params.roomName;
-  const userLoggedInName = route.params.userLoggedInName;
-  // console.log(route.params, "<<<<<<<<<<username>>>>>>>>>>");
+
+  // console.log(
+  //   route.params,
+  //   "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+  // );
+  let accountName = "User";
+  let imgUrl = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+
+  if (role === "talent") {
+    accountName = route.params.talentLoggedInName;
+    imgUrl = route.params.talentLoggedInImgUrl;
+  } else if (role === "user") {
+    accountName = route.params.userLoggedInName;
+  }
 
   function handleRoom(roomName) {
     setRoom(roomName);
@@ -37,7 +54,7 @@ export default function Chat({ route, navigation }) {
   const handleSendMessage = () => {
     if (messageInput.trim() !== "" || imageUri) {
       const messageData = {
-        username: userLoggedInName,
+        username: accountName,
         message: messageInput,
         imageUrl: imageUri,
         room,
@@ -57,7 +74,7 @@ export default function Chat({ route, navigation }) {
         aspect: [9, 16],
         quality: 1,
       });
-  
+
       if (!result.canceled) {
         // Now, upload the image to Cloudinary
         const formData = new FormData();
@@ -66,7 +83,7 @@ export default function Chat({ route, navigation }) {
           type: "image/jpeg",
           name: "myImage.jpg",
         });
-  
+
         const response = await fetch(`${serverURL}/upload`, {
           method: "POST",
           body: formData,
@@ -74,9 +91,9 @@ export default function Chat({ route, navigation }) {
             "Content-Type": "multipart/form-data",
           },
         });
-  
+
         const data = await response.json();
-  
+
         // Use the Cloudinary URL from the response
         setImageUri(data.imageUrl);
       }
@@ -84,7 +101,6 @@ export default function Chat({ route, navigation }) {
       console.error("Error uploading image:", error);
     }
   };
-    
 
   const openModal = () => {
     setModalVisible(true);
@@ -106,61 +122,31 @@ export default function Chat({ route, navigation }) {
     }
   };
 
-//   useEffect(() => {
-//     handleRoom(roomName);
+  useEffect(() => {
+    handleRoom(route.params.roomName);
 
-//     socket.on("new-message", (newChat) => {
-//       setChats((prevChats) => [...prevChats, newChat]);
-//     });
-//   });
+    socket.on("new-message", (newChat) => {
+      setChats((prevChats) => [...prevChats, newChat]);
+    });
 
-//   useEffect(() => {
-//     scrollToNewChat();
+    const fetchMessages = async () => {
+      try {
+        const response = await fetch(`${serverURL}/get-messages?room=${room}`);
+        const data = await response.json();
+        console.log(data, "aaaaaaa");
+        setChats(data.messages);
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+      }
+    };
 
-//     const fetchMessages = async () => {
-//       try {
-//         const response = await fetch(`${serverURL}/get-messages?room=${room}`);
-//         const data = await response.json();
-//         setChats(data.messages);
-//       } catch (error) {
-//         console.error("Error fetching messages:", error);
-//       }
-//     };
+    fetchMessages();
 
-//     fetchMessages();
-//   }, [chats, room]);
-
-
-
-useEffect(() => {
-  handleRoom(route.params.roomName);
-
-  socket.on("new-message", (newChat) => {
-    setChats((prevChats) => [...prevChats, newChat]);
-  });
-
-  const fetchMessages = async () => {
-    try {
-      const response = await fetch(`${serverURL}/get-messages?room=${room}`);
-      const data = await response.json();
-      console.log(data,"aaaaaaa")
-      setChats(data.messages);
-    } catch (error) {
-      console.error("Error fetching messages:", error);
-    }
-  };
-
-  fetchMessages();
-
-  return () => {
-    // Clean up socket subscriptions
-    socket.off("new-message");
-  };
-}, [room]);
-  
-
-
-
+    return () => {
+      // Clean up socket subscriptions
+      socket.off("new-message");
+    };
+  }, [room]);
 
   // console.log(modalVisible);
 
@@ -181,15 +167,15 @@ useEffect(() => {
           >
             <Image
               source={{
-                uri: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fHByb2ZpbGV8ZW58MHx8MHx8fDA%3D",
+                uri: imgUrl,
               }}
               style={styles.avatarHeader}
             />
 
             <View style={{ justifyContent: "center" }}>
-              <Text style={{ fontWeight: "bold" }}>Maldini Junior</Text>
+              <Text style={{ fontWeight: "bold" }}>{accountName}</Text>
               <Text style={{ color: "gray" }}>Online</Text>
-              <Text style={{ fontSize: 16 }}>Current Room: {room}</Text>
+              {/* <Text style={{ fontSize: 16 }}>Current Room: {room}</Text> */}
             </View>
           </TouchableOpacity>
         </View>
@@ -215,8 +201,10 @@ useEffect(() => {
             )}
             <View
               style={{
-                alignSelf: el.username === userLoggedInName ? "flex-end" : "flex-start",
-                backgroundColor: el.username === userLoggedInName ? "#ADD8E6" : "#eeeeee",
+                alignSelf:
+                  el.username === accountName ? "flex-end" : "flex-start",
+                backgroundColor:
+                  el.username === accountName ? "#ADD8E6" : "#eeeeee",
                 padding: 10,
                 borderRadius: 8,
                 marginTop: 5,
@@ -227,7 +215,7 @@ useEffect(() => {
               <Text
                 style={{
                   fontSize: 16,
-                  color: el.username === userLoggedInName ? "white" : "black",
+                  color: el.username === accountName ? "white" : "black",
                 }}
               >
                 {el.username}: {el.message}
@@ -253,7 +241,7 @@ useEffect(() => {
       >
         <View style={styles.messageContainer}>
           <TouchableOpacity onPress={handleImageUpload}>
-          <Ionicons name="attach" size={29} style={styles.attachButton}  />
+            <Ionicons name="attach" size={29} style={styles.attachButton} />
           </TouchableOpacity>
           <TextInput
             placeholder="Message..."
