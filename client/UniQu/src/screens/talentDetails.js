@@ -28,6 +28,7 @@ export default function TalentDetails({ navigation, route }) {
     talent.reviews.forEach((review) => totalReviewers.add(review.reviewerName));
   }
 
+
   const {
     loading: loadingUser,
     error: errorUser,
@@ -48,6 +49,7 @@ export default function TalentDetails({ navigation, route }) {
     })
 
   }
+
 
 
   // console.log(talent, "menungsoooo");
