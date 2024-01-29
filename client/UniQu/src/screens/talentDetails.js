@@ -81,7 +81,7 @@ export default function TalentDetails({ navigation, route }) {
             <Text style={styles.name}>{talent.name}</Text>
             <Ionicons name="star" size={13} color={"#85803a"} style={{ left: 19 }}></Ionicons>
             <Text style={styles.rating}>
-              {(talent.rating / talent.reviews?.length).toFixed(1)} ({totalReviewers.size}) reviews
+              {(talent.rating / talent?.reviews?.length).toFixed(1)} ({talent?.reviews?.length}) reviews
             </Text>
           </View>
 

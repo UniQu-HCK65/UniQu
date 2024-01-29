@@ -157,7 +157,8 @@ export default function EditProfileUser() {
         </View>
       </View>
 
-      <View style={styles.cardEdit}>
+      <View style={{display:"none"}}>
+      {/* <View style={styles.cardEdit}> */}
         <View>
           <Text style={styles.textStyle}> Password </Text>
         </View>

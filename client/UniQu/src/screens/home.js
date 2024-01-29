@@ -248,7 +248,7 @@ export default function Home({ navigation }) {
                   {(item.rating / item.reviews?.length).toFixed(1)}
                 </Text>
                 <Text style={styles.reviewsText}>
-                  ({totalReviewers.size} reviews)
+                  ({item?.reviews?.length} reviews)
                 </Text>
               </View>
             </View>

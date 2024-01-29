@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { DENY_BOOKING, GET_BOOKING_BY_ID, UPDATE_BOOKING_STATUS } from "../queries/query";
 import { gql, useMutation, useQuery } from "@apollo/client";
+import Ionicons from 'react-native-vector-icons/EvilIcons';
 
 export default function ListBookingTalent({ route }) {
     const bookingId = route.params.bookingId;
-    const { loading, error, data } = useQuery(GET_BOOKING_BY_ID, {
+    const { loading, error, data, refetch } = useQuery(GET_BOOKING_BY_ID, {
         variables: {
             bookingId: bookingId,
         },
@@ -42,7 +43,7 @@ export default function ListBookingTalent({ route }) {
     const convertToDate = (timestamp) => {
         const date = new Date(parseInt(timestamp));
         return date.toLocaleDateString();
-      };
+    };
 
     const handleOnAccept = () => {
         handleMutation(updateBook);
@@ -61,11 +62,16 @@ export default function ListBookingTalent({ route }) {
         setShowButton(false);
     };
 
+    const handleRefresh = async () => {
+        await refetch();
+    }
+
     console.log(data?.bookingId?.bookStatus, '<<< status booking')
 
 
     return (
         <View style={styles.container}>
+            
             <View style={styles.overlayContainer}>
                 <Image
                     source={{
@@ -96,7 +102,7 @@ export default function ListBookingTalent({ route }) {
                             <View>
                                 <View style={styles.userDetail}>
                                     <Text style={styles.name}>{data?.bookingById?.userName}</Text>
-                                   
+
                                 </View>
                                 <Text style={styles.status}>{data?.bookingById?.bookStatus}</Text>
                                 <Text style={styles.status}>{convertToDate(data?.bookingById.bookDate)}</Text>
@@ -143,6 +149,11 @@ export default function ListBookingTalent({ route }) {
                         )}
                     </View>
                 </View>
+            </View>
+            <View style={{ justifyContent: 'center', alignItems: 'center', position: 'absolute', marginTop: 50, marginLeft: 330, flex: 1 }}>
+                <TouchableOpacity onPress={handleRefresh} style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Ionicons name="refresh" size={40} color="white" />
+                </TouchableOpacity>
             </View>
         </View>
     );
@@ -249,7 +260,7 @@ const styles = StyleSheet.create({
     },
     status: {
         color: "grey",
-        fontSize: 11, 
+        fontSize: 11,
         marginTop: 3
     },
     name: {
