@@ -3,8 +3,8 @@ import { ApolloClient, createHttpLink, InMemoryCache } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 
 const httpLink = createHttpLink({
-  // uri:  'http://localhost:5555/graphql'
-  uri: "https://uniqu-base-server.rprakoso.my.id/graphql",
+  uri:  'http://localhost:5555/graphql'
+  // uri: "https://uniqu-base-server.rprakoso.my.id/graphql",
 });
 
 async function getValueFor(key) {
