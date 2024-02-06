@@ -99,7 +99,7 @@ const RatingModal = (props) => {
           <Text style={styles.submitButtonText}>Submit</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-          <Text style={styles.closeButtonText}>Close</Text>
+          {/* <Text style={styles.closeButtonText}>Close</Text> */}
         </TouchableOpacity>
       </View>
     </Modal>

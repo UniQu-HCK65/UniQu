@@ -132,7 +132,7 @@ export default function StatusBooking({ navigation, route }) {
 
     useEffect(() => {
         convertTemp();
-        if (statusBooking === "ended") {
+        if (statusBooking === "Reviewed") {
             console.log("pop up modal! Booking has ended!");
             showRatingModal();
         } else {
@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
     },
     backgroundImage: {
         width: "100%",
-        height: 350,
+        height: 400,
         marginBottom: 400,
         resizeMode: "cover",
         position: "absolute",

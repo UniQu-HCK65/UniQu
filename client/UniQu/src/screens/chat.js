@@ -16,7 +16,7 @@ import { launchImageLibraryAsync } from "expo-image-picker";
 import { LoginContext } from "../context/LoginContext";
 
 const serverURL = "https://uniqu-chat-server.rprakoso.my.id";
-
+``
 const socket = io(serverURL);
 
 export default function Chat({ route, navigation }) {
